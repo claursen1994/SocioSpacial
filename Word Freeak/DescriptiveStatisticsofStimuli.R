@@ -1,3 +1,14 @@
+######################################################
+#Descriptive Statistics of Spatial and Social Stimuli#
+##########################################################################################
+#Notes:                                                                                  #
+#~Soc stands for Social                                                                  #
+#~Spat,Space and maybe some other things stand for Spacial                               #
+#~Ambi stands for Ambiguous                                                              #
+#~Nambi Stands for Non-Ambiguous                                                         #
+#Trickle down changes should be made to the excel files "AllStim","AllstimSoc"and        #
+#AllstimSpace or whatever you wanna call them.                                          #
+##########################################################################################
 #Sorted out code#
 
 rm(list= ls())
