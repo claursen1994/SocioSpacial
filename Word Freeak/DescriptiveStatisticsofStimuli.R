@@ -10,7 +10,7 @@
 #AllstimSpace or whatever you wanna call them.                                          #
 ##########################################################################################
 #Sorted out code#
-
+#
 rm(list= ls())
 getwd()
 
