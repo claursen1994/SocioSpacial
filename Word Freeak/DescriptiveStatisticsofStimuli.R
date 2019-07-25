@@ -46,7 +46,7 @@ AllStimSoc <- read_excel("Stimuli/AllStimSoc.xlsx")
 AllStimSpace <- read_excel("Stimuli/AllStimSpace.xlsx")
 
 #Master Table 
-MasterTable <- read_excel("~/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Output Table/MasterTable.xlsx")
+MasterTable <- read_excel("Output Table/MasterTable.xlsx")
 
 ###############################
 #Text Cleaning and Descriptives
@@ -76,12 +76,12 @@ wbspa$Nword <- sapply(wbspa$word_clean, function(x) length(unlist(strsplit(as.ch
 #SOcial
 #######################
 for (i in wbsoc$Item) {
-  write(wbsoc$word_clean[i], paste0("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/SocTxt/NewSoc/Soc",
+  write(wbsoc$word_clean[i], paste0("Word Freeak/TextFiles/SocTxt/NewSoc/Soc",
                                     wbsoc$Item[i], ".txt", sep="" ))}
 
 #Spatial
 for(i in wbspa$Item){
-  write(wbspa$word_clean[i], paste0("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/SpaceTxt/NewSPace/Space",
+  write(wbspa$word_clean[i], paste0("Word Freeak/TextFiles/SpaceTxt/NewSPace/Space",
                                     wbspa$Item[i], ".txt", sep="" ))}
 
 ####################################################
@@ -89,15 +89,16 @@ for(i in wbspa$Item){
 ####################################################
 #SOcial
 #######################
-setwd("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/")
+
+
 for (i in AllStimSoc$Item) {
-  write(AllStimSoc$Soc[i], paste0("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/OriginalSocial/Soc0",
+  write(AllStimSoc$Soc[i], paste0("Word Freeak/TextFiles/OriginalSocial/SocO",
                                   AllStimSoc$Item[i], ".txt", sep="" ))}
 ###########
 #Spatial
 ###########
 for(i in AllStimSoc$Item){
-  write(AllStimSoc$Soc[i], paste0("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/OriginalSpace/Space0",
+  write(AllStimSoc$Soc[i], paste0("Word Freeak/TextFiles/OriginalSpace/Space0",
                                   AllStimSoc$Item[i], ".txt", sep="" ))}
 
 #Not sure what this does but it's needed
@@ -108,13 +109,13 @@ get_num<- function(string){as.numeric(unlist(gsub("[^0-9]", "", unlist(string)),
 # social:
 ###############
 
-setwd("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/SocTxt")
-get_num<- function(string){as.numeric(unlist(gsub("[^0-9]", "", unlist(string)), ""))}
+#setwd("Word Freeak/TextFiles/SocTxt")
 
-soc<- list.files("NewSoc")
+
+soc<- list.files("Word Freeak/TextFiles/SocTxt/NewSoc/")
 n<- get_num(soc)
 soc<- soc[order(n, soc)]
-soc<- paste("NewSoc/", soc, sep= '')
+soc<- paste("Word Freeak/TextFiles/SocTxt/NewSoc/", soc, sep= '')
 
 item<- NULL
 word_num<- NULL
@@ -149,8 +150,8 @@ unique(soc_wb$item)
 ############################
 
 library(readr)
-lex2=read_table2("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/SUBTLEX-UK/SUBTLEX-UK.txt")
-lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
+lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
+#lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
 soc_wb$Zipf<- NA
 soc_wb$freq<-NA
 for(i in 1:nrow(soc_wb)){
@@ -177,13 +178,13 @@ MasterTable$SocMeanWordFrequency=Socmeans$Socmeans
 # Spatial
 ###############
 
-setwd("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles/Spacetxt")
+
 get_num<- function(string){as.numeric(unlist(gsub("[^0-9]", "", unlist(string)), ""))}
 
-space<- list.files("NewSpace")
+space<- list.files("Word Freeak/TextFiles/Spacetxt/NewSpace")
 n<- get_num(space)
 space<- space[order(n, space)]
-space<- paste("NewSpace/", space, sep= '')
+space<- paste("Word Freeak/TextFiles/Spacetxt/NewSpace/", space, sep= '')
 
 item<- NULL
 word_num<- NULL
@@ -217,8 +218,8 @@ unique(space_wb$item)
 #Spatial
 ############################
 library(readr)
-lex2=read_table2("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/SUBTLEX-UK/SUBTLEX-UK.txt")
-lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
+lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
+#lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
 space_wb$Zipf<- NA
 space_wb$freq<-NA
 for(i in 1:nrow(space_wb)){
@@ -266,7 +267,7 @@ MasterTable$SpaMeanWordLength<-spaMWL
 ################
 #Social
 ###############
-setwd("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Word Freeak/TextFiles")
+
 
 
 Sockinc=textstat_readability(AllStimSoc$Soc,measure="Flesch.Kincaid")
@@ -299,7 +300,7 @@ View(MasterTable)
 #Save Master table 
 ##################
 
-write.csv (MasterTable,"H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Output Table/CompletedMasterTable.csv")
+write.csv (MasterTable,"Output Table/CompletedMasterTable.csv")
 
 
 #Remember to check the Master Table to see if it's all there.

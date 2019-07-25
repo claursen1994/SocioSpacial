@@ -30,8 +30,8 @@ View(NambiMaster)
 #Ignore if you're not interested#
 #################################
 
-write.csv (NambiMaster,"Output Table/NambiMasterTable.csv")
-write.csv(AmbiMaster,"Output Table/AmbiMasterTable.csv")
+#write.csv (NambiMaster,"Output Table/NambiMasterTable.csv")
+#write.csv(AmbiMaster,"Output Table/AmbiMasterTable.csv")
 
 ############################################
 #T tests between Ambiguous and non Ambiguous
@@ -70,7 +70,7 @@ SpaMWFT=t.test(AmbiMaster$SpaMeanWordFrequency,NambiMaster$SpaMeanWordFrequency)
 SocMWFT=t.test(AmbiMaster$SocMeanWordFrequency,NambiMaster$SocMeanWordFrequency)
 #
 
-TestData=merge.data.frame(SpaKT$p.value,SockT$p.value,SpaMWLT$p.value,SocMWLT$p.value,SpaMWFT$p.value,SocMWFT$p.value,SoNWT$p.value,SpNWT$p.value)
-
+Tdatafull=c(SpaKT$p.value,SockT$p.value,SpaMWLT$p.value,SocMWLT$p.value,SpaMWFT$p.value,SocMWFT$p.value,SoNWT$p.value,SpNWT$p.value)
+Tdatafull=as.data.frame(Tdatafull)
 
 
