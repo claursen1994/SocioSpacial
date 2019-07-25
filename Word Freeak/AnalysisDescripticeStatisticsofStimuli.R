@@ -30,8 +30,8 @@ View(NambiMaster)
 #Ignore if you're not interested#
 #################################
 
-#write.csv (NambiMaster,"H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Output Table/NambiMasterTable.csv")
-#write.csv(AmbiMaster,"H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Output Table/AmbiMasterTable.csv")
+write.csv (NambiMaster,"Output Table/NambiMasterTable.csv")
+write.csv(AmbiMaster,"Output Table/AmbiMasterTable.csv")
 
 ############################################
 #T tests between Ambiguous and non Ambiguous

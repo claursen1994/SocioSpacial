@@ -41,9 +41,9 @@ library("readr")
 #Data
 ########
 
-AllStim <- read_excel("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Stimuli/AllStim.xlsx")
-AllStimSoc <- read_excel("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Stimuli/AllStimSoc.xlsx")
-AllStimSpace <- read_excel("H:/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Stimuli/AllStimSpace.xlsx")
+AllStim <- read_excel("Stimuli/AllStim.xlsx")
+AllStimSoc <- read_excel("Stimuli/AllStimSoc.xlsx")
+AllStimSpace <- read_excel("Stimuli/AllStimSpace.xlsx")
 
 #Master Table 
 MasterTable <- read_excel("~/Profile/Desktop/SpatSoc Stimuli/SocioSpacial/Output Table/MasterTable.xlsx")
