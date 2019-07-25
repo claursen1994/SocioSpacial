@@ -305,3 +305,14 @@ write.csv (MasterTable,"Output Table/CompletedMasterTable.csv")
 
 #Remember to check the Master Table to see if it's all there.
 
+
+##############
+#Reading Ease#
+#For curiosity#
+##############
+
+#FTSo=textstat_readability(AllStimSoc$Soc ,measure="Flesch")
+#FTSp=textstat_readability(AllStimSpace$Spat ,measure="Flesch")
+
+#MasterTable$ReadingeaseSoc=FTSo$Flesch
+#MasterTable$ReadingeaseSpat=FTSp$Flesch

@@ -72,5 +72,8 @@ SocMWFT=t.test(AmbiMaster$SocMeanWordFrequency,NambiMaster$SocMeanWordFrequency)
 
 Tdatafull=c(SpaKT$p.value,SockT$p.value,SpaMWLT$p.value,SocMWLT$p.value,SpaMWFT$p.value,SocMWFT$p.value,SoNWT$p.value,SpNWT$p.value)
 Tdatafull=as.data.frame(Tdatafull)
-
+####################################
+#Reading Ease Kincaid for curiosity
+#ReadingEaseSpa=t.test(AmbiMaster$ReadingeaseSpat,NambiMaster$ReadingeaseSpat)
+#ReadingEaseSoc=t.test(AmbiMaster$ReadingeaseSoc,NambiMaster$ReadingeaseSoc)
 
