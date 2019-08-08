@@ -27,6 +27,7 @@ install.packages("RColorBrewer")
 install.packages("ngram")
 install.packages("quanteda")
 install.packages("readr")
+install.packages("tidyr")
 #Library#
 
 library("tm")
@@ -38,6 +39,7 @@ library("koRpus")
 library("readxl")
 library("quanteda")
 library("readr")
+library("tidyr")
 #Data
 ########
 

@@ -12,7 +12,7 @@ settings; % load settings
 ExpSetup; % do window and tracker setup
 
 %% Load stimuli and design:
-load('AllStim.xlsx');
+load('AllStim.mat');
 
 %importDesign; % old fun for loading txt files
 design= genDesign(); % generate the design matrix for this subject
