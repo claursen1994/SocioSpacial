@@ -13,7 +13,7 @@ ExpSetup; % do window and tracker setup
 
 %% Load stimuli and design:
 load('AllStim.mat');
-
+load('QuestMaster.mat'); % questions
 %importDesign; % old fun for loading txt files
 design= genDesign(); % generate the design matrix for this subject
 const.ntrials= length(design);
