@@ -6,7 +6,8 @@ clear mex;
 clear functions;
 
 cd('H:\Profile\Desktop\worb\SocioSpacial\SocioSpatial Experiment MatlabCode');
-addpath([cd '\functions'], [cd '\corpus'], [cd '\design'], [cd '\img']);
+%addpath([cd '\functions'], [cd '\corpus'], [cd '\corpus\Sorted Texts'], [cd '\design']);
+addpath(genpath(cd));
 
 settings; % load settings
 ExpSetup; % do window and tracker setup
