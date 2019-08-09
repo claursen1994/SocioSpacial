@@ -66,13 +66,21 @@ SocNambiList<- paste("CounterB/Sorted Texts/SocNambi/", SocNambiList, sep= '')
 
 #Condition 1 SpaAmbi SoNambi order 1#
 
-Cond1=read_xlsx("CounterB/Conditions/Cond1.xlsx")
+
+Cond1=read_xlsx("CounterB/Conditions/Cond2.xlsx")
+Cond1$Cond=c(1)
+Cond1$Stimulus=cbind(AmbiSoc$Soc,AmbiSpace$Spat)
+write.csv(Cond1,"CounterB/Conditions/tst.csv",col.names = TRUE)
+for (i in Cond1$Item){
+  write(Cond1$Stimulus[i],paste0("CounterB/Conditions/Cond1txt/Cond1",
+                                 Cond1$Item[i],".txt",sep=""))}
+
 Cond1$Stimulus=cbind(AmbiSpace$Spat,NambiSoc$Soc)
 Cond1$Stimulus=cbind(Cond1$Stimulus)
 
 for (i in Cond1$Item) {
   write(Cond1$Stimulus[i], paste0("CounterB/Conditions/Cond1txt/",
-                                    Cond1$Item[i], ".txt", sep="" ))}
+                                  Cond1$Item[i], ".txt", sep="" ))}
 
 
 
@@ -80,7 +88,6 @@ for (i in Cond1$Item) {
 
 Cond5=read_xlsx("CounterB/Conditions/Cond5.xlsx")
 Cond5$Stimulus=cbind(AmbiSoc$Soc,NambiSpace$Spat)
-
 
 
 

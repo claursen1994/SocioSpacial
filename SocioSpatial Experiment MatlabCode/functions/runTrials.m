@@ -13,13 +13,6 @@ global const Visual sent Monitor el Audio;
 %const.ntrials=3; % TEMPORARY!!! Use only for testing
 
 HideCursor; % hide the mouse cursor
-%abbreviation break points
- prac =length(design)-const.Maxtrials;
-  break1= prac + const.Maxtrials/4;
-  break2= break1+const.Maxtrials/4;
-  break3= break2+const.Maxtrials/4;
-  break4= break3+const.Maxtrials/4;
-  abb_items= [break1,break2,break3,break4];
   
 % Calibrate the eye tracker
 EyelinkDoTrackerSetup(el);

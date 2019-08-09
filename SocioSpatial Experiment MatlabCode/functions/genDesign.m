@@ -26,7 +26,7 @@ end
    %exp_items = [sfr;bfr]; % small font to big font 
 %else % even participants
    %exp_items = [bfr;sfr]; % big font to small font
-end
+%end
 
 
 %Practice items:
