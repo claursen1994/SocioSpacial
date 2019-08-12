@@ -39,7 +39,7 @@ pr = horzcat(c1,c2); % 2- column matrix
 prr = pr(randperm (length(pr)),:);
 
 % % combine practice & experimental items:
-design = [prr; exp_items];
+design = [prr; cps];
 
 % save design matrix for our records:
 savefile= ['design/sub_matrix/s_' num2str(const.ID) '.mat'];

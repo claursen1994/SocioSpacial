@@ -109,25 +109,8 @@ Cond5$Stimulus=cbind(AmbiSoc$Soc,NambiSpace$Spat)
 
 #Dud code
 ####################################################
-#StimuliCondi=read_xlsx("Stimuli/StimuliCondi.xlsx")
-#StimuliCondi$Item==c(1:24)
-#StimuliCondi$Cond=c(1:8,24)
 
-
-#merged=NULL
-
-#merged=cbind(AmbiSpace$Spat,NambiSoc$Soc)
-
-
-#Cond1=read_xlsx("CounterB/Cond1.xlsx")
-#Cond1$Stimulus=merged
-
-
-
-#for (i in Cond1$Item) {
-  write(Cond1$Stimulus[i], paste0("CounterB/Cond1Text/Cond1",
-                                    Cond1$Item[i], ".txt", sep="" ))}
-
+sent=read_excel("Stimuli/ActualMaster.xlsx")
 
 
 
