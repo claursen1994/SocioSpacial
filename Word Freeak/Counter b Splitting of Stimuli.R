@@ -112,6 +112,19 @@ Cond5$Stimulus=cbind(AmbiSoc$Soc,NambiSpace$Spat)
 
 sent=read_excel("Stimuli/ActualMaster.xlsx")
 
+sent$ID=NULL
+sent$ID=c(1:192)
+sent$stimuli=sent$Stimulus
 
+#Making the txt files
+
+for (i in sent$ID) {
+  write(sent$Stimulus[i], paste0("Word Freeak/TextFiles/AllStimuli/Stim",
+                                  sent$ID[i], ".txt", sep="" ))}
+get_num<- function(string){as.numeric(unlist(gsub("[^0-9]", "", unlist(string)), ""))}
+soc<- list.files("Word Freeak/TextFiles/AllStimuli/")
+n<- get_num(soc)
+soc<- soc[order(n, soc)]
+soc<- paste("Word Freeak/TextFiles/AllStimuli/", soc, sep= '')
 
 

@@ -5,9 +5,8 @@ function [] = stim2edfML(sentenceString)
 global Visual;
     
     %% Multiple line stims:
-    sentenceString= strrep(sentenceString, '%', '¬'); % percent signs break the code, so I replace them
+    
     sentenceString= sprintf(sentenceString);
-    %sentenceString= strrep(sentenceString, '¬', '%');
     sentenceString= strsplit(sentenceString, '\n');
     sentenceString(cellfun('isempty', sentenceString))= [];
     

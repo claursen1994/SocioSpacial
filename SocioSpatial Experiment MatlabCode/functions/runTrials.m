@@ -24,11 +24,11 @@ for i=1:const.ntrials
 %%  stimuli set-up:
     
     trialEnd= false; 
-	item= design_same(i,1); % item is 1st column
-    cond= design_same(i,2); % condition is 2nd column
+	item= design(i,1); % item is 1st column
+    cond= design(i,2); % condition is 2nd column
     
     % get sent string:
-    whichRow= find(sent.Item== item & sent.Cond== cond, 1);
+    whichRow= find(sent.item== item & sent.Cond== cond, 1);
     line1= char(sent.Line1(whichRow));
     line2= char(sent.Line2(whichRow));
     sentenceString= [line1, '\n', line2];
@@ -37,12 +37,12 @@ for i=1:const.ntrials
     %if ismember(cond, [1,3,9])
         %Visual.Pix_per_Letter= 12;
         %Visual.LetterHeight= 21;
-       % Visual.FontSize= 16;
-   % else
-        %Visual.Pix_per_Letter= 16;
-       % Visual.LetterHeight= 28;
+        %Visual.FontSize= 16;
+    %else
+       % Visual.Pix_per_Letter= 16;
+        %Visual.LetterHeight= 28;
        % Visual.FontSize= 22;
-    end
+   % end
     
 	
 	% get image dir:

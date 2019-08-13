@@ -1,4 +1,4 @@
-function [answer]=Question(question, corr_ans, item, cond, opt1, opt2, opt3)
+function [answer]=Question(question, corr_ans, item, cond, opt1, opt0, adjustFontSize)
 % Presents a binary question (Yes/No, TRUE/FALSE)
 % Martin Vasilev, 2017
 

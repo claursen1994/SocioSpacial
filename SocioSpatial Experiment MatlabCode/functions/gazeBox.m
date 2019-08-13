@@ -5,18 +5,10 @@ function [stimuliOn] = gazeBox(stimuliOn)
 global Visual Monitor el
 
 % print gaze box on screen:
-
-% get coordinates:
-
-gazeBnds= [Visual.offsetX-Visual.GazeBoxSize/2 Visual.offsetY- Visual.GazeBoxSize/2 ...
-           Visual.offsetX+Visual.GazeBoxSize/2 Visual.offsetY+ Visual.GazeBoxSize];
-Screen('FillRect', Monitor.buffer(1), Visual.FGC, gazeBnds); % gazebox
-       
-
-%Screen('FillRect', Monitor.buffer(1), Visual.FGC, [Visual.offsetX Visual.offsetY- Visual.GazeBoxSize/2 Visual.offsetX+Visual.GazeBoxSize ...
-%    Visual.offsetY+ Visual.GazeBoxSize]); % gazebox
-%gazeBnds_x= [Visual.offsetX-+Visual.GazeBoxSize/2 Visual.offsetX+Visual.GazeBoxSize/2]; % centre at xpos offset
-%gazeBnds_y= [Visual.resY/2- Visual.GazeBoxSize/2 Visual.resY/2+ Visual.GazeBoxSize];
+Screen('FillRect', Monitor.buffer(1), Visual.FGC, [Visual.offsetX Visual.resY/2- Visual.GazeBoxSize/2 Visual.offsetX+Visual.GazeBoxSize ...
+    Visual.resY/2+ Visual.GazeBoxSize]); % gazebox
+gazeBnds_x= [Visual.offsetX-+Visual.GazeBoxSize/2 Visual.offsetX+Visual.GazeBoxSize/2]; % centre at xpos offset
+gazeBnds_y= [Visual.resY/2- Visual.GazeBoxSize/2 Visual.resY/2+ Visual.GazeBoxSize];
 
 Eyelink('Command', ['draw_filled_box ' num2str(Visual.offsetX) ' ' num2str(Visual.resY/2- Visual.GazeBoxSize/2) ' ' ...
             num2str(Visual.offsetX+Visual.GazeBoxSize) ' ' num2str(Visual.resY/2+ Visual.GazeBoxSize/2) '3']);
@@ -42,13 +34,11 @@ while ~gazeBoxTriggered && ~onTarget
     % the positive number (always max) is the value of the eye that is tracked 
 
     elapsedTime= GetSecs-gazeStart; % time since gaze box appeared
-    %onTarget= x>= gazeBnds_x(1) && x<= gazeBnds_x(2) && y>= gazeBnds_y(1) && y<= gazeBnds_y(2);
-    onTarget= IsInRect(x,y,gazeBnds);
-    
+    onTarget= x>= gazeBnds_x(1) && x<= gazeBnds_x(2) && y>= gazeBnds_y(1) && y<= gazeBnds_y(2);
+
     if onTarget % the eye is on the gaze box
         WaitSecs(Visual.gazeBoxDur/1000);
-        %onTarget= x>= gazeBnds_x(1) && x<= gazeBnds_x(2) && y>= gazeBnds_y(1) && y<= gazeBnds_y(2);
-        onTarget= IsInRect(x,y,gazeBnds);
+        onTarget= x>= gazeBnds_x(1) && x<= gazeBnds_x(2) && y>= gazeBnds_y(1) && y<= gazeBnds_y(2);
         if onTarget % eye still on gaze box after x ms
             gazeBoxTriggered= true;
             stimuliOn= true;
@@ -70,5 +60,9 @@ while ~gazeBoxTriggered && ~onTarget
         gazeBoxTriggered= true;
     end
 end
+
+Eyelink('Message', 'GAZE TARGET OFF');
+Eyelink('Message', 'DISPLAY ON');
+Eyelink('Message', 'SYNCTIME');
 
 end
