@@ -12,10 +12,10 @@ global const Visual sent Monitor el; %Audio;
 
 %const.ntrials=10; % TEMPORARY!!! Use only for testing
 
-%HideCursor; % hide the mouse cursor
+HideCursor; % hide the mouse cursor
 
 % Calibrate the eye tracker
-%EyelinkDoTrackerSetup(el);
+EyelinkDoTrackerSetup(el);
 
 % Trial presentation loop:
 for i=1:const.ntrials
@@ -46,7 +46,7 @@ for i=1:const.ntrials
     
 	
 	% get image dir:
-    TxtFile= ['corpus/AllStimuli' num2str(item) '_Cond' num2str(cond) '.txt'];
+    TxtFile= ['img/Item' num2str(item) '_Cond' num2str(cond) '.txt'];
     txt= read(TxtFile); % read in image
     
     % drift check:

@@ -5,9 +5,9 @@ clear all;
 clear mex;
 clear functions;
 %directory in P111
-cd('C:\Users\Eyetracker\Desktop\Calvin Laursen\worb\SocioSpacial\SocioSpatial Experiment MatlabCode')
+%cd('C:\Users\Eyetracker\Desktop\Calvin Laursen\worb\SocioSpacial\SocioSpatial Experiment MatlabCode')
 %Directory in P104
-%cd('H:\Profile\Desktop\worb\SocioSpacial\SocioSpatial Experiment MatlabCode');
+cd('H:\Profile\Desktop\worb\SocioSpacial\SocioSpatial Experiment MatlabCode');
 %addpath([cd '\functions'], [cd '\corpus'], [cd '\corpus\Sorted Texts'], [cd '\design']);
 addpath(genpath(cd));
 

@@ -128,3 +128,5 @@ soc<- soc[order(n, soc)]
 soc<- paste("Word Freeak/TextFiles/AllStimuli/", soc, sep= '')
 
 
+write.csv(sent,"Stimuli/sent.csv",col.names = TRUE)
+
