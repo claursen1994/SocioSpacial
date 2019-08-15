@@ -25,15 +25,18 @@ Screen(Monitor.window, 'TextFont', Visual.Font);
 Screen('FillRect', Monitor.window, Visual.BGC);
 Screen('Flip', Monitor.window);
 
-for i=1:2
+for i=1:3
    Monitor.buffer(i)= Screen(Monitor.window, 'OpenOffscreenWindow');
 end
 
-for i=1:2
+for i=1:3
    Screen(Monitor.buffer(i), 'TextSize', Visual.FontSize);
    Screen(Monitor.buffer(i), 'TextFont', Visual.Font);
    Screen(Monitor.buffer(i), 'TextStyle', 0); % normal
 end
+
+% buffer 3 is for instructions (use larger font):
+Screen(Monitor.buffer(3), 'TextSize', Visual.InstrTextSize);
 
 %% Open Eyelink connection:
 dummymode=0;
@@ -67,37 +70,53 @@ Eyelink('command', 'link_event_filter = LEFT,RIGHT,FIXATION,SACCADE,BLINK,BUTTON
 Eyelink('command', 'link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,HTARGET');
 Eyelink('command', 'sample_rate= 1000');
 
-%% Open sounds:
-if const.hasAudio
-    InitializePsychSound;
+%% Set up audio for microphone
 
-    [y, freq] = wavread([cd '\sounds\' 'standard.wav']);
-    wavedata = y';
-    wavedata(2,:)= wavedata;
-    nrchannels = size(wavedata,1); % Number of rows == number of channels.
+InitializePsychSound;
 
-    Audio.pamaster = PsychPortAudio('Open', [], 1+8, 1, freq, nrchannels);
-    PsychPortAudio('Volume', Audio.pamaster, 1)
-    PsychPortAudio('Start', Audio.pamaster, 0, 0, 1);
+% Open audio device 'device', with mode 2 (== Only audio capture),
+% and a required latencyclass of 1 == low-latency mode, with the preferred
+% default sampling frequency of the audio device, and 2 sound channels
+% for stereo capture. This returns a handle to the audio device:
+%pahandle = PsychPortAudio('Open', [], 2, [], [], 2);
 
-    % create slaves:
-    Audio.standard1 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
-    Audio.standard2 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
-    Audio.standard3 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
-    Audio.standard4 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
-    Audio.standard5 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
-    Audio.deviant = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
-    %Audio.silence = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+Audio.pahandle = PsychPortAudio('Open', [], 2, 0, Audio.freq, 2);
 
-    % Fill standard buffers:
-    PsychPortAudio('FillBuffer', Audio.standard1, wavedata);
-    PsychPortAudio('FillBuffer', Audio.standard2, wavedata);
-    PsychPortAudio('FillBuffer', Audio.standard3, wavedata);
-    PsychPortAudio('FillBuffer', Audio.standard4, wavedata);
-    PsychPortAudio('FillBuffer', Audio.standard5, wavedata);
-else
-    Audio.exists= 0;
+PsychPortAudio('GetAudioData', Audio.pahandle, const.TrialTimeout);
+
 end
+
+%% Open sounds:
+% if const.hasAudio
+%     InitializePsychSound;
+% 
+%     [y, freq] = wavread([cd '\sounds\' 'standard.wav']);
+%     wavedata = y';
+%     wavedata(2,:)= wavedata;
+%     nrchannels = size(wavedata,1); % Number of rows == number of channels.
+% 
+%     Audio.pamaster = PsychPortAudio('Open', [], 1+8, 1, freq, nrchannels);
+%     PsychPortAudio('Volume', Audio.pamaster, 1)
+%     PsychPortAudio('Start', Audio.pamaster, 0, 0, 1);
+% 
+%     % create slaves:
+%     Audio.standard1 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+%     Audio.standard2 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+%     Audio.standard3 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+%     Audio.standard4 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+%     Audio.standard5 = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+%     Audio.deviant = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+%     %Audio.silence = PsychPortAudio('OpenSlave', Audio.pamaster, 1, nrchannels);
+% 
+%     % Fill standard buffers:
+%     PsychPortAudio('FillBuffer', Audio.standard1, wavedata);
+%     PsychPortAudio('FillBuffer', Audio.standard2, wavedata);
+%     PsychPortAudio('FillBuffer', Audio.standard3, wavedata);
+%     PsychPortAudio('FillBuffer', Audio.standard4, wavedata);
+%     PsychPortAudio('FillBuffer', Audio.standard5, wavedata);
+% else
+%     Audio.exists= 0;
+% end
 % Fill deviant buffer:
 %[y, freq] = wavread([cd '\corpus\' 'deviant.wav']);
 %wavedata = y';
