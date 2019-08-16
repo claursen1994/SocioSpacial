@@ -72,7 +72,7 @@ Eyelink('command', 'sample_rate= 1000');
 
 %% Set up audio for microphone
 
-InitializePsychSound;
+%InitializePsychSound;
 
 % Open audio device 'device', with mode 2 (== Only audio capture),
 % and a required latencyclass of 1 == low-latency mode, with the preferred
@@ -80,9 +80,9 @@ InitializePsychSound;
 % for stereo capture. This returns a handle to the audio device:
 %pahandle = PsychPortAudio('Open', [], 2, [], [], 2);
 
-Audio.pahandle = PsychPortAudio('Open', [], 2, 0, Audio.freq, 2);
+%Audio.pahandle = PsychPortAudio('Open', [], 2, 0, Audio.freq, 2);
 
-PsychPortAudio('GetAudioData', Audio.pahandle, const.TrialTimeout);
+%PsychPortAudio('GetAudioData', Audio.pahandle, const.TrialTimeout);
 
 end
 

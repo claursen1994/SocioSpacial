@@ -12,13 +12,9 @@ global const Visual sent Monitor el; %Audio;
 
 %const.ntrials=10; % TEMPORARY!!! Use only for testing
 
-%HideCursor; % hide the mouse cursor
+HideCursor; % hide the mouse cursor
 
 % Calibrate the eye tracker
-%EyelinkDoTrackerSetup(el);
-
-EyelinkDoTrackerSetup(el);
-
 EyelinkDoTrackerSetup(el);
 
 % Trial presentation loop:
@@ -37,46 +33,27 @@ for i=1:const.ntrials
        whichRow= find(sent.item== item & sent.cond== 2, 1); 
     end
    
-    sentenceString= char(sent.stimulus(whichRow));
+    sentenceString= char(sent.Stimulus(whichRow));
     sentenceString= strjoin(strsplit(sentenceString, '"'));
-    % Block instructions:
-   % if i== length(design)-const.Maxtrials+1 || i== length(design)-const.Maxtrials/2+1
-        
-     %   if ismember(cond, [1, 3])
-         %   instrText= const.SilentInstr; % 1 & 3
-        %    blockStr= 'SILENT';
-      %  else
-         %   instrText= const.AloudInstr; % 2 & 4
-          %  blockStr= 'ALOUD';
-        end
-        
-        Eyelink('Message', [blockStr ' BLOCK INSTRUCTION PRESENTED']);
-        
-        DrawFormattedText(Monitor.buffer(3), instrText, Visual.sentPos(1), ...
-            Visual.sentPos(2) + 250, [139, 0, 0], ...
-            [], [], [], Visual.TextSpacing*1.95);
-        
-        text=  'Please click the mouse to continue!';
-        
-        Screen('DrawText', Monitor.buffer(3), text,  Visual.sentPos(1), Visual.resY/1.4, Visual.FGC);
-        Screen('CopyWindow', Monitor.buffer(3), Monitor.window);
-        Screen('Flip', Monitor.window);
-        sendScreenshot(Monitor.buffer(3));
-        
-        InstrDone= false;
-        ShowCursor(0); 
-        
-        while ~InstrDone
-            [x,y,buttons] = GetMouse(Monitor.window);
-            InstrDone= buttons(1); %KbCheck; 
-        end
-        HideCursor
-        
-        % clear main screen:
-        Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
-        Screen('FillRect', Monitor.buffer(3), Visual.BGC); % clear subject screen
-        Screen('Flip', Monitor.window);
-        
+    
+    sentenceString=format_text(sentenceString , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+
+%         DrawFormattedText(Monitor.buffer(3), instrText, Visual.sentPos(1), ...
+%             Visual.sentPos(2) + 250, [139, 0, 0], ...
+%             [], [], [], Visual.TextSpacing*1.95);
+%         
+%         
+%         Screen('DrawText', Monitor.buffer(3), text,  Visual.sentPos(1), Visual.resY/1.4, Visual.FGC);
+%         Screen('CopyWindow', Monitor.buffer(3), Monitor.window);
+%         Screen('Flip', Monitor.window);
+%         sendScreenshot(Monitor.buffer(3));
+%         
+%         
+%         % clear main screen:
+%         Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
+%         Screen('FillRect', Monitor.buffer(3), Visual.BGC); % clear subject screen
+%         Screen('Flip', Monitor.window);
+%         
    
     
 	% get image dir:
@@ -203,132 +180,20 @@ for i=1:const.ntrials
 
     
      %% Questioms:
+%     
+%      options= [ '1)  ' char(quest.O1(item)) '/n' '2)  ' char(quest.O2(item)) ...
+%                '/n' '3)  ' char(quest.O3(item)) '/n' '4)  ' char(quest.O4(item))];
+%      options= strjoin(strsplit(options, '"'));    
+%      
+%      question= char(quest.Q(item));
+%      question= strjoin(strsplit(question, '"'));
+%      
+%      % present question:
+%       answer= QuestionMC(question, strsplit(options, '/n'), ...
+%         quest.corr_answ(item), item, cond, 1);
     
-     options= [ '1)  ' char(quest.O1(item)) '/n' '2)  ' char(quest.O2(item)) ...
-               '/n' '3)  ' char(quest.O3(item)) '/n' '4)  ' char(quest.O4(item))];
-     options= strjoin(strsplit(options, '"'));    
-     
-     question= char(quest.Q(item));
-     question= strjoin(strsplit(question, '"'));
-     
-     % present question:
-      answer= QuestionMC(question, strsplit(options, '/n'), ...
-        quest.corr_answ(item), item, cond, 1);
-    
-  %% Abbrev recognition questions:
- 
-  if ismember(i,Q_items)
-     %Present instructions
-     Eyelink('Message', 'Question instruction presented');
-            
-        
-        DrawFormattedText(Monitor.buffer(3), const.abbInstr, Visual.sentPos(1), ...
-            Visual.sentPos(2) + 250, [139, 0, 0], ...
-            [], [], [], Visual.TextSpacing*1.95);
-        
-        text=  'Please click the mouse to continue!';
-        
-        Screen('DrawText', Monitor.buffer(3), text,  Visual.sentPos(1), Visual.resY/1.4, Visual.FGC);
-        Screen('CopyWindow', Monitor.buffer(3), Monitor.window);
-        Screen('Flip', Monitor.window);
-        sendScreenshot(Monitor.buffer(3));
-        
-        InstrDone= false;
-        ShowCursor(0); 
-        
-        while ~InstrDone
-            [x,y,buttons] = GetMouse(Monitor.window);
-            InstrDone= buttons(1); %KbCheck; 
-        end
-        HideCursor
-        
-        % clear main screen:
-        Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
-        Screen('FillRect', Monitor.buffer(3), Visual.BGC); % clear subject screen
-        Screen('Flip', Monitor.window);
-        
-        %Present the P1 questions
-        for j=0:const.Maxtrials/4-1
-            start=i-const.Maxtrials/4+1;
-            rowN= start+j;
-           Q_item= design(rowN,1);
-            Q_cond= design(rowN,2);
-            
-            options= [ '1)  ' char(Quest.Q1O1(Q_item,Q_cond)) '/n' '2)  ' char(Quest.Q1O2(Q_item,Q_cond)) ...
-               '/n' '3)  ' char(Quest.Q1O3(Q_item,Q_cond))];
-            options= strjoin(strsplit(options, '"'));    
-     
-            question= char(Quest(Q_item,Q_cond));
-            question= [Quest.Q1];
-     
-             if ismember(Q_cond, [1,3,5,7])
-                 corr_ans = P1Quest.Q1corr_ans;
-             elseif ismember(Q_cond, [2,4])
-                 corr_ans = P1Quest.Q1corr_ans;
-             else 
-                 corr_ans= P1Quest.Q1corr_ans;
-             end
-            % present question:
-            answer= QuestionMC(question, strsplit(options, '/n'), ...
-           corr_ans, Q_item, Q_cond, 2);
-       
-       
-        end
-        %Present P2 Question
-        for j=0:const.Maxtrials/4-1
-            start=i-const.Maxtrials/4+1;
-            rowN= start+j;
-           Q_item= design(rowN,1);
-            P2_cond= design(rowN,2);
-            
-            options= [ '1)  ' char(Quest.Q2O1(Q_item,Q_cond)) '/n' '2)  ' char(Quest.Q2O2(Q_item,Q_cond)) ...
-               '/n' '3)  ' char(Quest.Q2O3(Q_item,Q_cond))];
-            options= strjoin(strsplit(options, '"'));    
-     
-            question= char(Quest(Q_item));
-            question= [Quest.Q2];
-     
-             if ismember(Q_cond, [1,4,5,8])
-                 corr_ans = Quest.Q2corr_ans;
-             elseif ismember(Q_cond, [2,3])
-                 corr_ans = P1Quest.Q2corr_ans;
-             else 
-                 corr_ans= P1Quest.Q2corr_ans;
-             end
-            % present question:
-            answer= QuestionMC(question, strsplit(options, '/n'), ...
-           corr_ans, Q_item, Q_cond, 2);
-
-        end
-                %Present Comprehenstion Question
-        for j=0:const.Maxtrials/4-1
-            start=i-const.Maxtrials/4+1;
-            rowN= start+j;
-           Q_item= design(rowN,1);
-            
-            
-            options= [ '1)  ' char(Quest.Q3O1(Q_item)) '/n' '2)  ' char(Quest.Q3O2(Q_item)) ...
-               '/n' '3)  ' char(Quest.Q3O3(Q_item))];
-            options= strjoin(strsplit(options, '"'));     
-     
-            question= char(Quest(Q_item));
-            question= [Quest.Q3];
-     
-          
-                 corr_ans = Quest.Q3corr_ans;
-           
-                 corr_ans = P1Quest.Q1corr_ans;
-        
-                 corr_ans= P1Quest.Q1corr_ans;
-        
-            % present question:
-            answer= QuestionMC(question, strsplit(options, '/n'), ...
-           corr_ans, Q_item, Q_cond, 2);
-
-        end
-  end
-
-
+  
+end
 
 % end of Experiment text:
 text= 'The experiment is finished! Thank you for participating!';
