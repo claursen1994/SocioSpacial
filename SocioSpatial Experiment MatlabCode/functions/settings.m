@@ -4,15 +4,15 @@ global Visual const Audio;
 Visual.resX= 1920; % Screen resolution, X-axis; P111
 Visual.resY= 1080; % Screen resolution, Y-axis; P111
 Visual.frameRate= 120; % frame rate of monitor (saved to edf file)
-Visual.offsetX= 500; %200; % X offset of the text
+Visual.offsetX= 100; %200; % X offset of the text
 Visual.offsetY= 150; % Y offset of the text
 Visual.sentPos= [Visual.offsetX Visual.offsetY]; % sentence position
 Visual.FGC= [0 0 0]; % stimuli colour
 Visual.BGC= [255 255 255]; % background colour
 Visual.Pix_per_Letter= 13; % letter width in pixels
-Visual.FontSize= 18; % Consolas: 16: 14ppl # Courier New: 18pt: 14ppl; 16pt: 13ppl; 14pt: 11ppl
+Visual.FontSize= 16; % Consolas: 16: 14ppl # Courier New: 18pt: 14ppl; 16pt: 13ppl; 14pt: 11ppl
 Visual.TextSpacing= 2; % text spacing between lines (multi-line only)
-Visual.LetterHeight= 24; % letter height in pixels  (multi-line only)
+Visual.LetterHeight= 22; % letter height in pixels  (multi-line only)
 
 Visual.Font= 'Consolas'; %'Courier New';
 Visual.TextSize= 18; % possibly unused?

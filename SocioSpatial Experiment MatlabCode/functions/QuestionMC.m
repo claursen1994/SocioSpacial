@@ -22,13 +22,13 @@ Screen('DrawText', Monitor.window, question , Visual.sentPos(1), ...
 dim1= [Visual.sentPos(1)-10  Visual.sentPos(2)+Visual.LetterHeight*3-Visual.LetterHeight/2  Visual.sentPos(1)+40 Visual.sentPos(2)+Visual.LetterHeight*4+Visual.LetterHeight/2];
 dim2= [Visual.sentPos(1)-10  Visual.sentPos(2)+Visual.LetterHeight*5+Visual.LetterHeight/2  Visual.sentPos(1)+40 Visual.sentPos(2)+Visual.LetterHeight*7+Visual.LetterHeight/2];
 dim3= [Visual.sentPos(1)-10  Visual.sentPos(2)+Visual.LetterHeight*8+Visual.LetterHeight/2  Visual.sentPos(1)+40 Visual.sentPos(2)+Visual.LetterHeight*10+Visual.LetterHeight/2];
-dim4= [Visual.sentPos(1)-10  Visual.sentPos(2)+Visual.LetterHeight*11+round(Visual.LetterHeight/2.3)  Visual.sentPos(1)+40 Visual.sentPos(2)+Visual.LetterHeight*13+round(Visual.LetterHeight/2.3)];
+%dim4= [Visual.sentPos(1)-10  Visual.sentPos(2)+Visual.LetterHeight*11+round(Visual.LetterHeight/2.3)  Visual.sentPos(1)+40 Visual.sentPos(2)+Visual.LetterHeight*13+round(Visual.LetterHeight/2.3)];
 
 % draw answer boxes:
 Screen('FillRect', Monitor.window , [210 210 210], dim1);
 Screen('FillRect', Monitor.window , [210 210 210], dim2);
 Screen('FillRect', Monitor.window , [210 210 210], dim3);
-Screen('FillRect', Monitor.window , [210 210 210], dim4);
+%Screen('FillRect', Monitor.window , [210 210 210], dim4);
 
 % draw answers: 
 % Screen('DrawText', Monitor.window, char(opts(1)), dim1(1)+ 15, ...
@@ -43,11 +43,11 @@ DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sent
                           [], [], [], Visual.TextSpacing*1.95);
 
 % print text to asc file:
-%get string to print:
-
+% get string to print:
+% 
 % strPrint= [question ''];
-
-
+% 
+% 
 % % draw answer number:
 % Screen('DrawText', Monitor.window, '1' , dim1(1) + (dim1(3)-dim1(1))/2, ...
 %     dim1(2) + 10, Visual.FGC); % sentence
@@ -56,7 +56,7 @@ DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sent
 % Screen('DrawText', Monitor.window, '3' , dim3(1) + (dim3(3)-dim3(1))/2, ...
 %     dim3(2) + 10, Visual.FGC); % sentence
 % Screen('DrawText', Monitor.window, '4' , dim4(1) + (dim4(3)-dim4(1))/2, ...
-%     dim4(2) + 10, Visual.FGC);
+% %     dim4(2) + 10, Visual.FGC);
 
 Screen('Flip', Monitor.window);
 
@@ -115,7 +115,7 @@ while answer<0
             Screen('FillRect', Monitor.window , [189 255 183], dim1);
             Screen('FillRect', Monitor.window , [210 210 210], dim2);
             Screen('FillRect', Monitor.window , [210 210 210], dim3);
-            Screen('FillRect', Monitor.window , [210 210 210], dim4);
+            %Screen('FillRect', Monitor.window , [210 210 210], dim4);
             
             % draw answers:
             DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, ...
@@ -140,7 +140,7 @@ while answer<0
             Screen('FillRect', Monitor.window , [189 255 183], dim2);
             Screen('FillRect', Monitor.window , [210 210 210], dim1);
             Screen('FillRect', Monitor.window , [210 210 210], dim3);
-            Screen('FillRect', Monitor.window , [210 210 210], dim4);
+            %Screen('FillRect', Monitor.window , [210 210 210], dim4);
             
             % draw answers:
             DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, ...
@@ -165,7 +165,7 @@ while answer<0
             Screen('FillRect', Monitor.window , [189 255 183], dim3);
             Screen('FillRect', Monitor.window , [210 210 210], dim1);
             Screen('FillRect', Monitor.window , [210 210 210], dim2);
-            Screen('FillRect', Monitor.window , [210 210 210], dim4);
+            %Screen('FillRect', Monitor.window , [210 210 210], dim4);
             
             % draw answers:
             DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, ...
@@ -184,30 +184,30 @@ while answer<0
             answer= 3;
         end
         
-        if IsInRect(x,y, dim4) %x> no_dim(1) && y> no_dim(2) && x< no_dim(3) && y< no_dim(4)
-            Screen('DrawText', Monitor.window, question , Visual.sentPos(1), Visual.sentPos(2), Visual.FGC) % sentence
-            
-            Screen('FillRect', Monitor.window , [189 255 183], dim4);
-            Screen('FillRect', Monitor.window , [210 210 210], dim1);
-            Screen('FillRect', Monitor.window , [210 210 210], dim2);
-            Screen('FillRect', Monitor.window , [210 210 210], dim3);
-            
-            % draw answers:
-            DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, ...
-                          [], [], [], Visual.TextSpacing*1.95);
-%             Screen('DrawText', Monitor.window, char(opts(1)), dim1(1)+ 15, ...
-%                 dim1(2)+10, Visual.FGC);
-%             Screen('DrawText', Monitor.window, char(opts(2)), dim2(1)+ 15, ...
-%                 dim2(2)+10, Visual.FGC); 
-%             Screen('DrawText', Monitor.window, char(opts(3)), dim3(1)+ 15, ...
-%                 dim3(2)+10, Visual.FGC); 
-%             Screen('DrawText', Monitor.window, char(opts(4)), dim4(1)+ 15, ...
-%                 dim4(2)+10, Visual.FGC); 
-            
-           Screen('Flip', Monitor.window);
-            WaitSecs(0.5);
-            answer= 4;
-        end
+%         if IsInRect(x,y, dim4) %x> no_dim(1) && y> no_dim(2) && x< no_dim(3) && y< no_dim(4)
+%             Screen('DrawText', Monitor.window, question , Visual.sentPos(1), Visual.sentPos(2), Visual.FGC) % sentence
+%             
+%             %Screen('FillRect', Monitor.window , [189 255 183], dim4);
+%             Screen('FillRect', Monitor.window , [210 210 210], dim1);
+%             Screen('FillRect', Monitor.window , [210 210 210], dim2);
+%             Screen('FillRect', Monitor.window , [210 210 210], dim3);
+%             
+%             % draw answers:
+%             DrawFormattedText(Monitor.window, questionString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, ...
+%                           [], [], [], Visual.TextSpacing*1.95);
+% %             Screen('DrawText', Monitor.window, char(opts(1)), dim1(1)+ 15, ...
+% %                 dim1(2)+10, Visual.FGC);
+% %             Screen('DrawText', Monitor.window, char(opts(2)), dim2(1)+ 15, ...
+% %                 dim2(2)+10, Visual.FGC); 
+% %             Screen('DrawText', Monitor.window, char(opts(3)), dim3(1)+ 15, ...
+% %                 dim3(2)+10, Visual.FGC); 
+% %             Screen('DrawText', Monitor.window, char(opts(4)), dim4(1)+ 15, ...
+% %                 dim4(2)+10, Visual.FGC); 
+%             
+%            Screen('Flip', Monitor.window);
+%             WaitSecs(0.5);
+%             answer= 4;
+%         end
         
     end
     

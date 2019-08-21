@@ -7,27 +7,27 @@ switch cond
         P1= char(importdata(['SocAmbi' num2str(item) '.txt'])); 
         P2= char(importdata(['SpaAmbi' num2str(item) '.txt']));  
     case 2
-        P1= char(importdata(['SocNambi' num2str(item) '.txt'])); 
-        P2= char(importdata(['SpaNambi' num2str(item) '.txt'])); 
+        P1= ['corpus/Sorted Texts/SocNambi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SpaNambi/' num2str(item) '.txt']; 
     case 3
-         P1= char(importdata(['SocAmbi' num2str(item) '.txt']));  
-        P2= char(importdata(['SpaNambi' num2str(item) '.txt']));  
+        P1= ['corpus/Sorted Texts/SocAmbi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SpaNambi/' num2str(item) '.txt']; 
     case 4
-        P1= char(importdata(['SocNambi' num2str(item) '.txt'])); 
-        P2= char(importdata(['SpaAmbi' num2str(item) '.txt']));
+        P1= ['corpus/Sorted Texts/SocNambi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SpaNambi/' num2str(item) '.txt'];
     case 5
-        P1= char(importdata(['SpaAmbi' num2str(item) '.txt'])); 
-        P2= char(importdata(['SocAmbi' num2str(item) '.txt']));
+        P1= ['corpus/Sorted Texts/SpaAmbi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SocAmbi/' num2str(item) '.txt'];
         
     case 6
-        P1= char(importdata(['SpaNambi' num2str(item) '.txt']));
-        P2= char(importdata(['SocNambi' num2str(item) '.txt'])); 
+        P1= ['corpus/Sorted Texts/SpaNambi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SocNambi/' num2str(item) '.txt'];
     case 7
-         P1= char(importdata(['SpaAmbi' num2str(item) '.txt']));  
-        P2= char(importdata(['SocNambi' num2str(item) '.txt'])); 
+        P1= ['corpus/Sorted Texts/SpaAmbi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SocNambi/' num2str(item) '.txt'];
     case 8
-       P1= char(importdata(['SpaNambi' num2str(item) '.txt']));
-        P2= char(importdata(['SocAmbi' num2str(item) '.txt']));
+        P1= ['corpus/Sorted Texts/SpaNambi/' num2str(item) '.txt']; 
+        P2= ['corpus/Sorted Texts/SocAmbi/' num2str(item) '.txt'];
 end
 
 

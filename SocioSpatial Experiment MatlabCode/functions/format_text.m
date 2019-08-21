@@ -21,7 +21,7 @@ for i=1:n_line
         breaked= line_break+1; % to count correctly in string
        
         %generate text:
-        tmp_txt= [string(1:line_break) '' '/n'];
+        tmp_txt= [string(1:line_break) '' '\n'];
         text= [text '' tmp_txt];
     else
         diff= abs(spaces- (breaked+ usable_scr_letters));
@@ -34,11 +34,11 @@ for i=1:n_line
         end
         breaked_new= line_break+1; % to count correctly in string
         if i== n_line && length(string) < breaked+usable_scr_letters 
-            tmp_txt= [string(breaked+1:end) '' '/n'];
+            tmp_txt= [string(breaked+1:end) '' '\n'];
         elseif i== n_line && length(string) > breaked+usable_scr_letters
-            tmp_txt= [string(breaked+1:line_break) '' '/n' string(line_break+2:end)];
+            tmp_txt= [string(breaked+1:line_break) '' '\n' string(line_break+2:end)];
         else
-            tmp_txt= [string(breaked+1:line_break) '' '/n'];
+            tmp_txt= [string(breaked+1:line_break) '' '\n'];
         end
         
         text= [text '' tmp_txt];
