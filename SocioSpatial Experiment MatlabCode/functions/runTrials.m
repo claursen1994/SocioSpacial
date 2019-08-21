@@ -28,9 +28,9 @@ for i=1:const.ntrials
     
     if cond< 5 % Social 1st (cond 1 - 4)
       % get sent string:
-        whichRow= find(sent.item== item & sent.cond== 1, 1);
+        whichRow= find(sent.item== item & sent.cond== cond, 1);
     else % Spatial 1st (cond 5 - 8)
-       whichRow= find(sent.item== item & sent.cond== 2, 1); 
+       whichRow= find(sent.item== item & sent.cond== cond, 1); 
     end
    
     sentenceString= char(sent.Stimulus(whichRow));
@@ -178,19 +178,44 @@ for i=1:const.ntrials
     Eyelink('command', 'clear_screen 0'); % clear tracker screen
     
 
+    my_indexer = ((item-1) * 8) + cond;
+     % Questioms:
+    %Q1
+     options= [ '1)  ' char(Quest.Q1O1(my_indexer)) '/n' '2)  ' char(Quest.Q1O2(my_indexer)) ...
+               '/n' '3)  ' char(Quest.Q1O3(my_indexer))];
+     options= strjoin(strsplit(options, '"'));    
+     
+     question= char(Quest.Q1(my_indexer));
+     question= strjoin(strsplit(question, '"'));
+     
+     % present question:
+      answer= QuestionMC(question, strsplit(options, '/n'), ...
+        Quest.Q1corr_ans(my_indexer), item, cond, 1);
     
-     %% Questioms:
-%     
-%      options= [ '1)  ' char(quest.O1(item)) '/n' '2)  ' char(quest.O2(item)) ...
-%                '/n' '3)  ' char(quest.O3(item)) '/n' '4)  ' char(quest.O4(item))];
-%      options= strjoin(strsplit(options, '"'));    
-%      
-%      question= char(quest.Q(item));
-%      question= strjoin(strsplit(question, '"'));
-%      
-%      % present question:
-%       answer= QuestionMC(question, strsplit(options, '/n'), ...
-%         quest.corr_answ(item), item, cond, 1);
+    %Q2
+options= [ '1)  ' char(Quest.Q2O1(my_indexer)) '/n' '2)  ' char(Quest.Q2O2(my_indexer)) ...
+               '/n' '3)  ' char(Quest.Q2O3(my_indexer))];
+     options= strjoin(strsplit(options, '"'));    
+     
+     question= char(Quest.Q2(my_indexer));
+     question= strjoin(strsplit(question, '"'));
+    
+       answer= QuestionMC(question, strsplit(options, '/n'), ...
+        Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    
+    
+    %Q3
+options= [ '1)  ' char(Quest.Q3O1(my_indexer)) '/n' '2)  ' char(Quest.Q3O2(my_indexer)) ...
+               '/n' '3)  ' char(Quest.Q3O3(my_indexer))];
+     options= strjoin(strsplit(options, '"'));    
+     
+     question= char(Quest.Q3(my_indexer));
+     question= strjoin(strsplit(question, '"'));
+    
+       answer= QuestionMC(question, strsplit(options, '/n'), ...
+        Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    
+    
     
   
 end

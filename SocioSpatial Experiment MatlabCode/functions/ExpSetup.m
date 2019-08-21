@@ -17,6 +17,7 @@ oldSupressAllWarnings = Screen('Preference', 'SuppressAllWarnings', 1);
 	
 % Find out how many screens and use largest screen number.
 whichScreen = max(Screen('Screens'));
+%whichScreen = 2;
 
 % Setup window:
 Monitor.window = Screen('OpenWindow', whichScreen);
