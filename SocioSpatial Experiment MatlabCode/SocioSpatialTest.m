@@ -1,7 +1,7 @@
-
+Screen('Preference', 'SkipSyncTests', 1); 
 global const; 
 
-%% settings:
+% settings:
 clear all;
 clear mex;
 clear functions;
@@ -28,19 +28,22 @@ cd('/home/experimenter/Desktop/SocioSpatial Experiment MatlabCode');
 %addpath([cd '\functions'], [cd '\corpus'], [cd '\corpus\Sorted Texts'], [cd '\design']);
 addpath(genpath(cd));
 
-
+% functs
 settings; % load settings
 ExpSetup; % do window and tracker setup
 
-%% Load stimuli and design:
+% Load stimuli and design:
 load('sent.mat');
 load('Quest.mat'); % questions
 
-design= genDesign(); % generate the design matrix for this subject
-const.ntrials= length(design);
-%% Run Experiment:
+% generate the design matrix for this subject
+design = genDesign(); 
+const.ntrials = length(design);
+
+% Run Experiment:
 runTrials;
-%% Save file & Exit:
+
+% Save file & Exit:
 status= Eyelink('ReceiveFile');
 Eyelink('Shutdown');
 

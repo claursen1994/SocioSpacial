@@ -11,12 +11,6 @@ global Visual Monitor el
 gazeBnds= [Visual.offsetX-Visual.GazeBoxSize/2 Visual.offsetY- Visual.GazeBoxSize/2 ...
            Visual.offsetX+Visual.GazeBoxSize/2 Visual.offsetY+ Visual.GazeBoxSize];
 Screen('FillRect', Monitor.buffer(1), Visual.FGC, gazeBnds); % gazebox
-       
-
-%Screen('FillRect', Monitor.buffer(1), Visual.FGC, [Visual.offsetX Visual.offsetY- Visual.GazeBoxSize/2 Visual.offsetX+Visual.GazeBoxSize ...
-%    Visual.offsetY+ Visual.GazeBoxSize]); % gazebox
-%gazeBnds_x= [Visual.offsetX-+Visual.GazeBoxSize/2 Visual.offsetX+Visual.GazeBoxSize/2]; % centre at xpos offset
-%gazeBnds_y= [Visual.resY/2- Visual.GazeBoxSize/2 Visual.resY/2+ Visual.GazeBoxSize];
 
 Eyelink('Command', ['draw_filled_box ' num2str(Visual.offsetX) ' ' num2str(Visual.resY/2- Visual.GazeBoxSize/2) ' ' ...
             num2str(Visual.offsetX+Visual.GazeBoxSize) ' ' num2str(Visual.resY/2+ Visual.GazeBoxSize/2) '3']);

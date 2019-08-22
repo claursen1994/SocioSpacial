@@ -1,105 +1,59 @@
 % Presentation of Experimental trials
 % Martin Vasilev, 2017
 
-global const Visual sent Monitor el; %Audio; 
+% init
+global const Visual sent Monitor el;
 
-% Blackbox toolkit testing:
-%s= serial('COM11');
-%set(s, 'BaudRate', 115200, 'DataBits', 8, 'StopBits', 1, 'Parity', 'none')
-%fopen(s);
-%fprintf(s, 'RR');
-%fprintf(s,'FF');
-
-%const.ntrials=10; % TEMPORARY!!! Use only for testing
-
-HideCursor; % hide the mouse cursor
+% hide the mouse cursor
+HideCursor; 
 
 % Calibrate the eye tracker
 EyelinkDoTrackerSetup(el);
 
 % Trial presentation loop:
 for i=1:const.ntrials
-    
-    %calResult = Eyelink('CalResult');
-%%  stimuli set-up:
+    % stimuli set-up:
     trialEnd= false; 
 	item= design(i,1); % item is 1st column
     cond= design(i,2); % condition is 2nd column
     
     if cond< 5 % Social 1st (cond 1 - 4)
-      % get sent string:
         whichRow= find(sent.item== item & sent.cond== cond, 1);
     else % Spatial 1st (cond 5 - 8)
-       whichRow= find(sent.item== item & sent.cond== cond, 1); 
+        whichRow= find(sent.item== item & sent.cond== cond, 1); 
     end
    
-    sentenceString= char(sent.Stimulus(whichRow));
-    sentenceString= strjoin(strsplit(sentenceString, '"'));
-    
-    sentenceString=format_text(sentenceString , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+    sentenceString = char(sent.Stimulus(whichRow));
+    sentenceString = strjoin(strsplit(sentenceString, '"'));
+    sentenceString = format_text(sentenceString , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
 
-%         DrawFormattedText(Monitor.buffer(3), instrText, Visual.sentPos(1), ...
-%             Visual.sentPos(2) + 250, [139, 0, 0], ...
-%             [], [], [], Visual.TextSpacing*1.95);
-%         
-%         
-%         Screen('DrawText', Monitor.buffer(3), text,  Visual.sentPos(1), Visual.resY/1.4, Visual.FGC);
-%         Screen('CopyWindow', Monitor.buffer(3), Monitor.window);
-%         Screen('Flip', Monitor.window);
-%         sendScreenshot(Monitor.buffer(3));
-%         
-%         
-%         % clear main screen:
-%         Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
-%         Screen('FillRect', Monitor.buffer(3), Visual.BGC); % clear subject screen
-%         Screen('Flip', Monitor.window);
-%         
-   
-    
-	% get image dir:
-    %imageFile= ['img/Item' num2str(item) '_Cond' num2str(cond) '.bmp'];
-    %img= imread(imageFile); % read in image
-    
-    % recording dir:
-  %  if ismember(cond, [2,4])
-     %   Audio.filename= ['Audio/S' num2str(const.ID) 'E' num2str(cond) 'I' num2str(item) '.wav'];
-  %  end
-       
     % drift check:
     EyelinkDoDriftCorrection(el);
     
-    %% Eyelink & Screen trial set-up:
+    % Eyelink & Screen trial set-up:
 	stimuliOn= false;
     
     while ~stimuliOn
-        if item> const.Maxtrials % if practice
-            Eyelink('Message', ['TRIALID ' 'P' num2str(cond) 'I' num2str(item) 'D0']);
-			% print trial ID on tracker screen:
-            Eyelink('command', ['record_status_message ' [ num2str(round((i/const.ntrials)*100)) 'Prcnt:' 'P' num2str(cond) 'I' num2str(item) 'D0']]);
-        else
-			Eyelink('Message', ['TRIALID ' 'E' num2str(cond) 'I' num2str(item) 'D0']);
-			% print trial ID on tracker screen:
-			Eyelink('command', ['record_status_message ' [ num2str(round((i/const.ntrials)*100)) 'Prcnt:' 'E' num2str(cond) 'I' num2str(item) 'D0']]); 
-        end
+        if practice
+            if item> const.Maxtrials 
+                Eyelink('Message', ['TRIALID ' 'P' num2str(cond) 'I' num2str(item) 'D0']);
+                % print trial ID on tracker screen:
+                Eyelink('command', ['record_status_message ' [ num2str(round((i/const.ntrials)*100)) 'Prcnt:' 'P' num2str(cond) 'I' num2str(item) 'D0']]);
+            else
+                Eyelink('Message', ['TRIALID ' 'E' num2str(cond) 'I' num2str(item) 'D0']);
+                % print trial ID on tracker screen:
+                Eyelink('command', ['record_status_message ' [ num2str(round((i/const.ntrials)*100)) 'Prcnt:' 'E' num2str(cond) 'I' num2str(item) 'D0']]); 
+            end
         
-        % print image url to edf:
-        %Eyelink('Message', imageFile);
-
-        % print text stimuli to edf:
-        %stim2edf(sentenceString); % Single line
         stim2edfML(sentenceString); % Multi-line
         
         % prepare Screens:
-        % sentence presentation:
         Screen('FillRect', Monitor.buffer(2), Visual.BGC);
-        % put image on the screen:
-        %Screen('PutImage', Monitor.buffer(2), img);
-       
-        % Use this for printing text as a string:
-        %Screen('DrawText', Monitor.buffer(2), sentenceString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC); % sentence
-        DrawFormattedText(Monitor.buffer(2), sentenceString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, ...
-                          [], [], [], Visual.TextSpacing*1.95);
+              
+        % Draw the paragraph to back buffer
+        DrawFormattedText(Monitor.buffer(2), sentenceString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, [], [], [], Visual.TextSpacing*1.95);
         
+        % don't know what PPL is
         if const.checkPPL
             MLcheck= strfind(sentenceString, '\n');
             
@@ -117,18 +71,16 @@ for i=1:const.ntrials
         
         % Print stimuli to Eyelink monitor:
         % draw gaze box on tracker monitor:
-       sendScreenshot(Monitor.buffer(2));
+        sendScreenshot(Monitor.buffer(2));
         
-        %% Present Gaze-box:
+        % Present Gaze-box:
         stimuliOn= gazeBox(stimuliOn);
-        
     end
     
     %% Present text stimuli:
- 
- 
+  
     Screen('CopyWindow', Monitor.buffer(2), Monitor.window);
-    Screen('Flip', Monitor.window); % present sentence
+    Screen('Flip', Monitor.window); % present paragraph
     Eyelink('Message', 'DISPLAY ON');
     Eyelink('Message', 'SYNCTIME');
 
@@ -138,11 +90,6 @@ for i=1:const.ntrials
         trialTime= GetSecs- trialStart;
         [x,y,buttons] = GetMouse(Monitor.window);
         trialEnd= buttons(1); %KbCheck; 
-        
-        % use this for gaze-contingent manipulations:
-        %evt= Eyelink('NewestFloatSample');
-        %xpos = evt.gx(2);
-
         
         if const.seeEye % for testing only (enable code above)
             Screen('FillRect', Monitor.window, Visual.BGC);
@@ -154,7 +101,7 @@ for i=1:const.ntrials
         % end trial automatically if no response by participant
         if trialTime> const.TrialTimeout 
              trialEnd= true;
-             %tracker.log('TRIAL ABORTED')
+             tracker.log('TRIAL ABORTED')
  			 Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
              Screen('Flip', Monitor.window);
         end
@@ -166,58 +113,34 @@ for i=1:const.ntrials
     Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
     Screen('Flip', Monitor.window);
     Eyelink('Message', 'DISPLAY OFF');
-    
-  
-   
-    
     Eyelink('Message', 'TRIAL_RESULT 5');
     Eyelink('Message', 'TRIAL OK');
-    
     Eyelink('StopRecording');
-    
     Eyelink('command', 'clear_screen 0'); % clear tracker screen
-    
 
-    my_indexer = ((item-1) * 8) + cond;
-     % Questioms:
-    %Q1
-     options= [ '1)  ' char(Quest.Q1O1(my_indexer)) '/n' '2)  ' char(Quest.Q1O2(my_indexer)) ...
-               '/n' '3)  ' char(Quest.Q1O3(my_indexer))];
-     options= strjoin(strsplit(options, '"'));    
-     
-     question= char(Quest.Q1(my_indexer));
-     question= strjoin(strsplit(question, '"'));
-     
-     % present question:
-      answer= QuestionMC(question, strsplit(options, '/n'), ...
-        Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    my_indexer = ((item-1) * 8) + cond; % my_indexer picks the row
     
-    %Q2
-options= [ '1)  ' char(Quest.Q2O1(my_indexer)) '/n' '2)  ' char(Quest.Q2O2(my_indexer)) ...
-               '/n' '3)  ' char(Quest.Q2O3(my_indexer))];
-     options= strjoin(strsplit(options, '"'));    
-     
-     question= char(Quest.Q2(my_indexer));
-     question= strjoin(strsplit(question, '"'));
+    % Question 1 ? for eyelink?
+    options= [ '1)  ' char(Quest.Q1O1(my_indexer)) '/n' '2)  ' char(Quest.Q1O2(my_indexer)) '/n' '3)  ' char(Quest.Q1O3(my_indexer))];
+    options= strjoin(strsplit(options, '"'));    
+    question= char(Quest.Q1(my_indexer));
+    question= strjoin(strsplit(question, '"'));
+    answer= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
     
-       answer= QuestionMC(question, strsplit(options, '/n'), ...
-        Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    % Question 2 ? for eyelink?
+    options= [ '1)  ' char(Quest.Q2O1(my_indexer)) '/n' '2)  ' char(Quest.Q2O2(my_indexer)) '/n' '3)  ' char(Quest.Q2O3(my_indexer))];
+    options= strjoin(strsplit(options, '"'));     
+    question= char(Quest.Q2(my_indexer));
+    question= strjoin(strsplit(question, '"'));
+    answer= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
     
-    
-    %Q3
-options= [ '1)  ' char(Quest.Q3O1(my_indexer)) '/n' '2)  ' char(Quest.Q3O2(my_indexer)) ...
-               '/n' '3)  ' char(Quest.Q3O3(my_indexer))];
-     options= strjoin(strsplit(options, '"'));    
-     
-     question= char(Quest.Q3(my_indexer));
-     question= strjoin(strsplit(question, '"'));
-    
-       answer= QuestionMC(question, strsplit(options, '/n'), ...
-        Quest.Q1corr_ans(my_indexer), item, cond, 1);
-    
-    
-    
-  
+    % Question 2 ? for eyelink?
+    options= [ '1)  ' char(Quest.Q3O1(my_indexer)) '/n' '2)  ' char(Quest.Q3O2(my_indexer)) '/n' '3)  ' char(Quest.Q3O3(my_indexer))];
+    options= strjoin(strsplit(options, '"'));    
+    question= char(Quest.Q3(my_indexer));
+    question= strjoin(strsplit(question, '"'));
+    answer= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
+
 end
 
 % end of Experiment text:
