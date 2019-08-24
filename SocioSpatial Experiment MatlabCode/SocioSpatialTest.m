@@ -1,4 +1,5 @@
-Screen('Preference', 'SkipSyncTests', 1); 
+Screen('Preference', 'SkipSyncTests', 0); 
+%change to 1 if it's getting fucky
 global const; 
 
 % settings:

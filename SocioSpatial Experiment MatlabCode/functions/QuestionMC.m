@@ -52,7 +52,8 @@ status= Eyelink('ImageTransfer', 'disp.bmp', 0, 0, 0, 0,0, 0, 16);
 % Initial question stamps:
 Eyelink('Message', ['TRIALID F' num2str(cond) 'I' num2str(item) 'D' num2str(D)]);
 stim2edfML(comp_qn_and_all_answers); % print question string to edf file:
- 
+%Posibility of changing this to comp_qn_and_all_answers instead of questionstring as it's a better name
+
 Eyelink('Message', ['QUESTION_ANSWER ' num2str(corr_ans)]);
 Eyelink('Message', 'DELAY 500 MS');
 Eyelink('StartRecording');
@@ -146,6 +147,7 @@ if answer==corr_ans
 else
     Eyelink('command', ['record_status_message ' 'INCORRECT!']);
 end
+
 WaitSecs(0.5);
 Eyelink('StopRecording');
 

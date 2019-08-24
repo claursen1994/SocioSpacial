@@ -21,7 +21,7 @@ for i=1:const.ntrials
         whichRow= find(sent.item== item & sent.cond== cond, 1);
     else % Spatial 1st (cond 5 - 8)
         whichRow= find(sent.item== item & sent.cond== cond, 1); 
-    end
+end
    
     sentenceString = char(sent.Stimulus(whichRow));
     sentenceString = strjoin(strsplit(sentenceString, '"'));
@@ -34,7 +34,7 @@ for i=1:const.ntrials
 	stimuliOn= false;
     
     while ~stimuliOn
-        if practice
+        %if practice
             if item> const.Maxtrials 
                 Eyelink('Message', ['TRIALID ' 'P' num2str(cond) 'I' num2str(item) 'D0']);
                 % print trial ID on tracker screen:
@@ -125,23 +125,23 @@ for i=1:const.ntrials
     options= strjoin(strsplit(options, '"'));    
     question= char(Quest.Q1(my_indexer));
     question= strjoin(strsplit(question, '"'));
-    answer= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    answer1= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
     
     % Question 2 ? for eyelink?
     options= [ '1)  ' char(Quest.Q2O1(my_indexer)) '/n' '2)  ' char(Quest.Q2O2(my_indexer)) '/n' '3)  ' char(Quest.Q2O3(my_indexer))];
     options= strjoin(strsplit(options, '"'));     
     question= char(Quest.Q2(my_indexer));
     question= strjoin(strsplit(question, '"'));
-    answer= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    answer2= QuestionMC(question, strsplit(options, '/n'), Quest.Q2corr_ans(my_indexer), item, cond, 1);
     
     % Question 2 ? for eyelink?
     options= [ '1)  ' char(Quest.Q3O1(my_indexer)) '/n' '2)  ' char(Quest.Q3O2(my_indexer)) '/n' '3)  ' char(Quest.Q3O3(my_indexer))];
     options= strjoin(strsplit(options, '"'));    
     question= char(Quest.Q3(my_indexer));
     question= strjoin(strsplit(question, '"'));
-    answer= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
+    answer3= QuestionMC(question, strsplit(options, '/n'), Quest.Q3corr_ans(my_indexer), item, cond, 1);
+    end
 
-end
 
 % end of Experiment text:
 text= 'The experiment is finished! Thank you for participating!';
