@@ -77,3 +77,6 @@ Tdatafull=as.data.frame(Tdatafull)
 #ReadingEaseSpa=t.test(AmbiMaster$ReadingeaseSpat,NambiMaster$ReadingeaseSpat)
 #ReadingEaseSoc=t.test(AmbiMaster$ReadingeaseSoc,NambiMaster$ReadingeaseSoc)
 
+PPP=mean(AmbiMaster$SocMeanWordLength)
+PPT=mean(NambiMaster$SocMeanWordLength)
+
