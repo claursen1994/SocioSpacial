@@ -44,14 +44,17 @@ library("tidyr")
 ########
 
 AllStim <- read_excel("Stimuli/AllStim.xlsx")
+AllStimSoc=NULL
 AllStimSoc$Item=c(1:48)
 AllStimSoc$Ambi=AllStim$Ambi
 AllStimSoc$Soc=AllStim$Soc
+AllStimSoc=as.data.frame(AllStimSoc)
 write.csv(AllStimSoc,"Stimuli/AllStimSoc.CSV")
-
+AllStimSpace=NULL
 AllStimSpace$Item=c(1:48)
 AllStimSpace$Ambi=AllStim$Ambi
 AllStimSpace$Spat=AllStim$Soc
+AllStimSpace=as.data.frame(AllStimSpace)
 write.csv(AllStimSpace,"Stimuli/AllStimSpace.CSV")
 
 #Master Table 
