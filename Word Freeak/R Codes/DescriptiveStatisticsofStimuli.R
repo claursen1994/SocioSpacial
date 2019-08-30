@@ -281,8 +281,8 @@ MasterTable$SpaMeanWordLength<-spaMWL
 ###############
 
 
-
-Sockinc=textstat_readability(AllStimSoc$Soc,measure="Flesch.Kincaid")
+Soc=AllStim$Soc
+Sockinc=textstat_readability(Soc,measure="Flesch.Kincaid")
 
 MasterTable$`SocF-K`<-Sockinc$Flesch.Kincaid
 
@@ -291,7 +291,8 @@ MasterTable$`SocF-K`<-Sockinc$Flesch.Kincaid
 ################
 #Space
 ################
-Spacekinc=textstat_readability(AllStimSpace$Spat ,measure="Flesch.Kincaid")
+Spacer=AllStim$Spat
+Spacekinc=textstat_readability(Spacer ,measure="Flesch.Kincaid")
 MasterTable$`SpaF-K`<-Spacekinc$Flesch.Kincaid
 
 #############
