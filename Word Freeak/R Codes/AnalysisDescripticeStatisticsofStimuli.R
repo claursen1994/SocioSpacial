@@ -34,7 +34,7 @@ View(NambiMaster)
 #write.csv(AmbiMaster,"Output Table/AmbiMasterTable.csv")
 
 ############################################
-#T tests between Ambiguous and non Ambiguous
+#T tests between Ambiguous and non-Ambiguous
 ############################################
 #Number of words Space
 SpNWT=t.test(AmbiMaster$SpaNwords,NambiMaster$SpaNwords)
@@ -69,8 +69,9 @@ SocMWLT=t.test(AmbiMaster$SocMeanWordLength,NambiMaster$SocMeanWordLength)
 SpaMWFT=t.test(AmbiMaster$SpaMeanWordFrequency,NambiMaster$SpaMeanWordFrequency)
 SocMWFT=t.test(AmbiMaster$SocMeanWordFrequency,NambiMaster$SocMeanWordFrequency)
 #
-
-Tdatafull=c(SpaKT$p.value,SockT$p.value,SpaMWLT$p.value,SocMWLT$p.value,SpaMWFT$p.value,SocMWFT$p.value,SoNWT$p.value,SpNWT$p.value)
+Tdatafull=NULL
+#Tdatafull$Value=c
+Tdatafull$SameStimDiffAmbi=c(SpaKT$p.value,SockT$p.value,SpaMWLT$p.value,SocMWLT$p.value,SpaMWFT$p.value,SocMWFT$p.value,SoNWT$p.value,SpNWT$p.value)
 Tdatafull=as.data.frame(Tdatafull)
 ####################################
 #Reading Ease Kincaid for curiosity
@@ -79,4 +80,47 @@ Tdatafull=as.data.frame(Tdatafull)
 
 PPP=mean(AmbiMaster$SocMeanWordLength)
 PPT=mean(NambiMaster$SocMeanWordLength)
+
+#####################
+#ASocial Vs ASpatial#
+#NSocial vs NSpatial#
+####################
+
+
+#Ambi
+ANW=t.test(AmbiMaster$SpaNwords,AmbiMaster$SocNwords)
+
+#Nambi
+NNW=t.test(NambiMaster$SocNwords,NambiMaster$SpaNwords)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+#For Curiosity's sake ignore#
+#Number of words AmbiSocial vs AmbiSpacial
+#ASoSpNWT=t.test(AmbiMaster$SpaNwords,AmbiMaster$SocNwords)
+#Number of words NambiSocial vs NambiSpacial
+#NSoSpNWT=t.test(NambiMaster$SpaNwords,NambiMaster$SocNwords)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+#################
+#Kincaid T tests#
+#################
+AmbiKT=t.test(AmbiMaster$`SpaF-K`,AmbiMaster$`SocF-K`)
+NambiKT=t.test(NambiMaster$`SpaF-K`,NambiMaster$`SocF-K`)
+
+##################
+#Mean Word Length#
+##################
+AmbiMWLT=t.test(AmbiMaster$SpaMeanWordLength,AmbiMaster$SocMeanWordLength)
+NambiMWLT=t.test(NambiMaster$SpaMeanWordLength,NambiMaster$SocMeanWordLength)
+
+#####################
+#Mean Word Frequency#
+#####################
+
+AmbiMWFT=t.test(AmbiMaster$SpaMeanWordFrequency,AmbiMaster$SocMeanWordFrequency)
+NambiWFT=t.test(NambiMaster$SpaMeanWordFrequency,NambiMaster$SocMeanWordFrequency)
+#
+Tdatafull$DiffStimSameAmbi=c(ANW$p.value,NNW$p.value,AmbiKT$p.value,NambiKT$p.value,
+                             AmbiMWLT$p.value,NambiMWLT$p.value,AmbiMWFT$p.value,NambiWFT$p.value)
+
 

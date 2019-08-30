@@ -53,7 +53,7 @@ write.csv(AllStimSoc,"Stimuli/AllStimSoc.CSV")
 AllStimSpace=NULL
 AllStimSpace$Item=c(1:48)
 AllStimSpace$Ambi=AllStim$Ambi
-AllStimSpace$Spat=AllStim$Soc
+AllStimSpace$Spat=AllStim$Spat
 AllStimSpace=as.data.frame(AllStimSpace)
 write.csv(AllStimSpace,"Stimuli/AllStimSpace.CSV")
 
