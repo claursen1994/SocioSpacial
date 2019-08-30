@@ -81,12 +81,12 @@ Tdatafull=as.data.frame(Tdatafull)
 PPP=mean(AmbiMaster$SocMeanWordLength)
 PPT=mean(NambiMaster$SocMeanWordLength)
 
-#####################
+#######################################################################################
 #ASocial Vs ASpatial#
 #NSocial vs NSpatial#
-####################
-
-
+#######################################################################################
+#Number of words##
+##################
 #Ambi
 ANW=t.test(AmbiMaster$SpaNwords,AmbiMaster$SocNwords)
 
@@ -123,4 +123,55 @@ NambiWFT=t.test(NambiMaster$SpaMeanWordFrequency,NambiMaster$SocMeanWordFrequenc
 Tdatafull$DiffStimSameAmbi=c(ANW$p.value,NNW$p.value,AmbiKT$p.value,NambiKT$p.value,
                              AmbiMWLT$p.value,NambiMWLT$p.value,AmbiMWFT$p.value,NambiWFT$p.value)
 
+####################################################
+#Global
+####################################################
+AllNW=t.test(MasterTable$SpaNwords,MasterTable$SocNwords)
 
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+#For Curiosity's sake ignore#
+#Number of words AmbiSocial vs AmbiSpacial
+#ASoSpNWT=t.test(AmbiMaster$SpaNwords,AmbiMaster$SocNwords)
+#Number of words NambiSocial vs NambiSpacial
+#NSoSpNWT=t.test(NambiMaster$SpaNwords,NambiMaster$SocNwords)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+#################
+#Kincaid T tests#
+#################
+AllKT=t.test(MasterTable$`SpaF-K`,MasterTable$`SocF-K`)
+
+
+##################
+#Mean Word Length#
+##################
+AllMWLT=t.test(MasterTable$SpaMeanWordLength,MasterTable$SocMeanWordLength)
+
+
+#####################
+#Mean Word Frequency#
+#####################
+
+AllMWFT=t.test(MasterTable$SpaMeanWordFrequency,MasterTable$SocMeanWordFrequency)
+
+#
+Tdatafull$All=c(AllNW$p.value,AllKT$p.value,
+                             AllMWLT$p.value,AllMWFT$p.value)
+
+sd(MasterTable$`SpaF-K`)
+mean(MasterTable$`SpaF-K`)
+sd(MasterTable$`SocF-K`)
+mean(MasterTable$`SocF-K`)
+sd(MasterTable$SpaNwords)
+mean(MasterTable$SpaNwords)
+sd(MasterTable$SocNwords)
+mean(MasterTable$SpaNwords)
+
+Checktable=NULL
+Checktable$Item=MasterTable$Item
+Checktable$Ambi=MasterTable$Ambiguity
+Checktable$NWDiff=((MasterTable$SpaNwords)-(MasterTable$SocNwords))
+Checktable$KDiff=((MasterTable$`SpaF-K`)-(MasterTable$`SocF-K`))
+Checktable=as.data.frame(Checktable)
