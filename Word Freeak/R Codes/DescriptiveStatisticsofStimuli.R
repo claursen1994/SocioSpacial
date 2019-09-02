@@ -6,8 +6,7 @@
 #~Spat,Space and maybe some other things stand for Spacial                               #
 #~Ambi stands for Ambiguous                                                              #
 #~Nambi Stands for Non-Ambiguous                                                         #
-#Trickle down changes should be made to the excel files "AllStim","AllstimSoc"and        #
-#AllstimSpace or whatever you wanna call them.                                          #
+#Trickle down changes should be made to the excel file 'MDMK'                             #
 ##########################################################################################
 #Sorted out code#
 #
@@ -42,8 +41,24 @@ library("readr")
 library("tidyr")
 #Data
 ########
+# Note: MDMK is a huge excel file that Contains a great deal of excel formulas which makes it easier to
+# make trickle down changes and makes it easy to edit stimuli that are then read and analyised
+# these changes should be applied into columns W,X,Y,Z for the Stimuli, changes to the questions are 
+# made in AC, AH and AM. These columns don't have names making it harder to accidentally change them.
 
-AllStim <- read_excel("Stimuli/AllStim.xlsx")
+#For older version of allstim use  read_excel("Stimuli/AllStim.xlsx"
+
+MDMK= read_excel("Stimuli/MDMK.xlsx")
+
+AllStim=NULL
+AllStim$Item=c(1:48)
+AllStim$Ambi=MDMK$AllStimAmbi
+AllStim$Spat=MDMK$AllStimSpat
+AllStim$Soc=MDMK$AllStimSoc
+AllStim=as.data.frame(AllStim)
+  
+write.csv(Allstim,"Stimuli/Allstim.csv")
+
 AllStimSoc=NULL
 AllStimSoc$Item=c(1:48)
 AllStimSoc$Ambi=AllStim$Ambi
