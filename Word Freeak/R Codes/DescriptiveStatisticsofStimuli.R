@@ -56,9 +56,14 @@ AllStim$Ambi=MDMK$AllStimAmbi
 AllStim$Spat=MDMK$AllStimSpat
 AllStim$Soc=MDMK$AllStimSoc
 AllStim=as.data.frame(AllStim)
+<<<<<<< HEAD
 AllStim=na.omit(AllStim)
 write_csv2(AllStim,"Stimuli/Allstim.csv")
 
+=======
+  
+write.csv(Allstim,"Stimuli/Allstim.csv")
+>>>>>>> 4825c8326b0e7952a9b33bcced6bcff307187db4
 
 AllStimSoc=NULL
 AllStimSoc$Item=c(1:48)
