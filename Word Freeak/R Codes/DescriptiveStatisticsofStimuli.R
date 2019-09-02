@@ -6,8 +6,7 @@
 #~Spat,Space and maybe some other things stand for Spacial                               #
 #~Ambi stands for Ambiguous                                                              #
 #~Nambi Stands for Non-Ambiguous                                                         #
-#Trickle down changes should be made to the excel files "AllStim","AllstimSoc"and        #
-#AllstimSpace or whatever you wanna call them.                                          #
+#Trickle down changes should be made to the excel file 'MDMK'                             #
 ##########################################################################################
 #Sorted out code#
 #
@@ -42,20 +41,39 @@ library("readr")
 library("tidyr")
 #Data
 ########
+# Note: MDMK is a huge excel file that Contains a great deal of excel formulas which makes it easier to
+# make trickle down changes and makes it easy to edit stimuli that are then read and analyised
+# these changes should be applied into columns W,X,Y,Z for the Stimuli, changes to the questions are 
+# made in AC, AH and AM. These columns don't have names making it harder to accidentally change them.
 
-AllStim <- read_excel("Stimuli/AllStim.xlsx")
+#For older version of allstim use  read_excel("Stimuli/AllStim.xlsx"
+
+MDMK= read_excel("Stimuli/MDMK.xlsx")
+
+AllStim=NULL
+AllStim$Item=c(1:48)
+AllStim$Ambi=MDMK$AllStimAmbi
+AllStim$Spat=MDMK$AllStimSpat
+AllStim$Soc=MDMK$AllStimSoc
+AllStim=as.data.frame(AllStim)
+AllStim=na.omit(AllStim)
+write_csv2(AllStim,"Stimuli/Allstim.csv")
+
+
 AllStimSoc=NULL
 AllStimSoc$Item=c(1:48)
 AllStimSoc$Ambi=AllStim$Ambi
 AllStimSoc$Soc=AllStim$Soc
 AllStimSoc=as.data.frame(AllStimSoc)
-write.csv(AllStimSoc,"Stimuli/AllStimSoc.CSV")
+write_csv2(AllStimSoc,"Stimuli/AllStimSoc.csv")
+
 AllStimSpace=NULL
 AllStimSpace$Item=c(1:48)
 AllStimSpace$Ambi=AllStim$Ambi
 AllStimSpace$Spat=AllStim$Spat
 AllStimSpace=as.data.frame(AllStimSpace)
-write.csv(AllStimSpace,"Stimuli/AllStimSpace.CSV")
+write_csv2(AllStimSpace,"Stimuli/AllStimSpace.csv")
+
 
 #Master Table 
 MasterTable <- read_excel("Output Table/MasterTable.xlsx")
@@ -280,9 +298,10 @@ MasterTable$SpaMeanWordLength<-spaMWL
 #Social
 ###############
 
-
-Soc=AllStim$Soc
-Sockinc=textstat_readability(Soc,measure="Flesch.Kincaid")
+AllStimSoc=read_csv2("Stimuli/AllStimSoc.csv")
+#Soc=AllStim$Soc
+#Soc=as.data.frame(Soc)
+Sockinc=textstat_readability(AllStimSoc$Soc,measure="Flesch.Kincaid")
 
 MasterTable$`SocF-K`<-Sockinc$Flesch.Kincaid
 
@@ -291,8 +310,9 @@ MasterTable$`SocF-K`<-Sockinc$Flesch.Kincaid
 ################
 #Space
 ################
-Spacer=AllStim$Spat
-Spacekinc=textstat_readability(Spacer ,measure="Flesch.Kincaid")
+AllStimSpace=read_csv2("Stimuli/AllStimSpace.csv")
+#Spacer=AllStim$Spat
+Spacekinc=textstat_readability(AllStimSpace$Spat ,measure="Flesch.Kincaid")
 MasterTable$`SpaF-K`<-Spacekinc$Flesch.Kincaid
 
 #############
