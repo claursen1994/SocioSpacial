@@ -9,10 +9,10 @@ Visual.offsetY= 150; % Y offset of the text
 Visual.sentPos= [Visual.offsetX Visual.offsetY]; % sentence position
 Visual.FGC= [0 0 0]; % stimuli colour
 Visual.BGC= [255 255 255]; % background colour
-Visual.Pix_per_Letter= 13; % letter width in pixels
+Visual.Pix_per_Letter= 12; % letter width in pixels
 Visual.FontSize= 16; % Consolas: 16: 14ppl # Courier New: 18pt: 14ppl; 16pt: 13ppl; 14pt: 11ppl
 Visual.TextSpacing= 2; % text spacing between lines (multi-line only)
-Visual.LetterHeight= 22; % letter height in pixels  (multi-line only)
+Visual.LetterHeight= 21; % letter height in pixels  (multi-line only)
 Visual.Font= 'Consolas'; %'Courier New';
 Visual.TextSize= 18; % possibly unused?
 Visual.InstrTextSize= 24; % unused
@@ -20,9 +20,10 @@ Visual.GazeBoxSize= 50; % gaze box size in pixels
 Visual.GazeBoxColor= [0 0 0]; % colour of the gaze-box
 Visual.gazeBoxDur= 100; % how many ms the eye needs to stay on the gaze box before triggering it
 Visual.gazeBoxDisplayTime= 7; % how many seconds to wait to trigger the gaze box
-Visual.offsetX2= 50;
-Visual.offsetY2= 50;
-Visual.sentPos2= [Visual.offsetX2 Visual.offsetY2];
+% Visual.offsetX2= 50;
+% Visual.offsetY2= 50;
+% Visual.sentPos2= [Visual.offsetX2 Visual.offsetY2];
+
 % Const (experiment-wide)
 const.breakTime= 2*60; % break time in the experiment (in seconds)
 const.hasAudio= false; % is there audio in the experiment (used for set-up)

@@ -1,18 +1,19 @@
 %Screen('Preference', 'SkipSyncTests', 0); 
 %change to 1 if it's getting fucky
-global const; 
-
 % settings:
 clear all;
 clear mex;
 clear functions;
+
+global const; 
 
 %Directory set
 
 %%%%%%%%%%%%%%
 %Windows P111%
 %%%%%%%%%%%%%%
-cd('C:\Users\Eyetracker\Desktop\Calvin Laursen\LabCodeC');
+cd('C:\Users\Eyetracker\Desktop\Calvin Laursen\Socio Spatial All files\worb\SocioSpacial\LabCodeC');
+addpath(genpath(cd));
 
 %%%%%%%%%%%%%%%%%%%
 %Directory in P104%
@@ -27,7 +28,7 @@ cd('C:\Users\Eyetracker\Desktop\Calvin Laursen\LabCodeC');
 %Directory in P104
 %cd('H:\Profile\Desktop\worb\SocioSpacial\SocioSpatial Experiment MatlabCode');
 %addpath([cd '\functions'], [cd '\corpus'], [cd '\corpus\Sorted Texts'], [cd '\design']);
-addpath(genpath(cd));
+
 
 % functs
 settings; % load settings

@@ -44,7 +44,7 @@ Screen('Flip', Monitor.window);
 ShowCursor(0); 
 
 imageArray= Screen('GetImage', Monitor.window, [0 0 Visual.resX Visual.resY]);
-imwrite(imageArray, 'disp.bmp');
+imwrite(imageArray, 'dispQ.bmp');
 
 Eyelink('Command', 'set_idle_mode');
 Eyelink('Command', 'clear_screen 0');
@@ -52,7 +52,7 @@ status= Eyelink('ImageTransfer', 'disp.bmp', 0, 0, 0, 0,0, 0, 16);
  
 % Initial question stamps:
 Eyelink('Message', ['TRIALID F' num2str(cond) 'I' num2str(item) 'D' num2str(D)]);
-stim2edfML(comp_qn_and_all_answers); % print question string to edf file:
+stim2edfMLQ(comp_qn_and_all_answers); % print question string to edf file:
 %Posibility of changing this to comp_qn_and_all_answers instead of questionstring as it's a better name
 
 Eyelink('Message', ['QUESTION_ANSWER ' num2str(corr_ans)]);

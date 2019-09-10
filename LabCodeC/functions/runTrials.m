@@ -10,6 +10,8 @@ HideCursor;
 % Calibrate the eye tracker
 EyelinkDoTrackerSetup(el);
 
+const.ntrials= 1;
+
 % Trial presentation loop:
 for i=1:const.ntrials
     % stimuli set-up:
@@ -21,12 +23,34 @@ for i=1:const.ntrials
         whichRow= find(sent.item== item & sent.cond== cond, 1);
     else % Spatial 1st (cond 5 - 8)
         whichRow= find(sent.item== item & sent.cond== cond, 1); 
-end
+    end
    
-    sentenceString = char(sent.Stimulus(whichRow));
-    sentenceString = strjoin(strsplit(sentenceString, '"'));
-    sentenceString = format_text(sentenceString , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
 
+    P1_text= char(sent.P1(whichRow));
+    P1_text = format_text(P1_text , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+    P2_text= char(sent.P2(whichRow));
+    P2_text = format_text(P2_text , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+    
+    if strcmp(P1_text(length(P1_text)-1:end), '\n')
+        sentenceString= [P1_text '\n' P2_text];
+    else
+        sentenceString= [P1_text '\n\n' P2_text];
+    end
+    
+    
+%     sentenceString = char(sent.Stimulus(whichRow));
+%     sentenceString = strjoin(strsplit(sentenceString, '"'));
+%     sentenceString = format_text(sentenceString , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+    %Alternative presentation
+%     sentenceString= char(sent.P1(whichRow));
+%     sentenceString=strjoin(strplit(sentenceString,'"'));
+%     sentenceString=format_text(sentenceString, Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+%     
+%     sentenceString2=char(sent.P2(whichRow));
+%     sentenceString2=strjoin(strplit(sentenceString2,'"'));
+%     sentenceString2=format_text(sentenceString2, Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+%     
+%     sentenceString=strjoin(sentenceString,sentenceString2)
     % drift check:
     EyelinkDoDriftCorrection(el);
     
@@ -52,6 +76,7 @@ end
               
         % Draw the paragraph to back buffer
         DrawFormattedText(Monitor.buffer(2), sentenceString, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, [], [], [], Visual.TextSpacing*1.95);
+        
         
         % don't know what PPL is
         if const.checkPPL
@@ -121,28 +146,31 @@ end
     my_indexer = ((item-1) * 8) + cond; % my_indexer picks the row
     
     % Question 1 ? for eyelink?
-    options= [ '1)  ' char(Quest.Q1O1(my_indexer)) '/n' '2)  ' char(Quest.Q1O2(my_indexer)) '/n' '3)  ' char(Quest.Q1O3(my_indexer))];
+    options= [ '1)  ' char(Quest.Q1o1(my_indexer)) '/n' '2)  ' char(Quest.Q1o2(my_indexer)) '/n' '3)  ' char(Quest.Q1o3(my_indexer))];
     options= strjoin(strsplit(options, '"'));    
     question= char(Quest.Q1(my_indexer));
+%     question= strjoin(strsplit(question, '"'));
+%     question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
     question= strjoin(strsplit(question, '"'));
-    question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX2);
 
     answer1= QuestionMC(question, strsplit(options, '/n'), Quest.Q1corr_ans(my_indexer), item, cond, 1);
     
     % Question 2 ? for eyelink?
-    options= [ '1)  ' char(Quest.Q2O1(my_indexer)) '/n' '2)  ' char(Quest.Q2O2(my_indexer)) '/n' '3)  ' char(Quest.Q2O3(my_indexer))];
+    options= [ '1)  ' char(Quest.Q2o1(my_indexer)) '/n' '2)  ' char(Quest.Q2o2(my_indexer)) '/n' '3)  ' char(Quest.Q2o3(my_indexer))];
     options= strjoin(strsplit(options, '"'));     
     question= char(Quest.Q2(my_indexer));
     question= strjoin(strsplit(question, '"'));
-    question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX2);
+%     question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+%     question= strjoin(strsplit(question, '"'));
     answer2= QuestionMC(question, strsplit(options, '/n'), Quest.Q2corr_ans(my_indexer), item, cond, 1);
     
     % Question 2 ? for eyelink?
-    options= [ '1)  ' char(Quest.Q3O1(my_indexer)) '/n' '2)  ' char(Quest.Q3O2(my_indexer)) '/n' '3)  ' char(Quest.Q3O3(my_indexer))];
+    options= [ '1)  ' char(Quest.Q3o1(my_indexer)) '/n' '2)  ' char(Quest.Q3o2(my_indexer)) '/n' '3)  ' char(Quest.Q3o3(my_indexer))];
     options= strjoin(strsplit(options, '"'));    
     question= char(Quest.Q3(my_indexer));
     question= strjoin(strsplit(question, '"'));
-    question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX2);
+%     question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
+%     question= strjoin(strsplit(question, '"'));
     answer3= QuestionMC(question, strsplit(options, '/n'), Quest.Q3corr_ans(my_indexer), item, cond, 1);
     end
 
