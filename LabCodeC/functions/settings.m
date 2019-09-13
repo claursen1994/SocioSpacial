@@ -27,7 +27,7 @@ Visual.gazeBoxDisplayTime= 7; % how many seconds to wait to trigger the gaze box
 % Const (experiment-wide)
 const.breakTime= 2*60; % break time in the experiment (in seconds)
 const.hasAudio= false; % is there audio in the experiment (used for set-up)
-const.TrialTimeout= 3*60; % automatically terminates trial after x seconds
+const.TrialTimeout= 5*60; % automatically terminates trial after x seconds
 const.ncond= 8; % number of conditions, currently not in use?
 const.Maxtrials= 80; % number of experimental trials 
 const.seeEye= false; % if true, shows gaze position as a dot on the screen (for testing only!!)
