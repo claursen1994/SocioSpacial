@@ -51,29 +51,29 @@ library("tidyr")
 MDMK= read_excel("Stimuli/MDMK.xlsx")
 
 AllStim=NULL
-AllStim$Item=c(1:48)
+AllStim$Item=c(1:50)
 AllStim$Ambi=MDMK$AllStimAmbi
 AllStim$Spat=MDMK$AllStimSpat
 AllStim$Soc=MDMK$AllStimSoc
 AllStim=as.data.frame(AllStim)
-<<<<<<< HEAD
+
 AllStim=na.omit(AllStim)
 write_csv2(AllStim,"Stimuli/Allstim.csv")
 
-=======
+
   
 write.csv(Allstim,"Stimuli/Allstim.csv")
->>>>>>> 4825c8326b0e7952a9b33bcced6bcff307187db4
+
 
 AllStimSoc=NULL
-AllStimSoc$Item=c(1:48)
+AllStimSoc$Item=c(1:50)
 AllStimSoc$Ambi=AllStim$Ambi
 AllStimSoc$Soc=AllStim$Soc
 AllStimSoc=as.data.frame(AllStimSoc)
 write_csv2(AllStimSoc,"Stimuli/AllStimSoc.csv")
 
 AllStimSpace=NULL
-AllStimSpace$Item=c(1:48)
+AllStimSpace$Item=c(1:50)
 AllStimSpace$Ambi=AllStim$Ambi
 AllStimSpace$Spat=AllStim$Spat
 AllStimSpace=as.data.frame(AllStimSpace)
