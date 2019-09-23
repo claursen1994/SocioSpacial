@@ -9,8 +9,8 @@ HideCursor;
 
 % Calibrate the eye tracker
 EyelinkDoTrackerSetup(el);
-
-const.ntrials= 1;
+% deComment if testing, Comment if not testing 
+%  const.ntrials= 1;
 
 % Trial presentation loop:
 for i=1:const.ntrials
@@ -162,7 +162,7 @@ for i=1:const.ntrials
     question= strjoin(strsplit(question, '"'));
 %     question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
 %     question= strjoin(strsplit(question, '"'));
-    answer2= QuestionMC(question, strsplit(options, '/n'), Quest.Q2corr_ans(my_indexer), item, cond, 1);
+    answer2= QuestionMC(question, strsplit(options, '/n'), Quest.Q2corr_ans(my_indexer), item, cond, 2);
     
     % Question 2 ? for eyelink?
     options= [ '1)  ' char(Quest.Q3o1(my_indexer)) '/n' '2)  ' char(Quest.Q3o2(my_indexer)) '/n' '3)  ' char(Quest.Q3o3(my_indexer))];
@@ -171,7 +171,8 @@ for i=1:const.ntrials
     question= strjoin(strsplit(question, '"'));
 %     question= format_text(question , Visual.resX, Visual.Pix_per_Letter, Visual.offsetX);
 %     question= strjoin(strsplit(question, '"'));
-    answer3= QuestionMC(question, strsplit(options, '/n'), Quest.Q3corr_ans(my_indexer), item, cond, 1);
+    answer3= QuestionMC(question, strsplit(options, '/n'), Quest.Q3corr_ans(my_indexer), item, cond, 3);
+    
     end
 
 
