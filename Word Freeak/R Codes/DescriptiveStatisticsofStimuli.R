@@ -6,7 +6,9 @@
 #~Spat,Space and maybe some other things stand for Spacial                               #
 #~Ambi stands for Ambiguous                                                              #
 #~Nambi Stands for Non-Ambiguous                                                         #
-#Trickle down changes should be made to the excel file 'MDMK'                             #
+#Trickle down changes should be made to the excel file 'MDMK'    
+# To Change the Simuli in their CSV Files for Matlab Run The Descriptive Statistics of Stimuli 1st,
+#Followed by Analysis of Statistics, and then Matlab Stimuli Maker
 ##########################################################################################
 #Sorted out code#
 #
