@@ -3,7 +3,7 @@
 ###############################################
 #sent#
 
-NumQuest=read_excel("LabCodeC/corpus/Old and Uneeded/NumericQuest.xlsx")
+#NumQuest=read_excel("LabCodeC/corpus/Old and Uneeded/NumericQuest.xlsx")
 
 sent=NULL
 sent$item=MDMK$item
