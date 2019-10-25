@@ -42,7 +42,7 @@ library("readr")
 #Data
 ########
 
-AllQuest <- read_excel("Stimuli/Questions.xlsx")
+AllQuest <- read_excel("Stimuli/CheckQuest.xlsx")
 
 
 
@@ -51,13 +51,14 @@ AllQuest <- read_excel("Stimuli/Questions.xlsx")
 #Clean the questions and pull out the descriptives 
 AllQuest$SoCleanQ=NULL
 AllQuest$SpCleanQ=NULL
+AllQuest$Item=NULL
+AllQuest$Item=1:25
 
+AllQuest$SpaCleanQ=tolower(AllQuest$SPAQ)
+AllQuest$SocCleanQ=tolower(AllQuest$SocQ)
 
-AllQuest$SoCleanQ=tolower(AllQuest$`Social Question`)
-AllQuest$SpCleanQ=tolower(AllQuest$`Spatial Question`)
-
-AllQuest$SoCleanQ=removePunctuation(AllQuest$`Social Question`)
-AllQuest$SpCleanQ=removePunctuation(AllQuest$`Spatial Question`)
+AllQuest$SoCleanQ=removePunctuation(AllQuest$SpaCleanQ)
+AllQuest$SpCleanQ=removePunctuation(AllQuest$SocCleanQ)
 
 AllQuest$SocQNW=sapply(AllQuest$SoCleanQ, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
 AllQuest$SpaQNW=sapply(AllQuest$SpCleanQ, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
@@ -85,13 +86,13 @@ for(i in AllQuest$Item){
 
 
 for (i in AllQuest$Item) {
-  write(AllQuest$`Social Question`[i], paste0("Word Freeak/TextFiles/SocQuest/SocQuest",
+  write(AllQuest$SocQ[i], paste0("Word Freeak/TextFiles/SocQuest/SocQuest",
                                      AllQuest$Item[i], ".txt", sep="" ))}
 ###########
 #Spatial
 ###########
 for (i in AllQuest$Item) {
-  write(AllQuest$`Spatial Question`[i], paste0("Word Freeak/TextFiles/SpaQuest/SpaQuest",
+  write(AllQuest$SPAQ[i], paste0("Word Freeak/TextFiles/SpaQuest/SpaQuest",
                                            AllQuest$Item[i], ".txt", sep="" ))}
 
 #Get Num Fuc 4 file sorting#
@@ -106,13 +107,13 @@ get_num<- function(string){as.numeric(unlist(gsub("[^0-9]", "", unlist(string)),
 
 
 
-SocQkinc=textstat_readability(AllQuest$`Social Question`,measure="Flesch.Kincaid")
+SocQkinc=textstat_readability(AllQuest$SocQ,measure="Flesch.Kincaid")
+AllQuest$SocQKinc=NULL
+AllQuest$SocQKinc<-SocQkinc$Flesch.Kincaid
 
-AllQuest$SocQKinc<-Sockinc$Flesch.Kincaid
-
-SpaQkinc=textstat_readability(AllQuest$`Spatial Question`,measure="Flesch.Kincaid")
-
-AllQuest$SpaKinc<-SpaQkinc$Flesch.Kincaid
+SpaQkinc=textstat_readability(AllQuest$SPAQ,measure="Flesch.Kincaid")
+AllQuest$SpaQKinc=NULL
+AllQuest$SpaQKinc<-SpaQkinc$Flesch.Kincaid
 
 
 #####################
