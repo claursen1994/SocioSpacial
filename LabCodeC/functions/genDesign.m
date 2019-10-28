@@ -25,7 +25,7 @@ exp_items= cpsr;
 %Practice items:
 % condition always the same (e.g. 9)
 c1 = (25:26)'; % column 1 is item number
-c2 = [9,9]'; %repmat(9,6,1); % column 2 is condition (always 9)
+c2 = [1,1]'; %repmat(9,6,1); % column 2 is condition (always 9)
 pr = horzcat(c1,c2); % 2- column matrix 
 
 %Randomise practice items as above:
