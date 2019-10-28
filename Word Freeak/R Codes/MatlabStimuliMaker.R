@@ -12,8 +12,12 @@ sent$P1=MDMK$P1
 sent$P2=MDMK$P2
 sent$Stimulus=MDMK$Stimulus
 sent=as.data.frame(sent)
+
 #write.csv2(sent,"LabCodeC/corpus/sent.csv")# for some reason csv 2 not working. 
 write.csv(sent,"LabCodeC/corpus/sent.csv")
+write.table(sent, file = "LabCodeC/corpus/sent.txt",
+            
+            append = FALSE, sep = "\t", col.names = TRUE ,row.names = TRUE, quote = TRUE)
 ######################################################
 #quest#
 
@@ -35,3 +39,6 @@ Quest$Q3o3=MDMK$Q3O3
 Quest$Q3corr_ans=MDMK$Q3corr_ans
 Quest=as.data.frame(Quest)
 write.csv(Quest,"LabCodeC/corpus/Quest.csv")
+write.table(Quest, file = "LabCodeC/corpus/Quest.txt",
+      
+      append = FALSE, sep = "\t")
