@@ -56,24 +56,25 @@ write.csv2(Quest,"LabCodeC/corpus/QuestAnaly")
 ###########################
 
 if(!file.exists("data/Quest.Rda")){
-  Quest<- Question(data_list = data_dir, maxtrial = 100)
-  save(Quest, file= "data/Quest.Rda")
-  write.csv2(Quest, "data/Quest.csv")
+  QuestDa<- Question(data_list = data_dir, maxtrial = 100)
+  save(Quest, file= "data/QuestDa.Rda")
+  write.csv2(QuestDa, "data/QuestDa.csv")
 } else{
   load("data/Quest.Rda")
 }
 
 
 library(reshape)
-DesQuest<- melt(Quest, id=c('sub', 'item', 'cond'), 
+DesQuest<- melt(QuestDa, id=c('sub', 'item', 'cond'), 
                 measure=c("accuracy"), na.rm=TRUE)
-mQuest<- cast(DesQuest, sub ~ variable
+mQuestBySub<- cast(DesQuest, sub ~ variable
               ,function(x) c(M=signif(mean(x),3)
                              , SD= sd(x) ))
-mQuest
+mQuestBySub
 ##############################
 #Check Comprehension Data
 ###############################
+#Compared By Subject
 CompQ=split(Quest,Quest$dependnum)
 CompQ=CompQ$`3`
 
@@ -82,120 +83,238 @@ CompDesQuest<- melt(CompQ, id=c('sub', 'item', 'cond'),
 CompmQuest<- cast(CompDesQuest, sub ~ variable
               ,function(x) c(M=signif(mean(x),3)
                              , SD= sd(x) ))
-#################
-# Q1vs Q2 General
-#################
+
+#Compared by Item
+CompQ=split(Quest,Quest$dependnum)
+CompQ=CompQ$`3`
+
+CompDesQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
+                    measure=c("accuracy"), na.rm=TRUE)
+CompmQuest<- cast(CompDesQuest, item ~ variable
+                  ,function(x) c(M=signif(mean(x),3)
+                                 , SD= sd(x) ))
+plot(CompmQuest$item,CompmQuest$accuracy_M)
+
+
+
+#Questions Without COmprehension Data
+NoCompQ=rbind(Q0$`1`,Q0$`2`)
+NoCompQ=melt(NoCompQ, id=c('sub', 'item', 'cond'), 
+              measure=c("accuracy"), na.rm=TRUE)
+NoCompQ<- cast(NoCompQ, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+plot(NoCompQ$item,NoCompQ$accuracy_M)
+
+
+# Items by condition
 Q0=split(Quest,Quest$dependnum)
 Q1=Q0$`1`
 Q2=Q0$`2`
+Q1s=split(Q1,Q1$cond)
+Q2s=split(Q2,Q2$cond)
 
+AmbiSocQ1=rbind(Q1s$`1`,Q1s$`3`)
+NamibiSocQ1=rbind(Q1s$`2`,Q1s$`4`)
+AmbiSpaQ1=rbind(Q1s$`5`,Q1s$`7`)
+NambiSpaQ1=rbind(Q1s$`6`,Q1s$`8`)
+
+AmbiSocQ2=rbind(Q2s$`5`,Q2s$`8`)
+NamibiSocQ2=rbind(Q2s$`6`,Q2s$`7`)
+AmbiSpaQ2=rbind(Q2s$`1`,Q2s$`4`)
+NambiSpaQ2=rbind(Q2s$`2`,Q2s$`3`)
+
+AmbiSoc0=rbind(AmbiSocQ1,AmbiSocQ2)
+AmbiSpa0=rbind(AmbiSpaQ1,AmbiSpaQ2)
+NambiSoc0=rbind(NamibiSocQ1,NamibiSocQ2)
+NambiSpa0=rbind(NambiSpaQ1,NambiSpaQ2)
+
+AmbiGen=rbind(AmbiSoc0,AmbiSpa0)
+NambiGen=rbind(NambiSoc0,NambiSpa0)
+
+SpaGen=rbind(AmbiSpa0,NambiSpa0)
+SocGen=rbind(AmbiSoc0,NambiSoc0)
+
+AMG=melt(AmbiGen, id=c('sub', 'item', 'cond'), 
+             measure=c("accuracy"), na.rm=TRUE)
+AMG<- cast(AMG, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+NAMG=melt(NambiGen, id=c('sub', 'item', 'cond'), 
+          measure=c("accuracy"), na.rm=TRUE)
+NAMG<- cast(NAMG, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+#Plots
+
+#General Ambi Vs Nambi
+p = ggplot() + 
+  geom_line(data = AMG, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = NAMG, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(p)
+
+#General Social vs Spatial
+SPAG=melt(SpaGen, id=c('sub', 'item', 'cond'), 
+         measure=c("accuracy"), na.rm=TRUE)
+SPAG<- cast(SPAG, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+SOCG=melt(SocGen, id=c('sub', 'item', 'cond'), 
+          measure=c("accuracy"), na.rm=TRUE)
+SOCG<- cast(SOCG, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+
+G=  ggplot() + 
+  geom_line(data = SPAG, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = SOCG, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(G)
+#####################
+# General Q1 vs Q2 
+#######################
 Q1DesQuest<- melt(Q1, id=c('sub', 'item', 'cond'), 
-                    measure=c("accuracy"), na.rm=TRUE)
-Q1Q<- cast(Q1DesQuest, sub ~ variable
-                  ,function(x) c(M=signif(mean(x),3)
-                                 , SD= sd(x) ))
+                  measure=c("accuracy"), na.rm=TRUE)
+Q1Q<- cast(Q1DesQuest, item ~ variable
+           ,function(x) c(M=signif(mean(x),3)
+                          , SD= sd(x) ))
+
 Q2DesQuest<- melt(Q2, id=c('sub', 'item', 'cond'), 
                   measure=c("accuracy"), na.rm=TRUE)
-Q2Q<- cast(Q2DesQuest, sub ~ variable
+Q2Q<- cast(Q2DesQuest, item ~ variable
            ,function(x) c(M=signif(mean(x),3)
-   
-                                     , SD= sd(x) ))
+           , SD= sd(x) ))
+H=  ggplot() + 
+  geom_line(data = Q1Q, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = Q2Q, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(H) 
+#################
+# ASPA vs NSPA
+##################
+ASPA=melt(AmbiSpa0, id=c('sub', 'item', 'cond'), 
+         measure=c("accuracy"), na.rm=TRUE)
+ASPA<- cast(ASPA, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
-t.test(Q1Q$accuracy_M,Q2Q$accuracy_M)
-#
-#General
-#
-CondQP= melt(Quest,id=c('sub', 'item', 'cond'),
-             measure=c("accuracy"), na.rm=TRUE)
-CondQ=cast(CondQP,cond ~ variable,
-           function(x) c(M=signif(mean(x),3)
-                         , SD= sd(x) ))
+NSPA=melt(NambiSpa0, id=c('sub', 'item', 'cond'), 
+          measure=c("accuracy"), na.rm=TRUE)
+NSPA<- cast(NSPA, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+Y=  ggplot() + 
+  geom_line(data = ASPA, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = NSPA, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(Y)
+###################
+#ASOC vs NSOC
+####################
+ASOC=melt(AmbiSoc0, id=c('sub', 'item', 'cond'), 
+          measure=c("accuracy"), na.rm=TRUE)
+ASOC<- cast(ASOC, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+NSOC=melt(NambiSoc0, id=c('sub', 'item', 'cond'), 
+          measure=c("accuracy"), na.rm=TRUE)
+NSOC<- cast(NSOC, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+X=  ggplot() + 
+  geom_line(data = ASOC, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = NSOC, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(X)
+
+
+###############################
+# ASOC vs ASPA & NSOC vs NSPA
+###############################
+J=  ggplot() + 
+  geom_line(data = ASOC, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = ASPA, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(J)
+
+R=  ggplot() + 
+  geom_line(data = NSOC, aes(x = item, y = accuracy_M), color = "blue") +
+  geom_line(data = NSPA, aes(x = item, y = accuracy_M), color = "red") +
+  xlab('item') +
+  ylab('accuracy')
+print(R)
+
+#####################
+#Accuracy by duration
+#####################
+
+Overalls=rbind(Q1,Q2)
+TD=melt(Overalls, id=c('sub', 'item', 'cond','duration_ms'), 
+          measure=c("duration_ms"), na.rm=TRUE)
+TDS<- cast(TD, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+R=  ggplot() + 
+  geom_line(data = TDS, aes(x = item, y = duration_ms_M), color = "blue") +
+  xlab('item') +
+  ylab('duration_ms')
+print(R)
+######################
+# Sorted Out Data Set#
+######################
+
+SDS=NULL
+SDS$item=1:24
+SDS$sub=NULL
+SDS$Q1ASPA=NULL
+SDS$Q
+SDS$Q2cond=NULL
+SDS$
+
+
+
+###################
+#GLMM for accuracy#
+
+       
+                                      
+Overalls$cond<- as.factor(Overalls$cond)
+Overalls$dependnum<- as.factor(Overalls$dependnum)
+Overalls$item=as.factor(Overalls$item)
+
+#contrasts(Overalls$cond)<- c(-.5, 0.5)
+#contrasts(Overalls$dependnum)<- c(-1, 1)
+
+  TGLM<- glmer(accuracy ~ cond + (1|item)  +(1|sub), data = Overalls, family= binomial)
+
+  summary(TGLM)
+
+
+round(coef(summary(TGLM)), 2)
+
+#Plots:
+TGLMP= Effect(("cond"), TGLM)
+
+summary(TGLMP)
+# 
+GD= as.data.frame(TGLMP)
+TGLMP<- ggplot(GD, aes(x= cond, y=fit, ymax= upper, ymin= lower,
+                        color=cond, linetype= cond, fill= cond, shape= cond)) + theme_bw (22)+
+  geom_line(size= 1)+ geom_point(size=4)+
+   labs(x= "condition", y= "accuracy", 
+        color= "", shape= '', linetype= '', fill= '') +
+   geom_ribbon(alpha= 0.2, color= NA) + theme(legend.position = c(0.87, 0.88), legend.title=element_blank(),
+                                             legend.key.width = unit(1.5, 'cm'), legend.key.height = unit(0.75, 'cm'), 
+                                             panel.grid.major = element_line(size = 0.5, linetype = 'solid', colour = "white"), 
+                                            panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "white"),
+                                              strip.background = element_rect(colour="white", fill="white"),
+                                             strip.text = element_text(size=22, face="bold"), text=element_text(family="serif"))
 
 
 
 
-plot(CondQ$cond,CondQ$accuracy_M)
 
-
-#Q1
-CondQP1= melt(Q1,id=c('sub', 'item', 'cond'),
-             measure=c("accuracy"), na.rm=TRUE)
-CondQ1=cast(CondQP1,cond ~ variable,
-           function(x) c(M=signif(mean(x),3)
-                         , SD= sd(x) ))
-
-plot(CondQ1$cond,CondQ1$accuracy_M)
-
-#Q2
-CondQP2= melt(Q2,id=c('sub', 'item', 'cond'),
-              measure=c("accuracy"), na.rm=TRUE)
-CondQ2=cast(CondQP2,cond ~ variable,
-            function(x) c(M=signif(mean(x),3)
-                          , SD= sd(x) ))
-
-plot(CondQ2$cond,CondQ2$accuracy_M)
-
-plot(condQ1$Cond,CondQ1$accuracy_M,)
-
-t.test(CondQ1$accuracy_M,CondQ2$accuracy_M)
-
-###
-#Check by Item General
 ####
+#Sim
 
-ItemT= melt(Quest,id=c('sub', 'item', 'cond'),
-              measure=c("accuracy"), na.rm=TRUE)
-ItemT=cast(ItemT,item ~ variable,
-            function(x) c(M=signif(mean(x),3)
-                          , SD= sd(x) ))
-
-plot(ItemT$item,ItemT$accuracy_M)
-
-####
-#Check by Item 
-####
-
-Q1byItem= melt(Q1,id=c('sub', 'item', 'cond'),
-                       measure=c("accuracy"), na.rm=TRUE)
-Q1byItem=cast(Q1byItem,item ~ variable,
-            function(x) c(M=signif(mean(x),3)
-                          , SD= sd(x) ))
-
-Q2byItem=melt(Q2,id=c('sub', 'item', 'cond'),
-              measure=c("accuracy"), na.rm=TRUE)
-Q2byItem=cast(Q2byItem,item ~ variable,
-              function(x) c(M=signif(mean(x),3)
-                            , SD= sd(x) ))
-
-TrialOrder=melt(Quest,id=c('sub', 'item', 'cond','seq'),
-              measure=c("accuracy"), na.rm=TRUE)
-TrialOrder=cast(TrialOrder,seq ~ variable,
-              function(x) c(M=signif(mean(x),3)
-                            , SD= sd(x) ))
-
-plot(TrialOrder$seq,TrialOrder$accuracy_M)
-###########################################
-# Accuracy if Social was 1st vs Social 2nd
-###########################################
-YT=melt(Quest,id=c('sub', 'item', 'cond','seq', 'dependnum', 'duration_ms'),
-                measure=c("accuracy"), na.rm=TRUE)
-YT=cast(YT, cond ~ variable,
-                function(x) c(M=signif(mean(x),3)
-                              , SD= sd(x) ))
-
-ggplot(YT, aes(x=YT$cond, y=YT$accuracy_M)) + geom_point()
-
-YT=split(Quest,Quest$dependnum)
-
-YT=merge(YT$`1`,YT$`2`)
-
-
-
-
-
-
-
-
+fixef(TGLM)["size"]<- 0.05
+PS=powerSim(TGLM,fixed("size", "z"),nsim=150)
+summary(PS)
 
 
 
