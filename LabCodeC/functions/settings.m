@@ -4,8 +4,8 @@ global Visual const;
 Visual.resX= 1920; % Screen resolution, X-axis; P111
 Visual.resY= 1080; % Screen resolution, Y-axis; P111
 Visual.frameRate= 120; % frame rate of monitor (saved to edf file)
-Visual.offsetX= 100; %200; % X offset of the text
-Visual.offsetY= 150; % Y offset of the text
+Visual.offsetX= 450; %200; % X offset of the text
+Visual.offsetY= 100; % Y offset of the text
 Visual.sentPos= [Visual.offsetX Visual.offsetY]; % sentence position
 Visual.FGC= [0 0 0]; % stimuli colour
 Visual.BGC= [255 255 255]; % background colour

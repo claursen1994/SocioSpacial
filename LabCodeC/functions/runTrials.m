@@ -10,20 +10,19 @@ HideCursor;
 % Calibrate the eye tracker
 EyelinkDoTrackerSetup(el);
 % deComment if testing, Comment if not testing 
-%  const.ntrials= 1;
+%   const.ntrials= 1;
 
 % Trial presentation loop:
 for i=1:const.ntrials
     % stimuli set-up:
+    
     trialEnd= false; 
 	item= design(i,1); % item is 1st column
     cond= design(i,2); % condition is 2nd column
     
-    if cond< 5 % Social 1st (cond 1 - 4)
-        whichRow= find(sent.item== item & sent.cond== cond, 1);
-    else % Spatial 1st (cond 5 - 8)
-        whichRow= find(sent.item== item & sent.cond== cond, 1); 
-    end
+    whichRow= find(sent.item== item & sent.cond== cond, 1);
+   
+   
    
 
     P1_text= char(sent.P1(whichRow));
@@ -36,6 +35,10 @@ for i=1:const.ntrials
     else
         sentenceString= [P1_text '\n\n' P2_text];
     end
+   
+    
+%         sentenceString= [P1_text '\n\n' P2_text];
+  
     
     
 %     sentenceString = char(sent.Stimulus(whichRow));
@@ -126,7 +129,8 @@ for i=1:const.ntrials
         % end trial automatically if no response by participant
         if trialTime> const.TrialTimeout 
              trialEnd= true;
-             tracker.log('TRIAL ABORTED')
+             Eyelink('Message', 'TRIAL TIMEOUT');
+             %tracker.log('TRIAL ABORTED')
  			 Screen('FillRect', Monitor.window, Visual.BGC); % clear subject screen
              Screen('Flip', Monitor.window);
         end

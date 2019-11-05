@@ -35,6 +35,7 @@ prr = pr(randperm (length(pr)),:);
 %design = [prr; exp_items];
 design = [prr; exp_items];
 
+
 % save design matrix for our records:
 savefile= ['design/sub_matrix/s_' num2str(const.ID) '.mat'];
 save(savefile, 'design');

@@ -14,13 +14,13 @@ Screen('Flip', Monitor.window);
 
 % Defines the location of the click boxes
 % rect arguments are [top, left, right, bottom]
-dim1= [Visual.sentPos(1)-10, Visual.sentPos(2)+Visual.LetterHeight*3-Visual.LetterHeight/2, Visual.sentPos(1)+40, Visual.sentPos(2)+Visual.LetterHeight*4+Visual.LetterHeight/2];
-dim2= [Visual.sentPos(1)-10, Visual.sentPos(2)+Visual.LetterHeight*5+Visual.LetterHeight/2, Visual.sentPos(1)+40, Visual.sentPos(2)+Visual.LetterHeight*7+Visual.LetterHeight/2];
-dim3= [Visual.sentPos(1)-10, Visual.sentPos(2)+Visual.LetterHeight*8+Visual.LetterHeight/2, Visual.sentPos(1)+40, Visual.sentPos(2)+Visual.LetterHeight*10+Visual.LetterHeight/2];
+dim1= [100-10, Visual.sentPos(2)+Visual.LetterHeight*3-Visual.LetterHeight/2, 100+40, Visual.sentPos(2)+Visual.LetterHeight*4+Visual.LetterHeight/2];
+dim2= [100-10, Visual.sentPos(2)+Visual.LetterHeight*5+Visual.LetterHeight/2, 100+40, Visual.sentPos(2)+Visual.LetterHeight*7+Visual.LetterHeight/2];
+dim3= [100-10, Visual.sentPos(2)+Visual.LetterHeight*8+Visual.LetterHeight/2, 100+40, Visual.sentPos(2)+Visual.LetterHeight*10+Visual.LetterHeight/2];
 
 % put the comprehension question into the backbuffer: two possible ways:
 %   draws the comprehension question only
-Screen('DrawText', Monitor.window, question , Visual.sentPos(1), Visual.sentPos(2), Visual.FGC); 
+Screen('DrawText', Monitor.window, question , 100, Visual.sentPos(2), Visual.FGC); 
 %   draws the comprehension question and the (text of the) answers
 %DrawFormattedText(Monitor.window, comp_qn_and_all_answers, Visual.sentPos(1), Visual.sentPos(2), Visual.FGC, [], [], [], Visual.TextSpacing*1.95);
 %sentence shifting for space purposes (incomplete)
@@ -48,7 +48,7 @@ imwrite(imageArray, 'dispQ.bmp');
 
 Eyelink('Command', 'set_idle_mode');
 Eyelink('Command', 'clear_screen 0');
-status= Eyelink('ImageTransfer', 'disp.bmp', 0, 0, 0, 0,0, 0, 16);
+status= Eyelink('ImageTransfer', 'dispQ.bmp', 0, 0, 0, 0,0, 0, 16);
  
 % Initial question stamps:
 Eyelink('Message', ['TRIALID F' num2str(cond) 'I' num2str(item) 'D' num2str(D)]);
@@ -81,8 +81,8 @@ while answer<0
     [keyIsDown, seconds, keyCode]= KbCheck;
     keyCode= find(keyCode,1);
     if keyCode== escapeKey
-        % status= Eyelink('ReceiveFile');
-        % Eyelink('Shutdown');
+        status= Eyelink('ReceiveFile');
+        Eyelink('Shutdown');
         Screen('CloseAll');
         error('Experiment terminated by user');
     end
@@ -91,7 +91,7 @@ while answer<0
         % check whether the mouse clicked click box 1
         if IsInRect(x,y, dim1) 
             % redraw the comprehension question, and change the colour of the clicked-in box
-            Screen('DrawText', Monitor.window, question , Visual.sentPos(1), Visual.sentPos(2), Visual.FGC); % draws the comprehension question only
+            Screen('DrawText', Monitor.window, question ,100, Visual.sentPos(2), Visual.FGC); % draws the comprehension question only
             % Put the click boxes into the back buffer
             Screen('FillRect', Monitor.window , [189 255 183], dim1);
             Screen('FillRect', Monitor.window , [210 210 210], dim2);
@@ -108,7 +108,7 @@ while answer<0
         % check whether the mouse clicked click box 2
         if IsInRect(x,y, dim2) 
             % redraw the comprehension question, and change the colour of the clicked-in box
-            Screen('DrawText', Monitor.window, question , Visual.sentPos(1), Visual.sentPos(2), Visual.FGC); % draws the comprehension question only
+            Screen('DrawText', Monitor.window, question , 100, Visual.sentPos(2), Visual.FGC); % draws the comprehension question only
             % Put the click boxes into the back buffer
             Screen('FillRect', Monitor.window , [210 210 210], dim1);
             Screen('FillRect', Monitor.window , [189 255 183], dim2);
@@ -125,7 +125,7 @@ while answer<0
         % check whether the mouse clicked click box 3
         if IsInRect(x,y, dim3) 
             % redraw the comprehension question, and change the colour of the clicked-in box
-            Screen('DrawText', Monitor.window, question , Visual.sentPos(1), Visual.sentPos(2), Visual.FGC); % draws the comprehension question only
+            Screen('DrawText', Monitor.window, question , 100, Visual.sentPos(2), Visual.FGC); % draws the comprehension question only
             % Put the click boxes into the back buffer
             Screen('FillRect', Monitor.window , [210 210 210], dim1);
             Screen('FillRect', Monitor.window , [210 210 210], dim2);
