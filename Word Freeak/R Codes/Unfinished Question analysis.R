@@ -55,7 +55,7 @@ write.csv2(Quest,"LabCodeC/corpus/QuestAnaly")
 # Comprehension accuracy: #
 ###########################
 
-if(!file.exists("data/Quest.Rda")){
+if(!file.exists("data/QuestDa.Rda")){
   QuestDa<- Question(data_list = data_dir, maxtrial = 100)
   save(Quest, file= "data/QuestDa.Rda")
   write.csv2(QuestDa, "data/QuestDa.csv")
@@ -75,7 +75,7 @@ mQuestBySub
 #Check Comprehension Data
 ###############################
 #Compared By Subject
-CompQ=split(Quest,Quest$dependnum)
+CompQ=split(QuestDa,QuestDa$dependnum)
 CompQ=CompQ$`3`
 
 CompDesQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
@@ -85,7 +85,7 @@ CompmQuest<- cast(CompDesQuest, sub ~ variable
                              , SD= sd(x) ))
 
 #Compared by Item
-CompQ=split(Quest,Quest$dependnum)
+CompQ=split(QuestDa,QuestDa$dependnum)
 CompQ=CompQ$`3`
 
 CompDesQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
@@ -106,7 +106,7 @@ plot(NoCompQ$item,NoCompQ$accuracy_M)
 
 
 # Items by condition
-Q0=split(Quest,Quest$dependnum)
+Q0=split(QuestDa,QuestDa$dependnum)
 Q1=Q0$`1`
 Q2=Q0$`2`
 Q1s=split(Q1,Q1$cond)
@@ -192,11 +192,11 @@ print(H)
 ##################
 ASPA=melt(AmbiSpa0, id=c('sub', 'item', 'cond'), 
          measure=c("accuracy"), na.rm=TRUE)
-ASPA<- cast(ASPA, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+ASPA<- cast(ASPA, sub ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 NSPA=melt(NambiSpa0, id=c('sub', 'item', 'cond'), 
           measure=c("accuracy"), na.rm=TRUE)
-NSPA<- cast(NSPA, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+NSPA<- cast(NSPA, sub ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 Y=  ggplot() + 
   geom_line(data = ASPA, aes(x = item, y = accuracy_M), color = "blue") +
@@ -318,7 +318,16 @@ summary(PS)
 
 
 
+####
+#Checker
 
+Q0C=split(Q1,Q1$cond)
+Question1Ambiguous=rbind(Q0C$`1`,Q0C$`3`,Q0C$`5`,Q0C$`7`)
+Question1NonAmbiguous=rbind(Q0C$`2`,Q0C$`4`,Q0C$`6`,Q0C$`8`)
+
+Q3C=split(Q2,Q2$cond)
+Question2AmbiguousC=rbind(Q3C$`1`,Q3C$`4`,Q3C$`5`,Q3C$`8`)
+Question2NonAmbiguous=rbind(Q3C$`2`,Q3C$`3`,Q3C$`6`,Q3C$`7`)
 
 
 

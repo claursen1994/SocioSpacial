@@ -3,7 +3,8 @@
 ###############################################
 #sent#
 
-#NumQuest=read_excel("LabCodeC/corpus/Old and Uneeded/NumericQuest.xlsx")
+
+MDMK= read_excel("Stimuli/MDMK.xlsx")
 
 sent=NULL
 sent$item=MDMK$item
@@ -17,7 +18,7 @@ sent=as.data.frame(sent)
 write.csv(sent,"LabCodeC/corpus/sent.csv")
 write.table(sent, file = "LabCodeC/corpus/sent.txt",
             
-            append = FALSE, sep = "\t", col.names = TRUE ,row.names = TRUE, quote = TRUE)
+            append = FALSE, sep = "\t", col.names = TRUE ,row.names = FALSE, quote = TRUE)
 ######################################################
 #quest#
 
@@ -41,4 +42,4 @@ Quest=as.data.frame(Quest)
 write.csv(Quest,"LabCodeC/corpus/Quest.csv")
 write.table(Quest, file = "LabCodeC/corpus/Quest.txt",
             
-            append = FALSE, sep = "\t", col.names = TRUE ,row.names = TRUE, quote = TRUE)
+            append = FALSE, sep = "\t", col.names = TRUE ,row.names = FALSE, quote = TRUE)
