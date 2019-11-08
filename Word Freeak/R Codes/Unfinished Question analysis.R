@@ -1,4 +1,6 @@
+######################
 #Question analysis
+######################
 
 
 # Martin R. Vasilev, 2019
@@ -11,6 +13,8 @@ rm(list= ls())
 # Calvin 1-21
 # Victoria- 22- 43
 # Martin 44+
+#############################################################
+########### Library and padding##############################
 
 # EyeDoctor_PadLines(data_dir = data_dir, paddingSize = 5)
 
@@ -32,9 +36,11 @@ if('EMreading' %in% rownames(installed.packages())==FALSE){
 }
 
 library(lme4)
-setwd("H:/Profile/Desktop/worb 2/SocioSpacial")
-data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/data")
-#data_dir= "E:/FontSizeData" # Victoria
+#######################################################################################
+
+###setwd("H:/Profile/Desktop/worb 2/SocioSpacial")
+
+
 
 packages= c("reshape", "lme4", "ggplot2", "MASS", "arm", "effects", "lattice",
             "mgcv", "itsadug", 'ggpubr') # list of used packages:
@@ -51,9 +57,10 @@ for(i in 1:length(packages)){
 
 write.csv2(Quest,"LabCodeC/corpus/QuestAnaly")
 
+##########################################################################################
+# Comprehension accuracy: 
 ###########################
-# Comprehension accuracy: #
-###########################
+data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
 
 if(!file.exists("data/QuestDa.Rda")){
   QuestDa<- Question(data_list = data_dir, maxtrial = 100)
@@ -62,35 +69,71 @@ if(!file.exists("data/QuestDa.Rda")){
 } else{
   load("data/Quest.Rda")
 }
+#######################
+#Make some stuff to look at
+############################
+write.csv2(QuestDa,"data/QuestDa1.csv")
+write_excel_csv(QuestDa,"data/QuestDa1.xls")
+
+#############################################################################
+# Some comprehension questions didn't come out properly so lets remove them#
+#############################################################################
+na.omit(QuestDa)
 
 
+########################################
+# Add details of age in excel file etc#
+#######################################
+#Load that shit back in#
+QuestDa=read_excel("data/QuestDa1.xlsx")
+########################################
+
+######################################################
+#Practice questions tend to be fucky so I remove them
+QuestDat= filter(QuestDa, QuestDa$item<25)
+QuestDa=QuestDat
+
+############
+#Average 
+QuestDa=as.data.frame(QuestDa)
 library(reshape)
 DesQuest<- melt(QuestDa, id=c('sub', 'item', 'cond'), 
                 measure=c("accuracy"), na.rm=TRUE)
-mQuestBySub<- cast(DesQuest, sub ~ variable
+mQuestBySub<- cast(DesQuest, item ~ variable
               ,function(x) c(M=signif(mean(x),3)
                              , SD= sd(x) ))
 mQuestBySub
+
+
+
+#################################
+#Split the Question Data
+################################
+
+Q0=split(QuestDa,QuestDa$dependnum)
+
+
+
+
 ##############################
 #Check Comprehension Data
 ###############################
 #Compared By Subject
-CompQ=split(QuestDa,QuestDa$dependnum)
-CompQ=CompQ$`3`
 
-CompDesQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
-                measure=c("accuracy"), na.rm=TRUE)
-CompmQuest<- cast(CompDesQuest, sub ~ variable
-              ,function(x) c(M=signif(mean(x),3)
-                             , SD= sd(x) ))
+CompQ=Q0$`3`
+SubQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
+                  measure=c("accuracy"), na.rm=TRUE)
+SubQuest<- cast(SubQuest, sub ~ variable
+                  ,function(x) c(M=signif(mean(x),3)
+                                 , SD= sd(x) ))
 
 #Compared by Item
-CompQ=split(QuestDa,QuestDa$dependnum)
-CompQ=CompQ$`3`
 
-CompDesQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
+CompQ=Q0$`3`
+
+CompmQuest<- melt(CompQ, id=c('sub', 'item', 'cond'), 
                     measure=c("accuracy"), na.rm=TRUE)
-CompmQuest<- cast(CompDesQuest, item ~ variable
+CompmQuest<- cast(CompmQuest, item ~ variable
                   ,function(x) c(M=signif(mean(x),3)
                                  , SD= sd(x) ))
 plot(CompmQuest$item,CompmQuest$accuracy_M)
@@ -106,7 +149,7 @@ plot(NoCompQ$item,NoCompQ$accuracy_M)
 
 
 # Items by condition
-Q0=split(QuestDa,QuestDa$dependnum)
+
 Q1=Q0$`1`
 Q2=Q0$`2`
 Q1s=split(Q1,Q1$cond)
@@ -121,6 +164,36 @@ AmbiSocQ2=rbind(Q2s$`5`,Q2s$`8`)
 NamibiSocQ2=rbind(Q2s$`6`,Q2s$`7`)
 AmbiSpaQ2=rbind(Q2s$`1`,Q2s$`4`)
 NambiSpaQ2=rbind(Q2s$`2`,Q2s$`3`)
+
+
+Q1$cond = factor(Q1$cond)
+U0=ggplot(Q1, aes(item, accuracy, colour = cond, fill = cond)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+
+Q2$cond = factor(Q2$cond)
+U1=ggplot(Q2, aes(item, accuracy, colour = cond, fill = cond)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+
+
+
+
+U = ggplot() + 
+  geom_line(data = AmbiSocQ1, aes(x = item, y = accuracy), color = "blue") +
+  geom_line(data = NamibiSocQ1, aes(x = item, y = accuracy), color = "red") +
+  xlab('item') +
+  ylab('accuracy')+ family='binomial'
+print(U)
+
+U2= 
+
 
 AmbiSoc0=rbind(AmbiSocQ1,AmbiSocQ2)
 AmbiSpa0=rbind(AmbiSpaQ1,AmbiSpaQ2)
@@ -142,7 +215,7 @@ NAMG=melt(NambiGen, id=c('sub', 'item', 'cond'),
 NAMG<- cast(NAMG, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 #Plots
-
+library("ggplot2")
 #General Ambi Vs Nambi
 p = ggplot() + 
   geom_line(data = AMG, aes(x = item, y = accuracy_M), color = "blue") +
@@ -192,11 +265,11 @@ print(H)
 ##################
 ASPA=melt(AmbiSpa0, id=c('sub', 'item', 'cond'), 
          measure=c("accuracy"), na.rm=TRUE)
-ASPA<- cast(ASPA, sub ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+ASPA<- cast(ASPA, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 NSPA=melt(NambiSpa0, id=c('sub', 'item', 'cond'), 
           measure=c("accuracy"), na.rm=TRUE)
-NSPA<- cast(NSPA, sub ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+NSPA<- cast(NSPA, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 Y=  ggplot() + 
   geom_line(data = ASPA, aes(x = item, y = accuracy_M), color = "blue") +
