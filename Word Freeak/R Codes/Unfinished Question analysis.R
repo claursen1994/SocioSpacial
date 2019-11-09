@@ -85,7 +85,7 @@ na.omit(QuestDa)
 # Add details of age in excel file etc#
 #######################################
 #Load that shit back in#
-QuestDa=read_excel("data/QuestDa1.xlsx")
+QuestDa=read.csv2("LabCodeC/QuestDa.csv")
 ########################################
 
 ######################################################
@@ -148,7 +148,8 @@ NoCompQ<- cast(NoCompQ, item ~ variable,function(x) c(M=signif(mean(x),3), SD= s
 plot(NoCompQ$item,NoCompQ$accuracy_M)
 
 
-# Items by condition
+# Split and play zone #
+#######################
 
 Q1=Q0$`1`
 Q2=Q0$`2`
@@ -165,9 +166,27 @@ NamibiSocQ2=rbind(Q2s$`6`,Q2s$`7`)
 AmbiSpaQ2=rbind(Q2s$`1`,Q2s$`4`)
 NambiSpaQ2=rbind(Q2s$`2`,Q2s$`3`)
 
+AmbiSoc0=rbind(AmbiSocQ1,AmbiSocQ2)
+AmbiSoc0$State=c("AmbiSoc")
+AmbiSpa0=rbind(AmbiSpaQ1,AmbiSpaQ2)
+AmbiSpa0$State=c("AmbiSpa")
+NambiSoc0=rbind(NamibiSocQ1,NamibiSocQ2)
+NambiSoc0$State=c("NambiSoc")
+NambiSpa0=rbind(NambiSpaQ1,NambiSpaQ2)
+NambiSpa0$State=c("NambiSpa")
+
+AmbiGen=rbind(AmbiSoc0,AmbiSpa0)
+NambiGen=rbind(NambiSoc0,NambiSpa0)
+
+SpaGen=rbind(AmbiSpa0,NambiSpa0)
+SocGen=rbind(AmbiSoc0,NambiSoc0)
+
+#############################
+# General Q1 vs Q2 by cond ##
+#############################
 
 Q1$cond = factor(Q1$cond)
-U0=ggplot(Q1, aes(item, accuracy, colour = cond, fill = cond)) +
+U0=ggplot(Q1, aes(seq, accuracy, colour = cond, fill = cond)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
@@ -175,36 +194,154 @@ U0=ggplot(Q1, aes(item, accuracy, colour = cond, fill = cond)) +
 print(U0)
 
 Q2$cond = factor(Q2$cond)
-U1=ggplot(Q2, aes(item, accuracy, colour = cond, fill = cond)) +
+U1=ggplot(Q2, aes(seq, accuracy, colour = cond, fill = cond)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
               se = FALSE) 
-print(U0)
+print(U1)
+
+Qi=rbind(Q1,Q2)
+
+U2=ggplot(Qi, aes(seq, accuracy, colour = cond, fill = cond)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U2)
+############################################################################################
+# By Item Zone
+
+###############################################
+# General Ambiguous Social Vs Amiguous Spatial#
+
+GASAS=rbind(AmbiSoc0,AmbiSpa0)
+
+GASAS$State = factor(GASAS$State)
+G1=ggplot(GASAS, aes(seq, accuracy, colour = State, fill = State)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G1)
+
+#########################################
+# General NonAmbiguous Social Vs Spatial#
+GNSAS=rbind(NambiSoc0,NambiSpa0)
+
+GNSAS$State = factor(GNSAS$State)
+G2=ggplot(GNSAS, aes(seq, accuracy, colour = State, fill = State)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G2)
 
 
+########################################
+# Whole AmbiVs Nambi ###################
+GAVN=rbind(GNSAS,GASAS)
+G3=ggplot(GAVN, aes(item, accuracy, colour = State, fill = State)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G3)
 
 
-U = ggplot() + 
-  geom_line(data = AmbiSocQ1, aes(x = item, y = accuracy), color = "blue") +
-  geom_line(data = NamibiSocQ1, aes(x = item, y = accuracy), color = "red") +
-  xlab('item') +
-  ylab('accuracy')+ family='binomial'
-print(U)
+########################################
+# The Same but by Trial Number      ###
 
-U2= 
+G4=ggplot(GAVN, aes(seq, accuracy, colour = State, fill = State)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G4)
 
 
-AmbiSoc0=rbind(AmbiSocQ1,AmbiSocQ2)
-AmbiSpa0=rbind(AmbiSpaQ1,AmbiSpaQ2)
-NambiSoc0=rbind(NamibiSocQ1,NamibiSocQ2)
-NambiSpa0=rbind(NambiSpaQ1,NambiSpaQ2)
+############################################################################
+# Lets see if there's a difference between accuracy of Q1 and Q2 in general#
+GAVN$dependnum=as.factor(GAVN$dependnum)
+G5=ggplot(GAVN, aes(seq, accuracy, colour = dependnum, fill = dependnum)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G5)
 
-AmbiGen=rbind(AmbiSoc0,AmbiSpa0)
-NambiGen=rbind(NambiSoc0,NambiSpa0)
+#############################################################################
+# Lets split up the Stimuli by ambiguity again 
+#################################################
+GAVN0=split(GAVN,GAVN$State)
+GAVNSOC= rbind(GAVN0$NambiSoc,GAVN0$AmbiSoc)
 
-SpaGen=rbind(AmbiSpa0,NambiSpa0)
-SocGen=rbind(AmbiSoc0,NambiSoc0)
+########################################################################################################
+#  by depend Num
+########################
+# Social
+G6=ggplot(GAVNSOC, aes(seq, accuracy, colour = dependnum, fill = dependnum)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G6)
+
+#########################
+#Spatial 
+
+GAVNSPA=rbind(GAVN0$NambiSpa,GAVN0$AmbiSpa)
+
+G7=ggplot(GAVNSPA, aes(seq, accuracy, colour = dependnum, fill = dependnum)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G7)
+
+#################################
+# Ambiguous 
+GAVNAMBI=rbind(GAVN0$AmbiSoc,GAVN0$AmbiSpa)
+
+G8=ggplot(GAVNAMBI, aes(seq, accuracy, colour = dependnum, fill = dependnum)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G8)
+
+################################
+# NonAmbiguous 
+GAVNNAMBI=rbind(GAVN0$NambiSoc,GAVN0$NambiSpa)
+
+G9=ggplot(GAVNNAMBI, aes(seq, accuracy, colour = dependnum, fill = dependnum)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G9)
+
+##############################################################################################################
+# Accuracy by time taken to answer 
+GAVN$duration_ms=as.factor(GAVN$duration_ms)
+
+G10=ggplot(GAVN, aes(cond, duration_ms)) +
+  geom_point() +
+  geom_smooth(method = "loess", 
+              method.args = list(family = "symetric"),
+              se = FALSE) 
+print(G10)
+
+#############################################################################################################
+# Time taken to answer by condition 
+G11=ggplot(GAVN, aes(duration_ms, accuracy, colour = cond, fill = cond)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G11)
+
+
 
 AMG=melt(AmbiGen, id=c('sub', 'item', 'cond'), 
              measure=c("accuracy"), na.rm=TRUE)
