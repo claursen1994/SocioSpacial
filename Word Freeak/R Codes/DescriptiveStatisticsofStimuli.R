@@ -44,6 +44,8 @@ library("readr")
 library("tidyr")
 library("dplyr")
 library("ggplot2")
+library("lme4")
+library("effects")
 #Data
 ########
 # Note: MDMK is a huge excel file that Contains a great deal of excel formulas which makes it easier to

@@ -74,12 +74,12 @@ if(!file.exists("data/QuestDa.Rda")){
 ############################
 write.csv2(QuestDa,"data/QuestDa1.csv")
 write_excel_csv(QuestDa,"data/QuestDa1.xls")
-
+QuestDa=QuestDat
 #############################################################################
 # Some comprehension questions didn't come out properly so lets remove them#
 #############################################################################
 na.omit(QuestDa)
-
+QuestDa=rbind(QuestDa,QuestDa12)
 
 ########################################
 # Add details of age in excel file etc#
@@ -340,6 +340,119 @@ G11=ggplot(GAVN, aes(duration_ms, accuracy, colour = cond, fill = cond)) +
               method.args = list(family = "binomial"), 
               se = FALSE) 
 print(G11)
+
+###################################################################################################
+
+# Seperated between young and old
+####################################
+# Remember to look at which participants were young and whcih were old 
+
+YOGAVN=split(GAVN,GAVN$sub)
+YGAVN=rbind(YOGAVN$`1`,YOGAVN$`3`,YOGAVN$`4`,YOGAVN$`6`)
+OGAVN=rbind(YOGAVN$`2`,YOGAVN$`5`,YOGAVN$`99`,YOGAVN$`198`)
+YGAVN$Age=c("Young")
+OGAVN$Age=c("Old")
+GAVN=rbind(YGAVN,OGAVN)
+
+############################################
+# Accuracy in general
+A1=ggplot(GAVN, aes(seq, accuracy, colour = Age, fill = Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(A1)
+
+# Accuracy by State
+A2=ggplot(GAVN, aes(seq, accuracy, colour = State, fill = State, linetype= Age )) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+  #facet_wrap(~Age)
+print(A2)
+##########################################################################################
+### Probability of chosing there isn't enough information 
+RespGAVN1=GAVN
+RespGAVN1$Resp=NULL
+RespGAVN0=split(RespGAVN1,RespGAVN1$subresp)
+RespGAVN2=rbind(RespGAVN0$`3`)
+RespGAVN2$resp=c(1)
+RespGavn0=rbind(RespGAVN0$`1`,RespGAVN0$`2`)
+RespGavn0$resp=c(0)
+RespGAVN1=rbind(RespGavn0,RespGAVN2)
+
+A3=ggplot(RespGAVN1, aes(seq, resp, colour = State, fill = State, linetype= Age )) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+#facet_wrap(~Age)
+print(A3)
+
+
+############################################################################################
+# Check Constructions
+
+Const <- read_excel("H:/Profile/Desktop/Const.xlsx")
+
+GAVN$construct=NULL
+
+GAVN=merge(Const,GAVN)
+SPACEGAVN=split(GAVN,GAVN$State)
+SPACEGAVN=rbind(SPACEGAVN$NambiSpa,SPACEGAVN$AmbiSpa)
+SPACEGAVN$construct=as.factor(SPACEGAVN$construct)
+
+
+######################################
+#General
+A4=ggplot(SPACEGAVN, aes(seq, accuracy, linetype= construct )) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+#facet_wrap(~Age)
+print(A4)
+
+######################################
+# By state
+A5=ggplot(SPACEGAVN, aes(seq, accuracy,colour= State, linetype= construct )) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+#facet_wrap(~Age)
+print(A5)
+
+####################################
+# General by age
+A6=ggplot(SPACEGAVN, aes(seq, accuracy,colour= Age, linetype= construct )) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE )
+print(A6)
+
+
+############################################################################################
+
+# Attempt at simulating 
+
+GAVNG=glmer(accuracy~seq*State + Age  + (1 | duration_ms),
+                    data = GAVN, family = binomial)
+
+summary(GAVNG)
+
+A3=ggplot(GAVNG, aes(seq, accuracy, colour = State, fill = State, linetype= Age )) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+#facet_wrap(~Age)
+print(A3)
+
+
+
 
 
 
