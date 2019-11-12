@@ -67,8 +67,23 @@ if(!file.exists("data/QuestDa.Rda")){
   save(Quest, file= "data/QuestDa.Rda")
   write.csv2(QuestDa, "data/QuestDa.csv")
 } else{
-  load("data/Quest.Rda")
+  load("data/QuestDa.Rda")
 }
+
+
+#########################################################################################
+# Additional older people from the older version of the experiment 
+data_dir= ("H:/Profile/Desktop/Burger")
+
+if(!file.exists("data/QuestDa12.Rda")){
+  QuestDa12<- Question(data_list = data_dir, maxtrial = 100)
+  save(Quest, file= "data/QuestDa12.Rda")
+  write.csv2(QuestDa12, "data/QuestDa12.csv")
+} else{
+  load("data/QuestDa12.Rda")
+}
+
+QuestDa12$sub=c(QuestDa12$sub*99)
 #######################
 #Make some stuff to look at
 ############################
