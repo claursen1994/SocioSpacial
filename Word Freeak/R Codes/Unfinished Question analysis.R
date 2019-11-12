@@ -452,19 +452,41 @@ print(A6)
 ############################################################################################
 
 # Attempt at simulating 
-
-GAVNG=glmer(accuracy~seq*State + Age  + (1 | duration_ms),
+GAVN$Age=as.factor(GAVN$Age)
+GAVNG=glmer(accuracy~Age*State + seq+ (1 | duration_ms),
                     data = GAVN, family = binomial)
 
 summary(GAVNG)
 
-A3=ggplot(GAVNG, aes(seq, accuracy, colour = State, fill = State, linetype= Age )) +
+A7=ggplot(GAVNG, aes(seq, accuracy, colour = State, fill = State, linetype= Age )) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
               se = FALSE) 
 #facet_wrap(~Age)
-print(A3)
+print(A7)
+
+#################################################
+# Check some things from the baby model
+plot(effect("Age*State",GAVNG))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
