@@ -3,6 +3,8 @@
 ################
 # Trial times: #
 ################
+rm(list= ls())
+data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
 
 if(!file.exists("data/Trial_time.Rda")){
   
@@ -33,6 +35,7 @@ if(!file.exists("preproc/raw_fix.Rda")){
 }
 
 
+
 ##############################
 # Preprocessing of raw data: #
 ##############################
@@ -42,6 +45,8 @@ if(!file.exists("preproc/raw_fix.Rda")){
 
 load("preproc/raw_fix.Rda")
 
+TRF=read.csv2("preproc/raw_fix.csv")
+raw_fix=read.csv2("preproc/raw_fix.csv")
 raw_fix$hasText<- NULL
 
 
@@ -134,6 +139,88 @@ for(i in 1:64){
 
 raw_fix<- raw_fix_new;
 rm(raw_fix_new)
+
+#
+#For total
+#AgeGroups <- read_excel("H:/Profile/AgeGroups.xlsx")
+
+#For Pilot
+
+raw_fix=merge(AgeGroups,raw_fix)
+AgeGroups <- read_excel("H:/AgeGroups8M.xlsx")
+TRF=raw_fix
+
+OMTRF=split(TRF,TRF$Rtn_sweep_type)
+OMTRF$accurate$Rtn_sweep_type=c(1)
+OMTRF$undersweep$Rtn_sweep_type=c(0)
+OMTRF=rbind(OMTRF$accurate,OMTRF$undersweep)
+#OMTRF$Rtn_sweep_type=as.factor(OMTRF$Rtn_sweep_type)
+#OMTRF$Rtn_sweep_type=as.numeric(OMTRF$Rtn_sweep_type)
+
+
+T1=ggplot(OMTRF, aes(seq, Rtn_sweep_type, colour = AgeGroup, fill = AgeGroup)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(T1)
+OMTRF$AgeGroup=as.factor(OMTRF$AgeGroup)
+GLM1= glmer(Rtn_sweep_type ~ AgeGroup  + 
+              (1|sub) + (1|item) 
+                , data= OMTRF, family= binomial)
+
+summary(GLM1)
+#######################
+# Power
+
+PA=extend(GLM1,along="sub",n=30)
+powerSim(PA)
+
+PC2=powerCurve(GLM1)
+print(pc2)
+#################################################
+# Generalised Descriptive data zone 
+
+#
+#Return sweep accuracy
+MRTS=melt(OMTRF, id=c('sub', 'item', 'AgeGroup'), 
+             measure=c("Rtn_sweep_type"), na.rm=TRUE)
+MRTS<- cast(MRTS, AgeGroup ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+
+
+
+#
+# FixDurr
+
+Durr=melt(raw_fix, id=c('sub', 'item', 'AgeGroup'), 
+          measure=c("fix_dur"), na.rm=TRUE)
+Durr<- cast(Durr, AgeGroup ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+
+
+
+
+
+
+GLM1P=ggplot(GLM1, aes(AgeGroup, Rtn_sweep_type, colour = AgeGroup, fill = AgeGroup)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(GLM1P)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
