@@ -145,9 +145,9 @@ rm(raw_fix_new)
 #AgeGroups <- read_excel("H:/Profile/AgeGroups.xlsx")
 
 #For Pilot
-
-raw_fix=merge(AgeGroups,raw_fix)
 AgeGroups <- read_excel("H:/AgeGroups8M.xlsx")
+raw_fix=merge(AgeGroups,raw_fix)
+
 TRF=raw_fix
 
 OMTRF=split(TRF,TRF$Rtn_sweep_type)
