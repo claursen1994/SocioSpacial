@@ -83,8 +83,78 @@ library(lme4)
 summary(LM1<- lmer(landStart~ Age + (1|item), data= RS))
 summary(LM2<- lmer(launchSite~ Age + (1|item), data= RS))
 summary(GLM1<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial))
+######################################################################################
+######################################################################################
+
+# Making sense# 
+contrasts(RS$Age)<- c(1, -1)
+summary(GLM1<- glmer(undersweep_prob~ Age * 
+                       landStart + (1|item)+ (1|sub), data= RS, family= binomial))
+######################################################################################
+# Check it's power
+
+PA=extend(GLM1,along="sub",n=30)
+powerSim(GLM1,test=fixed, sim=GLM1, nsim=20)
+
+PC2=powerCurve(GLM1)
+print(pc2)
+
+summary(GLM2<- glmer(undersweep_prob~ Age + 
+                       landStart + (1|item)+ (1|sub), data= RS, family= binomial))
 
 
 
 
+summary(GLM3<- lmer(launchSite~ Age + (1|item)+ (1|sub), data= RS))
 
+library(nlme)
+
+
+
+
+GLM1P=ggplot(effects(GLM2, aes(landStart, undersweep_prob, colour = Age, fill = Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE)) 
+print(GLM1P)
+  
+print(p)
+
+##############################################
+# Making a violin to show no effects
+
+RS$Rtn_sweep_type <- as.factor(RS$Rtn_sweep_type)
+RS$Age <- as.factor(RS$Age)
+
+chrisPlotDat = RS %>%
+  group_by(sub, Age, Rtn_sweep_type) %>%
+  summarise(count = n())
+
+prop = c()
+
+for(i in 1:nrow(chrisPlotDat)){
+  
+  tmpDat = chrisPlotDat[i,]
+  partID = tmpDat$sub
+  
+  allSweeps = sum(chrisPlotDat$count[chrisPlotDat$sub == partID])
+  
+  propTMP = tmpDat$count/allSweeps
+  
+  prop = rbind(prop, propTMP)
+  
+  
+}
+
+chrisPlotDat$prop = prop
+
+ggplot(data = chrisPlotDat, aes(x = Age, y = prop, fill = Rtn_sweep_type))+
+  geom_bar(stat = "summary", fun.y = "median", position = "dodge")+
+  geom_violin()
+
+chrisModel = lmer(prop ~ Age * Rtn_sweep_type + (1|sub), data = chrisPlotDat)
+summary(chrisModel)
+
+
+       

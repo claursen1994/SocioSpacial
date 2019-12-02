@@ -173,11 +173,11 @@ summary(GLM1)
 #######################
 # Power
 
-PA=extend(GLM1,along="sub",n=30)
-powerSim(PA)
+#PA=extend(GLM1,along="sub",n=30)
+#powerSim(PA)
 
-PC2=powerCurve(GLM1)
-print(pc2)
+#PC2=powerCurve(GLM1)
+#print(pc2)
 
 
 
