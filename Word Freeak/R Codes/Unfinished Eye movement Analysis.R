@@ -178,6 +178,21 @@ powerSim(PA)
 
 PC2=powerCurve(GLM1)
 print(pc2)
+
+
+
+###########################################################################
+# Landing position
+LP=melt(OMTRF, id=c('sub', 'item', 'AgeGroup'), 
+          measure=c("land_pos"), na.rm=TRUE)
+LP<- cast(LP, AgeGroup ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+T2=ggplot(OMTRF, aes(seq, land_pos, colour = AgeGroup, fill = AgeGroup)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(T2)
 #################################################
 # Generalised Descriptive data zone 
 
