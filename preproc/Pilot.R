@@ -91,16 +91,23 @@ summary(GLM0<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial
 contrasts(RS$Age)<- c(1, -1)
 summary(GLM1<- glmer(undersweep_prob~ Age * 
                        landStart + (1|item)+ (1|sub), data= RS, family= binomial))
+
+
+ef1=effect("Age:landStart", GLM1)
+summary(ef1)
+
 ######################################################################################
 # Launch Position 
 #USP
 
 summary(LM3<- lmer(undersweep_prob~ launchSite + (1|item)+ (1|sub), data= RS))
-
+effect("launchSite",LM3)
 #Age
 
 summary(LM3.1<- lmer(launchSite~ Age + (1|item)+ (1|sub), data= RS))
 anova(LM3.1)
+
+effect("Age",LM3.1)
 #summary(LM4<- lmer(undersweep_prob~ Age + (1|item)+ (1|sub), data= RS))
 #anova(LM4)
 
@@ -122,6 +129,8 @@ LaunchPosGG=ggplot(RS, aes(launchSite, undersweep_prob, colour = Age, fill = Age
 summary(LM5<- lmer(fix_dur~ Age + (1|item)+ (1|sub), data= raw_fix))
 anova(LM5)
 
+effect("Age",LM5)
+
 #Violin
 Fix_durViolin=ggplot(data = raw_fix, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
@@ -134,6 +143,7 @@ Fix_durViolin=ggplot(data = raw_fix, aes(x = Age, y = fix_dur, fill = Age))+
 summary(LM6<- lmer(prev_fix_dur~ Age + (1|item)+ (1|sub), data= RS))
 anova(LM6)
 
+effect("Age",LM6)
 
 #Violin
 prev_fix_durViolin=ggplot(data = RS, aes(x = Age, y = prev_fix_dur, fill = Age))+
@@ -150,11 +160,80 @@ prev_fix_durGG=ggplot(RS, aes(prev_fix_dur, undersweep_prob, colour = Age, fill 
 print(prev_fix_durGG)
 
 #### Mildy interesting lets see what a model would look like...
-summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub), data= RS, family= binomial))
+summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub)+ (1|Age), data= RS, family= binomial))
 anova(GLMI)
 
+effect("prev_fix_dur",GLMI)
 
 
+###################################################################################################
+# Landing Position by age 
+
+
+
+summary(LndPo<- lmer(landStart~ Age + (1|item), data= RS))
+
+
+land_startViolin=ggplot(data = RS, aes(x = Age, y = landStart, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+
+effect("Age",LndPo)
+##################################################################################################
+#Power
+library(simr)
+###########################################
+#The Basic Models
+
+#LandStart
+summary(LM1<- lmer(landStart~ Age + (1|item), data= RS))
+simtreat4LM1=powerSim(LM1,nsim=30)
+simtreat4LM1
+#extsimtreat4LM1=extend(LM1,along=sub,n=20)
+#powerCurve(simtreat4LM1=powerSim(LM1,nsim=30))
+
+#LaunchSite
+summary(LM2<- lmer(launchSite~ Age + (1|item), data= RS))
+simtreat4LM2=powerSim(LM2,nsim=30)
+simtreat4LM2
+
+#Undersweep probability
+summary(GLM0<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial))
+
+simtreat4GLM0=powerSim(GLM0,nsim=30)
+simtreat4GLM0
+powerCurve(simtreat4GLM0)
+
+#Under Sweep Prob but Age*Landstart
+summary(GLM1<- glmer(undersweep_prob~ Age * 
+                       landStart + (1|item)+ (1|sub), data= RS, family= binomial))
+
+simtreat4GLM1=powerSim(GLM1,nsim=30)
+simtreat4GLM1
+
+#Different launchSite model
+summary(LM3.1<- lmer(launchSite~ Age + (1|item)+ (1|sub), data= RS))
+simtreat4LM3.1=powerSim(LM3.1,nsim=30)
+simtreat4LM3.1
+
+# Fixation Duration
+summary(LM5<- lmer(fix_dur~ Age + (1|item)+ (1|sub), data= raw_fix))
+
+simtreat4LM5=powerSim(LM5,nsim=10)
+simtreat4LM5
+
+# Fixation Duration of fixation prior to return sweep
+summary(LM6<- lmer(prev_fix_dur~ Age + (1|item)+ (1|sub), data= RS))
+simtreat4LM6=powerSim(LM6,nsim=15)
+simtreat4LM6
+
+# UnderSweep Prob but with prev fix as predictor 
+summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub)+ (1|Age), data= RS, family= binomial))
+simtreat4GLMI=powerSim(GLMI,nsim=10)
+simtreat4GLMI                      
+                      
+                      
+                      
 ##############################################
 # Making a proportional violin to show no effects
 
