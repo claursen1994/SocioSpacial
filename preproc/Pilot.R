@@ -82,22 +82,84 @@ library(lme4)
 
 summary(LM1<- lmer(landStart~ Age + (1|item), data= RS))
 summary(LM2<- lmer(launchSite~ Age + (1|item), data= RS))
-summary(GLM1<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial))
+summary(GLM0<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial))
 ######################################################################################
 ######################################################################################
 
 # Making sense# 
+# Landing Position and Age Interaction
 contrasts(RS$Age)<- c(1, -1)
 summary(GLM1<- glmer(undersweep_prob~ Age * 
                        landStart + (1|item)+ (1|sub), data= RS, family= binomial))
 ######################################################################################
-# Check it's power
+# Launch Position 
+#USP
 
-PA=extend(GLM1,along="sub",n=30)
-powerSim(GLM1,test=fixed, sim=GLM1, nsim=20)
+summary(LM3<- lmer(undersweep_prob~ launchSite + (1|item)+ (1|sub), data= RS))
 
-PC2=powerCurve(GLM1)
-print(pc2)
+#Age
+
+summary(LM3.1<- lmer(launchSite~ Age + (1|item)+ (1|sub), data= RS))
+anova(LM3.1)
+#summary(LM4<- lmer(undersweep_prob~ Age + (1|item)+ (1|sub), data= RS))
+#anova(LM4)
+
+LaunchPosVioLin=ggplot(data = RS, aes(x = Age, y = launchSite, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+
+LaunchPosGG=ggplot(RS, aes(launchSite, undersweep_prob, colour = Age, fill = Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+
+####################################################################################
+## Fixation duration 
+## General
+##############################
+
+summary(LM5<- lmer(fix_dur~ Age + (1|item)+ (1|sub), data= raw_fix))
+anova(LM5)
+
+#Violin
+Fix_durViolin=ggplot(data = raw_fix, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+  # + geom_jitter()
+
+##################################################################################
+# Fixation Duration Prior to performing a return sweep
+
+summary(LM6<- lmer(prev_fix_dur~ Age + (1|item)+ (1|sub), data= RS))
+anova(LM6)
+
+
+#Violin
+prev_fix_durViolin=ggplot(data = RS, aes(x = Age, y = prev_fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+
+
+# Regression
+prev_fix_durGG=ggplot(RS, aes(prev_fix_dur, undersweep_prob, colour = Age, fill = Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(prev_fix_durGG)
+
+#### Mildy interesting lets see what a model would look like...
+summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub), data= RS, family= binomial))
+anova(GLMI)
+
+
+
+
+#######################################################
+# 
+
+
 
 summary(GLM2<- glmer(undersweep_prob~ Age + 
                        landStart + (1|item)+ (1|sub), data= RS, family= binomial))
