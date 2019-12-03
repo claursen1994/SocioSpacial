@@ -161,18 +161,6 @@ anova(GLMI)
 
 
 
-summary(GLM2<- glmer(undersweep_prob~ Age + 
-                       landStart + (1|item)+ (1|sub), data= RS, family= binomial))
-
-
-
-
-summary(GLM3<- lmer(launchSite~ Age + (1|item)+ (1|sub), data= RS))
-
-library(nlme)
-
-
-
 
 GLM1P=ggplot(effects(GLM2, aes(landStart, undersweep_prob, colour = Age, fill = Age)) +
   geom_point() +
@@ -184,7 +172,7 @@ print(GLM1P)
 print(p)
 
 ##############################################
-# Making a violin to show no effects
+# Making a proportional violin to show no effects
 
 RS$Rtn_sweep_type <- as.factor(RS$Rtn_sweep_type)
 RS$Age <- as.factor(RS$Age)
