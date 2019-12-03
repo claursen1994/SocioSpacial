@@ -155,22 +155,6 @@ anova(GLMI)
 
 
 
-
-#######################################################
-# 
-
-
-
-
-GLM1P=ggplot(effects(GLM2, aes(landStart, undersweep_prob, colour = Age, fill = Age)) +
-  geom_point() +
-  geom_smooth(method = "glm", 
-              method.args = list(family = "binomial"), 
-              se = FALSE)) 
-print(GLM1P)
-  
-print(p)
-
 ##############################################
 # Making a proportional violin to show no effects
 
