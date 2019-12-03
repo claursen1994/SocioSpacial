@@ -232,8 +232,38 @@ summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub)+ (1|Age),
 simtreat4GLMI=powerSim(GLMI,nsim=10)
 simtreat4GLMI                      
                       
-                      
-                      
+
+
+
+
+#######################################################################################
+
+# Hunch zone, perhaps nonsensical investigations. 
+
+#Saccade duration differences 
+NS1=melt(raw_fix,id=c('sub', 'item', 'Age'), 
+         measure=c("sacc_dur"), na.rm=TRUE)
+NS1m<- cast(NS1, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+NS1=ggplot(data = raw_fix, aes(x = Age, y = sacc_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+
+NS2=lmer(sacc_dur~ Age + (1|item)+ (1|sub), data= RS)
+simNS2=powerSim(NS2,nsim=20)                   
+simNS2
+
+
+
+# Number of fixations 
+
+NS3=melt(raw_fix,id=c('sub', 'item', 'Age'), 
+                         measure=c("fix_num"), na.rm=TRUE)
+         NS3<- cast(NS3, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+         
+         ggplot(data = raw_fix, aes(x = Age, y = fix_num, fill = Age))+
+           geom_bar(stat = "summary", fun.y = "mean", position = "dodge")+
+           geom_violin()
+         
 ##############################################
 # Making a proportional violin to show no effects
 
