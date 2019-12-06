@@ -278,6 +278,25 @@ NS3=melt(raw_fix,id=c('sub', 'item', 'Age'),
            geom_bar(stat = "summary", fun.y = "mean", position = "dodge")+
            geom_violin()
          
+         
+         
+         
+write.csv(RS,"RS.csv")
+
+# Remove duplicated rows based on Sepal.Length
+
+TRS=RS
+TRS$line %<% distinct(TRS$line, .keep_all = TRUE)
+
+
+for (i in TRS$sub){
+  for (j in TRS$item)
+    TRS[!duplicated(TRS$line), ]
+   }
+
+TRS=distinct(TRS$line, .keep_all = TRUE)
+2+2
+
 ##############################################
 # Making a proportional violin to show no effects
 
