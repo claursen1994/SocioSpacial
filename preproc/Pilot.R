@@ -83,6 +83,75 @@ library(lme4)
 summary(LM1<- lmer(landStart~ Age + (1|item), data= RS))
 summary(LM2<- lmer(launchSite~ Age + (1|item), data= RS))
 summary(GLM0<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial))
+#########################################################################################
+#Check and Mark 2nd pass in Return Sweeps. 
+
+##############################################################
+RS$remove<-  0
+newDatas<- NULL
+nsubs<- unique(RS$sub)
+
+for( i in 1:length(nsubs)){
+  n<- subset(RS, sub== nsubs[i])
+  nitems<- unique(n$item)
+
+  for(j in 1:length(nitems)){
+    m<- subset(n, item== nitems[j])
+    
+    if(nrow(m)>1){
+      m$remove[2:nrow(m)]=1
+                 }
+  
+    newDatas<- rbind(newDatas, m)
+  }
+}
+CleanRS=split(newDatas,newDatas$remove)
+CleanRS=CleanRS$`1`
+
+#########################
+# Seperate Regressions
+
+Regressions=split(raw_fix,raw_fix$regress)
+Regressions=RegRS$`1`
+
+########################
+# Line initial fixations 
+# These are fix_dur in RS and 
+
+Lineinit= RS
+LI=subset(raw_fix,raw_fix$line==1)
+LI=subset(LI,LI$fix_num==2)
+old<- c(2,5,8,9,11)
+LI$Age=NULL
+LI$remove=c(0)
+LI$Age<- ifelse(is.element(LI$sub, old), "Old", "Young")
+LI$launchSite<- LI$prev_max_char_line- LI$prevChar
+LI$landStart<- LI$char_line
+LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
+Lineinit=rbind(Lineinit,LI)
+##############################
+# Line init following accurate or undersweep return sweep
+
+Acc_RS_line_init=subset(RS,RS$Rtn_sweep_type=="accurate")
+Und_RS_line_init=subset(RS,RS$Rtn_sweep_type=="undersweep")
+
+#######################
+# Line final 
+
+Line_final=subset(raw_fix,raw_fix$yPos== RS$prevY & raw_fix$xPos==RS$prevX)
+
+
+
+######################################
+
+
+
+
+
+
+
+
+
 ######################################################################################
 ######################################################################################
 
@@ -137,7 +206,7 @@ Fix_durViolin=ggplot(data = raw_fix, aes(x = Age, y = fix_dur, fill = Age))+
   geom_violin()
   # + geom_jitter()
 
-##################################################################################
+##########################################
 # Fixation Duration Prior to performing a return sweep
 
 summary(LM6<- lmer(prev_fix_dur~ Age + (1|item)+ (1|sub), data= RS))
@@ -158,6 +227,39 @@ prev_fix_durGG=ggplot(RS, aes(prev_fix_dur, undersweep_prob, colour = Age, fill 
               method.args = list(family = "binomial"), 
               se = FALSE) 
 print(prev_fix_durGG)
+
+###########################################################
+# Fix_dur line initial vs line final
+#GG
+fix_durGG=ggplot(RS, aes(fix_dur, undersweep_prob, colour = Age, fill = Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(fix_durGG)
+
+#Violin
+fix_durViolin=ggplot(data = RS, aes(x = Age, y = fix_dur, fill = Rtn_sweep_type))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# Model
+
+
+summary(GLMP<- glmer(undersweep_prob~ Age + fix_dur + (1|item), data= RS, family= binomial))
+
+summary(LMF<- lmer(fix_dur~ Age + (1|item), data= RS))
+anova(LMF)
+
+summary(LMA=lmer(prev_fix_dur~ Age + (1|item), data=RS))
+#########################################################
+## Does Prev_line_fix_dur predict fix_dur?
+fixvs=ggplot(RS, aes(fix_dur, prev_fix_dur, colour = Age, fill = Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(fixvs)
+summary(LMFV<- lmer(fix_dur~ prev_fix_dur + (1|item), data= RS))
 
 #### Mildy interesting lets see what a model would look like...
 summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub)+ (1|Age), data= RS, family= binomial))
@@ -278,6 +380,25 @@ NS3=melt(raw_fix,id=c('sub', 'item', 'Age'),
            geom_bar(stat = "summary", fun.y = "mean", position = "dodge")+
            geom_violin()
          
+         
+         
+         
+write.csv(RS,"RS.csv")
+
+# Remove duplicated rows based on Sepal.Length
+
+TRS=RS
+TRS$line %<% distinct(TRS$line, .keep_all = TRUE)
+
+
+for (i in TRS$sub){
+  for (j in TRS$item)
+    TRS[!duplicated(TRS$line), ]
+   }
+
+TRS=distinct(TRS$line, .keep_all = TRUE)
+2+2
+
 ##############################################
 # Making a proportional violin to show no effects
 

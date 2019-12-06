@@ -30,6 +30,7 @@ install.packages("quanteda")
 install.packages("readr")
 install.packages("tidyr")
 install.packages("dplyr")
+install.packages("tidyverse")
 #Library#
 
 library("tm")
@@ -46,6 +47,7 @@ library("dplyr")
 library("ggplot2")
 library("lme4")
 library("effects")
+library("tidyverse")
 #Data
 ########
 # Note: MDMK is a huge excel file that Contains a great deal of excel formulas which makes it easier to
