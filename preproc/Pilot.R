@@ -1,5 +1,4 @@
 
-
 rm(list= ls())
 
 load("preproc/raw_fix.Rda")
@@ -94,14 +93,14 @@ nsubs<- unique(RS$sub)
 for( i in 1:length(nsubs)){
   n<- subset(RS, sub== nsubs[i])
   nitems<- unique(n$item)
-
+  
   for(j in 1:length(nitems)){
     m<- subset(n, item== nitems[j])
     
     if(nrow(m)>1){
       m$remove[2:nrow(m)]=1
-                 }
-  
+    }
+    
     newDatas<- rbind(newDatas, m)
   }
 }
@@ -184,17 +183,30 @@ Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter
 
 #Correct the spelling error
 Intra_line=Inter_line
+<<<<<<< HEAD
+=======
+  
+  ######################################
+# Mark second pass fixations Line initial, Line Final and Inter Line fixations?
+######################################
+>>>>>>> f4324433cfbe205a2352a1acb54ed4b233ab9c1e
 
 ######################################
 # Mark second pass fixations Line initial, Line Final and Inter Line fixations?
 ######################################
 
+########################################
+#Check for stuff within fixation groups
 
+<<<<<<< HEAD
 ########################################
 #Check for stuff within fixation groups
 
 #Line initial general
 ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
+  =======
+  #Line initial general
+  ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
   geom_violin()
 # + geom_jitter()
@@ -226,6 +238,52 @@ ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
 
 #Intra Line saccade lengths 
 ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
+  >>>>>>> f4324433cfbe205a2352a1acb54ed4b233ab9c1e
+geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+<<<<<<< HEAD
+#Line initial undersweep
+ggplot(data = Und_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+#Line initial accurate
+ggplot(data = Acc_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+#Line final
+
+ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+=======
+  ##### Re jig to gain more variables
+  
+  Intra_young=split(Intra_line, Intra_line$Age)
+Intra_old=Intra_split$Old
+Intra_young=Intra_split$Young
+
+## Nothing to see here...
+
+Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
+                 measure=c("fix_dur"), na.rm=TRUE)
+Intra_means<- cast(Intra_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+>>>>>>> f4324433cfbe205a2352a1acb54ed4b233ab9c1e
+
+#Intra line
+ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+#Intra Line saccade lengths 
+ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
   geom_violin()
 # + geom_jitter()
@@ -239,12 +297,12 @@ Intra_young=Intra_split$Young
 ## Nothing to see here...only means
 #Intra
 Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
-        measure=c("fix_dur"), na.rm=TRUE)
+                 measure=c("fix_dur"), na.rm=TRUE)
 Intra_means<- cast(Intra_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 #Line Init Undersweep
 Und_line_init_means=melt(Und_RS_line_init, id=c('sub', 'item', 'Age'), 
-                 measure=c("fix_dur"), na.rm=TRUE)
+                         measure=c("fix_dur"), na.rm=TRUE)
 Und_line_init_means<- cast(Und_line_init_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 #Line init accurate
 acc_line_init_means=melt(Acc_RS_line_init, id=c('sub', 'item', 'Age'), 
@@ -253,13 +311,13 @@ acc_line_init_means<- cast(acc_line_init_means, Age ~ variable,function(x) c(M=s
 
 #Line final 
 Line_final_means=melt(Line_final, id=c('sub', 'item', 'Age'), 
-                         measure=c("fix_dur"), na.rm=TRUE)
+                      measure=c("fix_dur"), na.rm=TRUE)
 Line_final_means<- cast(Line_final_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 
 ## Intra line Saccade Length means??
 Sacc_len_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
-                      measure=c("sacc_len"), na.rm=TRUE)
+                    measure=c("sacc_len"), na.rm=TRUE)
 Sacc_len_means<- cast(Sacc_len_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 
@@ -315,7 +373,7 @@ effect("Age",LM5)
 Fix_durViolin=ggplot(data = raw_fix, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
   geom_violin()
-  # + geom_jitter()
+# + geom_jitter()
 
 ##########################################
 # Fixation Duration Prior to performing a return sweep
@@ -459,7 +517,7 @@ simtreat4LM6
 summary(GLMI<- glmer(undersweep_prob~ prev_fix_dur + (1|item)+ (1|sub)+ (1|Age), data= RS, family= binomial))
 simtreat4GLMI=powerSim(GLMI,nsim=10)
 simtreat4GLMI                      
-                      
+
 
 
 
@@ -484,16 +542,16 @@ simNS2
 # Number of fixations 
 
 NS3=melt(raw_fix,id=c('sub', 'item', 'Age'), 
-                         measure=c("fix_num"), na.rm=TRUE)
-         NS3<- cast(NS3, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-         
-         ggplot(data = raw_fix, aes(x = Age, y = fix_num, fill = Age))+
-           geom_bar(stat = "summary", fun.y = "mean", position = "dodge")+
-           geom_violin()
-         
-         
-         
-         
+         measure=c("fix_num"), na.rm=TRUE)
+NS3<- cast(NS3, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
+
+ggplot(data = raw_fix, aes(x = Age, y = fix_num, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", position = "dodge")+
+  geom_violin()
+
+
+
+
 write.csv(RS,"RS.csv")
 
 # Remove duplicated rows based on Sepal.Length
@@ -505,7 +563,7 @@ TRS$line %<% distinct(TRS$line, .keep_all = TRUE)
 for (i in TRS$sub){
   for (j in TRS$item)
     TRS[!duplicated(TRS$line), ]
-   }
+}
 
 TRS=distinct(TRS$line, .keep_all = TRUE)
 2+2
@@ -546,4 +604,5 @@ chrisModel = lmer(prop ~ Age * Rtn_sweep_type + (1|sub), data = chrisPlotDat)
 summary(chrisModel)
 
 
-       
+
+
