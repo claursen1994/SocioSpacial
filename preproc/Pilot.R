@@ -108,11 +108,13 @@ for( i in 1:length(nsubs)){
 CleanRS=split(newDatas,newDatas$remove)
 CleanRS=CleanRS$`1`
 
+
+
 #########################
 # Seperate Regressions
 
 Regressions=split(raw_fix,raw_fix$regress)
-Regressions=RegRS$`1`
+Regressions=Regressions$`1`
 
 ########################
 # Line initial fixations 
@@ -138,16 +140,107 @@ Und_RS_line_init=subset(RS,RS$Rtn_sweep_type=="undersweep")
 #######################
 # Line final 
 
-Line_final=subset(raw_fix,raw_fix$yPos== RS$prevY & raw_fix$xPos==RS$prevX)
+Line_final=NULL
+Line_final$sub=RS$sub
+Line_final$item=RS$item
+Line_final$seq=RS$seq
+Line_final$fix_num=RS$fix_num-1
+#Line_final$xpos=RS$prevX
+#Line_final$ypos=RS$prevY
+#Line_final$line=RS$line-1
+Line_final=as.data.frame(Line_final)
+Line_final=merge(raw_fix,Line_final)
+# This doesn't give us the amount we should have...
 
 
 
+
+# Add columns so that these match later on for duplicate removal
+Line_final$Age=NULL
+Line_final$remove=c(0)
+Line_final$Age<- ifelse(is.element(Line_final$sub, old), "Old", "Young")
+Line_final$launchSite<- Line_final$prev_max_char_line- Line_final$prevChar
+Line_final$landStart<- Line_final$char_line
+Line_final$undersweep_prob<- ifelse(Line_final$Rtn_sweep_type=="undersweep", 1, 0)
+
+# Add line final fixations on the last line ?
+
+## Inter-line fixations
+# Make the columns match so they can be bound
+raw_fix2=raw_fix
+raw_fix2$Age=NULL
+raw_fix2$remove=c(0)
+raw_fix2$Age<- ifelse(is.element(raw_fix2$sub, old), "Old", "Young")
+raw_fix2$launchSite<- raw_fix2$prev_max_char_line- raw_fix2$prevChar
+raw_fix2$landStart<- raw_fix2$char_line
+raw_fix2$undersweep_prob<- ifelse(raw_fix2$Rtn_sweep_type=="undersweep", 1, 0)
+
+##rbind the columns and then remove all ones that are the same in line Final 
+Inter_line=rbind(raw_fix2,Line_final) 
+Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter_line,fromLast = TRUE),]
+# Bind in line initial and remove the duplicates
+Inter_line=rbind(Inter_line,Lineinit)
+Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter_line,fromLast = TRUE),]
+
+#Correct the spelling error
+Intra_line=Inter_line
+
+######################################
+# Mark second pass fixations Line initial, Line Final and Inter Line fixations?
 ######################################
 
 
+########################################
+#Check for stuff within fixation groups
 
+#Line initial general
+ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
 
+#Line initial undersweep
+ggplot(data = Und_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
 
+#Line initial accurate
+ggplot(data = Acc_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+#Line final
+
+ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+#Intra line
+ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+#Intra Line saccade lengths 
+ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
+
+##### Re jig to gain more variables
+
+Intra_young=split(Intra_line, Intra_line$Age)
+Intra_old=Intra_split$Old
+Intra_young=Intra_split$Young
+
+## Nothing to see here...
+
+Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
+        measure=c("fix_dur"), na.rm=TRUE)
+Intra_means<- cast(Intra_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 
 
 
