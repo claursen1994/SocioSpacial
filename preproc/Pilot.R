@@ -97,17 +97,25 @@ for( i in 1:length(nsubs)){
   for(j in 1:length(nitems)){
     m<- subset(n, item== nitems[j])
     
-    if(nrow(m)>1){
-      m$remove[2:nrow(m)]=1
-    }
+    nlines<- unique(m$line)
     
-    newDatas<- rbind(newDatas, m)
+    for(k in 1:length(nlines)){
+      o<- subset(m, line== nlines[k])
+      if(nrow(o)>1){
+        o$remove[2:nrow(o)]=1
+        cat(sprintf('Second pass RS: subject %i, item %i, cond %i, line %i ', o$sub[1],
+                o$item[1], o$cond[1], o$line[1]))
+      }
+      
+      newDatas<- rbind(newDatas, o)
+    }
+  
   }
 }
-CleanRS=split(newDatas,newDatas$remove)
-CleanRS=CleanRS$`1`
 
-
+RS<- subset(RS, remove==0)
+RS$remove<- NULL
+rm(newDatas)
 
 #########################
 # Seperate Regressions
