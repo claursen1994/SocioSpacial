@@ -125,14 +125,14 @@ Regressions=Regressions$`1`
 
 ########################
 # Line initial fixations 
-# These are fix_dur in RS and 
+# These are fix_dur in RS and Line 1 first fixations
 
 Lineinit= RS
 LI=subset(raw_fix,raw_fix$line==1)
 LI=subset(LI,LI$fix_num==2)
 old<- c(2,5,8,9,11)
 LI$Age=NULL
-LI$remove=c(0)
+LI$remove=NULL
 LI$Age<- ifelse(is.element(LI$sub, old), "Old", "Young")
 LI$launchSite<- LI$prev_max_char_line- LI$prevChar
 LI$landStart<- LI$char_line
@@ -158,13 +158,15 @@ Line_final$fix_num=RS$fix_num-1
 Line_final=as.data.frame(Line_final)
 Line_final=merge(raw_fix,Line_final)
 # This doesn't give us the amount we should have...
+# We are missing Line final fixations on the last line
 
 
 
 
 # Add columns so that these match later on for duplicate removal
 Line_final$Age=NULL
-Line_final$remove=c(0)
+Line_final$remove=NULL
+Inter_line$remove=NULL
 Line_final$Age<- ifelse(is.element(Line_final$sub, old), "Old", "Young")
 Line_final$launchSite<- Line_final$prev_max_char_line- Line_final$prevChar
 Line_final$landStart<- Line_final$char_line
@@ -176,7 +178,7 @@ Line_final$undersweep_prob<- ifelse(Line_final$Rtn_sweep_type=="undersweep", 1, 
 # Make the columns match so they can be bound
 raw_fix2=raw_fix
 raw_fix2$Age=NULL
-raw_fix2$remove=c(0)
+raw_fix2$remove=NULL
 raw_fix2$Age<- ifelse(is.element(raw_fix2$sub, old), "Old", "Young")
 raw_fix2$launchSite<- raw_fix2$prev_max_char_line- raw_fix2$prevChar
 raw_fix2$landStart<- raw_fix2$char_line
@@ -219,7 +221,9 @@ All_fix$Fix_type=as.factor(All_fix$Fix_type)
 
 # Make new RS data frame
 NRS=subset(All_fix, All_fix$Rtn_sweep==1)
-
+NRS2=subset(NRS,NRS$Fix_type=="Accurate_init")
+NRS=subset(NRS,NRS$Fix_type=="Undersweep_init")
+NRS=rbind(NRS,NRS2)
 ########################################
 #Check for stuff within fixation groups
 
@@ -284,11 +288,6 @@ ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
   geom_violin()
 # + geom_jitter()
 
-  ##### Re jig to gain more variables
-  
-  Intra_young=split(Intra_line, Intra_line$Age)
-Intra_old=Intra_split$Old
-Intra_young=Intra_split$Young
 
 ## Nothing to see here...
 
@@ -309,11 +308,7 @@ ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
   geom_violin()
 # + geom_jitter()
 
-##### Re jig to gain more variables
 
-Intra_young=split(Intra_line, Intra_line$Age)
-Intra_old=Intra_split$Old
-Intra_young=Intra_split$Young
 
 ## Nothing to see here...only means
 #Intra
