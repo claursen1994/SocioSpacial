@@ -289,13 +289,6 @@ ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
 # + geom_jitter()
 
 
-## Nothing to see here...
-
-Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
-                 measure=c("fix_dur"), na.rm=TRUE)
-Intra_means<- cast(Intra_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-
-
 #Intra line
 ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
@@ -309,7 +302,7 @@ ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
 # + geom_jitter()
 
 
-
+############################################################################################
 ## Nothing to see here...only means
 #Intra
 Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
@@ -344,33 +337,43 @@ Sacc_len_means<- cast(Sacc_len_means, Age ~ variable,function(x) c(M=signif(mean
 # Landing Position and Age Interaction
 contrasts(RS$Age)<- c(1, -1)
 summary(GLM1<- glmer(undersweep_prob~ Age * 
-                       landStart + (1|item)+ (1|sub), data= RS, family= binomial))
+                        + (1|item)+ (1|sub), data= NRS, family= binomial))
 
 
-ef1=effect("Age:landStart", GLM1)
-summary(ef1)
-
-#All Fix differences in fixation durations. 
-contrasts(RS$Age)<- c(1, -1)
-summary(GLM1<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
-
-
-ef1=effect("Age:Fix_type", GLM1)
+ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
+#All Fix differences in fixation durations. 
+contrasts(RS$Age)<- c(1, -1)
+summary(allfixtypelm<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
 
-#NRS difference in return sweep fixation durations
-summary(GLM1<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= NRS))
 
-
-ef2=effect("Age:Fix_type", GLM1)
+ef2=effect("Age:Fix_type", allfixtypelm)
 summary(ef2)
 plot(ef2)
 
+#NRS difference in return sweep fixation durations
+summary(RSfixTypelm<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= NRS))
+
+
+ef3=effect("Age:Fix_type", RSfixTypelm)
+summary(ef3)
+plot(ef3)
+
 # Sacc_len based on fixation durations 
 summary(Poop<-lmer(sacc_len~ Age + (1|item)+ (1|sub) , data= All_fix))
-ef3=effect("Age",Poop)
-plot(ef3)
+ef4=effect("Age",Poop)
+plot(ef4)
+
+#Age and Saccade Length
+summary(GLM666<- glmer(undersweep_prob~ Age + 
+                      sacc_len + (1|item)+ (1|sub), data= NRS, family= binomial))
+
+
+ef5=effect("Age*sacc_len", GLM666)
+summary(ef5)
+plot(ef5)
+
 ######################################################################################
 # Launch Position 
 #USP
@@ -574,6 +577,10 @@ NS2=lmer(sacc_dur~ Age + (1|item)+ (1|sub), data= RS)
 simNS2=powerSim(NS2,nsim=20)                   
 simNS2
 
+
+################################################################
+Sim666=powerSim(GLM666,nsim=20)
+Sim666
 
 
 # Number of fixations 
