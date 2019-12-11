@@ -183,28 +183,41 @@ Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter
 
 #Correct the spelling error
 Intra_line=Inter_line
-<<<<<<< HEAD
-=======
+
   
   ######################################
 # Mark second pass fixations Line initial, Line Final and Inter Line fixations?
 ######################################
->>>>>>> f4324433cfbe205a2352a1acb54ed4b233ab9c1e
+
 
 ######################################
 # Mark second pass fixations Line initial, Line Final and Inter Line fixations?
 ######################################
 
 ########################################
-#Check for stuff within fixation groups
+#Mark Fix Groups
 
-<<<<<<< HEAD
+Und_RS_line_init$Fix_type=c("Undersweep_init")
+Acc_RS_line_init$Fix_type=c("Accurate_init")
+Line_final$Fix_type=c("Line_Final")
+Intra_line$Fix_type=c("Intra_line")
+
+#Merge back into full df for some reason 
+All_fix=rbind(Und_RS_line_init,Acc_RS_line_init)
+All_fix2=rbind(Line_final,Intra_line)
+All_fix=rbind(All_fix,All_fix2)
+
+All_fix$Fix_type=as.factor(All_fix$Fix_type)
+
+# Make new RS data frame
+NRS=subset(All_fix, All_fix$Rtn_sweep==1)
+
 ########################################
 #Check for stuff within fixation groups
 
 #Line initial general
 ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
-  =======
+
   #Line initial general
   ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
@@ -238,12 +251,12 @@ ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
 
 #Intra Line saccade lengths 
 ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
-  >>>>>>> f4324433cfbe205a2352a1acb54ed4b233ab9c1e
+
 geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
   geom_violin()
 # + geom_jitter()
 
-<<<<<<< HEAD
+
 #Line initial undersweep
 ggplot(data = Und_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
@@ -262,7 +275,7 @@ ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
   geom_violin()
 # + geom_jitter()
-=======
+
   ##### Re jig to gain more variables
   
   Intra_young=split(Intra_line, Intra_line$Age)
@@ -274,7 +287,7 @@ Intra_young=Intra_split$Young
 Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
                  measure=c("fix_dur"), na.rm=TRUE)
 Intra_means<- cast(Intra_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
->>>>>>> f4324433cfbe205a2352a1acb54ed4b233ab9c1e
+
 
 #Intra line
 ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
@@ -334,6 +347,27 @@ summary(GLM1<- glmer(undersweep_prob~ Age *
 ef1=effect("Age:landStart", GLM1)
 summary(ef1)
 
+#All Fix differences in fixation durations. 
+contrasts(RS$Age)<- c(1, -1)
+summary(GLM1<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
+
+
+ef1=effect("Age:Fix_type", GLM1)
+summary(ef1)
+plot(ef1)
+
+#NRS difference in return sweep fixation durations
+summary(GLM1<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= NRS))
+
+
+ef2=effect("Age:Fix_type", GLM1)
+summary(ef2)
+plot(ef2)
+
+# Sacc_len based on fixation durations 
+summary(Poop<-lmer(sacc_len~ Age + (1|item)+ (1|sub) , data= All_fix))
+ef3=effect("Age",Poop)
+plot(ef3)
 ######################################################################################
 # Launch Position 
 #USP
