@@ -559,8 +559,23 @@ simtreat4GLMI=powerSim(GLMI,nsim=10)
 simtreat4GLMI                      
 
 
+# Difference of Fixation durations 
+summary(lmm1<- lmer(fix_dur~ Age + (1|item)+ (1|sub), data= All_fix))
+FixEff=effect("Age",lmm1)
+plot(FixEff)
+summary(LM6<- lmer(prev_fix_dur~ Age + (1|item)+ (1|sub), data= RS))
 
 
+FixPsim=powerSim(lmm1, nsim=10)
+FixPsim
+
+
+#Calculate effect size
+r2.corr.mer(lmm1)
+r2.corr.mer <- function(m) {
+  lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
+  summary(lmfit)$r.squared
+}
 #######################################################################################
 
 # Hunch zone, perhaps nonsensical investigations. 
@@ -598,19 +613,6 @@ ggplot(data = raw_fix, aes(x = Age, y = fix_num, fill = Age))+
 
 write.csv(RS,"RS.csv")
 
-# Remove duplicated rows based on Sepal.Length
-
-TRS=RS
-TRS$line %<% distinct(TRS$line, .keep_all = TRUE)
-
-
-for (i in TRS$sub){
-  for (j in TRS$item)
-    TRS[!duplicated(TRS$line), ]
-}
-
-TRS=distinct(TRS$line, .keep_all = TRUE)
-2+2
 
 ##############################################
 # Making a proportional violin to show no effects
