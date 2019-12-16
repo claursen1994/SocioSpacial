@@ -269,6 +269,7 @@ geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
 # + geom_jitter()
 
 
+
 #Line initial undersweep
 ggplot(data = Und_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
@@ -498,9 +499,11 @@ effect("Age",LndPo)
 Mlen=melt()
 
 
-summary(LengSac=lmer(sacc_len~ Age + (1|item), data= raw_fix))
-
-
+summary(LengSac<-lmer(sacc_len ~ Age + (1|item) +(1|sub), data= Intra_line))
+efct=effect("Age",LengSac)
+plot(efct)
+lensim=powerSim(LengSac,nsim=40)
+lensim
 sacclen=ggplot(data = raw_fix, aes(x = Age, y = sacclen, fill = Age))+
   geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
   geom_violin()
@@ -544,7 +547,7 @@ simtreat4LM3.1
 
 # Fixation Duration
 summary(LM5<- lmer(fix_dur~ Age + (1|item)+ (1|sub), data= raw_fix))
-
+tetst=lmer(fix_dur~ Age + (1|item)+ (Age|sub), data= Inter_line)
 simtreat4LM5=powerSim(LM5,nsim=5)
 simtreat4LM5
 
