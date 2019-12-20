@@ -70,3 +70,10 @@ r2.corr.mer <- function(m) {
   lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
   summary(lmfit)$r.squared
 }
+
+
+# Skip rate Power
+
+summary(GLM10<- glmer(skip_prob~ Age +  (1|item)+ (1|sub), data= TSkip_Raw_fix, family= binomial))
+simtreat4GLM10=powerSim(GLM10,nsim=20)
+simtreat4GLM10    
