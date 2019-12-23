@@ -61,7 +61,7 @@ write.csv2(Quest,"LabCodeC/corpus/QuestAnaly")
 # Comprehension accuracy: 
 ###########################
 data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
-
+data_dir=("E:/CalvinsDumb_work_Stuff/SoSpaPilotASC/Files4Quest")
 if(!file.exists("data/QuestDa.Rda")){
   QuestDa<- Question(data_list = data_dir, maxtrial = 100)
   save(Quest, file= "data/QuestDa.Rda")
@@ -362,13 +362,17 @@ print(G11)
 ####################################
 # Remember to look at which participants were young and whcih were old 
 
-YOGAVN=split(GAVN,GAVN$sub)
-YGAVN=rbind(YOGAVN$`1`,YOGAVN$`3`,YOGAVN$`4`,YOGAVN$`6`)
-OGAVN=rbind(YOGAVN$`2`,YOGAVN$`5`,YOGAVN$`99`,YOGAVN$`198`)
-YGAVN$Age=c("Young")
-OGAVN$Age=c("Old")
-GAVN=rbind(YGAVN,OGAVN)
+#YOGAVN=split(GAVN,GAVN$sub)
+#YGAVN=rbind(YOGAVN$`1`,YOGAVN$`3`,YOGAVN$`4`,YOGAVN$`6`)
+#OGAVN=rbind(YOGAVN$`2`,YOGAVN$`5`,YOGAVN$`99`,YOGAVN$`198`)
+#YGAVN$Age=c("Young")
+#OGAVN$Age=c("Old")
+#GAVN=rbind(YGAVN,OGAVN)
 
+library(readxl)
+Aegis <- read_excel("H:/Profile/Desktop/Aegis.xlsx")
+GAVN=merge(Aegis,GAVN)
+GAVN$Age=as.factor(GAVN$Age)
 ############################################
 # Accuracy in general
 A1=ggplot(GAVN, aes(seq, accuracy, colour = Age, fill = Age)) +
@@ -448,6 +452,89 @@ print(A6)
 
 
 ############################################################################################
+#Build a model on what we've learned. 
+#Basic State effect on accuracy
+GAVN$Age=as.factor(GAVN$Age)
+GAVN$State=as.factor(GAVN$State)
+GAVNG=glmer(accuracy~State+ (1 | item)+(1|sub),
+            data = GAVN, family = binomial)
+summary(GAVNG)
+Qef=effect("State",GAVNG)
+plot(Qef)
+###
+# Age*State
+GAVN$Age=as.factor(GAVN$Age)
+GAVN$State=as.factor(GAVN$State)
+GAVNG1=glmer(accuracy~Age*State+ (1 | item)+(1|sub),
+            data = GAVN, family = binomial)
+summary(GAVNG1)
+Qef1=effect("Age*State",GAVNG1)
+plot(Qef1)
+#
+##Age Only
+
+GAVNG2=glmer(accuracy~Age+ (1|item)+(1|sub),
+             data = GAVN, family = binomial)
+summary(GAVNG2)
+Qef2=effect("Age",GAVNG2)
+plot(Qef2)
+
+##########
+# If incorrect was there any age related reason for what was chosen?
+IncGAVN=subset(GAVN,GAVN$accuracy==0)
+IncGAVN$chose3=NULL
+IncGAVN$chose3<- ifelse(IncGAVN$subresp=="3", 1, 0)
+IncGAVNG=glmer(chose3~Age+ (1|item)+(1|sub),
+             data = IncGAVN, family=binomial)
+summary(IncGAVNG)
+Qef3=effect("Age",IncGAVNG)
+plot(Qef3)
+# Younger readers slightly more likely to have chosen 3 as a "guess?"
+# Is there a time difference as to weather they got it right or not? Can we tell guessing from this?
+#WHen not chosing 3 what was chosen? 
+Incandnotthree=subset(IncGAVN,IncGAVN$chose3==0)
+preference=lmer(subresp~Age*State+ (1|item)+(1|sub),
+               data = Incandnotthree)
+summary(preference)
+Qef3=effect("Age*State",preference)
+plot(Qef3)
+#############
+# Without splitting by ambiguity we can't go on so let's do that so we can ask
+# What mental model was prefered?
+
+Splitconds=split(GAVN,GAVN$State)
+NonAmbGAVN=rbind(Splitconds$NambiSoc,Splitconds$NambiSpa)
+AmbGavn=rbind(Splitconds$AmbiSoc,Splitconds$AmbiSpa)
+
+#In Non Ambiguous settings the incorrect answer (not 3) is based on the word order
+#we can see how this effects older people
+# Option 3 we will count as a guess here so we can see who prefered to guess and who prefered word order
+
+IncNonAm=subset(NonAmbGAVN,NonAmbGAVN$accuracy==0)
+IncNonAm$Guess=ifelse(IncNonAm$subresp=="3", 1, 0)
+
+preference3=glmer(Guess~Age+ (1|item)+(1|sub),
+                data = IncNonAm, family=binomial)
+summary(preference3)
+Qef3=effect("Age",preference3)
+plot(Qef3)
+# Younger people slightly more likely to guess, Older people prefer to not guess...
+#What is chosen if they don't guess? WORD ORDER MODEL 
+#Let's do the same but for ambiguous, This time we need to make sure we know what the word order model is
+IncAm=subset(AmbGavn,AmbGavn$accuracy==0)
+
+preference4=lmer(subresp~Age+ (1|item)+(1|sub),
+                  data = IncAm)
+summary(preference4)
+Qef3=effect("Age",preference4)
+plot(Qef3)
+
+
+# Check what mental model was preffered? 
+ggplot(data = IncGAVN, aes(x = Age, y = subresp, fill = State))+
+  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
+  geom_violin()
+# + geom_jitter()
 
 # Attempt at simulating 
 GAVN$Age=as.factor(GAVN$Age)
