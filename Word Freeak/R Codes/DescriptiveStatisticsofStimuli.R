@@ -31,6 +31,7 @@ install.packages("readr")
 install.packages("tidyr")
 install.packages("dplyr")
 install.packages("tidyverse")
+install.packages("EMreading")
 #Library#
 
 library("tm")
@@ -48,6 +49,7 @@ library("ggplot2")
 library("lme4")
 library("effects")
 library("tidyverse")
+library("EMreading")
 #Data
 ########
 # Note: MDMK is a huge excel file that Contains a great deal of excel formulas which makes it easier to
