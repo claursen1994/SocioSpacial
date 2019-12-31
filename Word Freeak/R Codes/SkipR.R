@@ -72,7 +72,7 @@ RTNAVG<- cast(RTNAVG, Age ~ variable
 RTNAVG
 
 summary(GLM2<- lmer(nfix2~ Age
-                     + (1|item)+ (1|sub), data= Skips))
+                    + (1|item)+ (1|sub), data= Skips))
 ef2=effect("Age", GLM2)
 summary(ef2)
 plot(ef2)
