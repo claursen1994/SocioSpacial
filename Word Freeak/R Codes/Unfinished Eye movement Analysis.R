@@ -3,9 +3,11 @@
 ################
 # Trial times: #
 ################
+library(EMreading)
+
 rm(list= ls())
 data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
-
+data_dir=("C:/Users/Calvin/Desktop/Proc/List Files")
 if(!file.exists("data/Trial_time.Rda")){
   
   Trialt<- trialTime(data_list = data_dir, maxtrial = 100)
