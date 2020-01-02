@@ -14,9 +14,9 @@ install_github('martin-vasilev/EMreading')
 
 
 #Load in takes a bit of time, and only works after raw_fix has been created
-#Skip_raw_fix2 has the ages prebound so lets add in that  
-Skip_Raw_fix=read.csv("Skip_Raw_fix2.csv")
 
+
+#Run After Pilot
 library("EMreading")
 Skip_Raw_fix=raw_fix
 Skip_Raw_fix22=wordMeasures(Skip_Raw_fix)

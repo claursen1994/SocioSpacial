@@ -8,7 +8,7 @@ data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
 
 #Load or read in Data
 
-
+load("preproc/raw_fix.Rda")
 if(!file.exists("preproc/raw_fix.Rda")){
   # extract raw data & merge it with da1 files:
   raw_fix<- preprocFromDA1(data_dir = data_dir, maxtrial = 100, padding = 5, tBlink = 100)
@@ -182,8 +182,43 @@ m<- cast(Des, Age ~ variable
 RS$Age<- as.factor(RS$Age)
 contrasts(RS$Age)<- c(1, -1)
 
-# Return Sweeps
+################################################# Return Sweeps ########################################
 library(lme4)
+
+#################################Check and Mark 2nd pass in Return Sweeps. 
+
+
+RS$remove<-  0
+newDatas<- NULL
+nsubs<- unique(RS$sub)
+
+for( i in 1:length(nsubs)){
+  n<- subset(RS, sub== nsubs[i])
+  nitems<- unique(n$item)
+  
+  for(j in 1:length(nitems)){
+    m<- subset(n, item== nitems[j])
+    
+    nlines<- unique(m$line)
+    
+    for(k in 1:length(nlines)){
+      o<- subset(m, line== nlines[k])
+      if(nrow(o)>1){
+        o$remove[2:nrow(o)]=1
+        cat(sprintf('Second pass RS: subject %i, item %i, cond %i, line %i ', o$sub[1],
+                    o$item[1], o$cond[1], o$line[1]))
+      }
+      
+      newDatas<- rbind(newDatas, o)
+    }
+    
+  }
+}
+
+RS<- subset(RS, remove==0)
+RS$remove<- NULL
+rm(newDatas)
+##################################### Make models
 
 summary(LM1<- lmer(landStart~ Age + (1|item), data= RS))
 summary(LM2<- lmer(launchSite~ Age + (1|item), data= RS))
@@ -199,26 +234,59 @@ plot(LM1)
 ef2=effect("Age", LM2)
 plot(ef2)
 
+############################################## Get power of effects for:
+#UnderSweepProbability
+
+USPSIM=powerSim(GLM0,nsim=20)
+USPSIM
 
 
+#Landing Position
+
+LANDSIM=powerSim(LM1,nsim=20)
+LANDSIM
+#Launch Site 
+
+LAUNCHSIM=powerSim(LM2,nsim=20)
+LAUNCHSIM
 
 
+############################################# SKIP RATE ############################################################
 
-## SPlit off different saccade types 
-########################
-# Line initial fixations 
+Skip_Raw_fix=raw_fix
+Skip_Raw_fix22=wordMeasures(Skip_Raw_fix)
+Skip_Raw_fix22$skip=NULL
+# If Nfix 1 was 0 then the word was skipped the first time.
+Skip_Raw_fix22$skip<- ifelse(Skip_Raw_fix22$nfix1=="0", 1, 0)
+
+# If Nfix1 was 0 and Nfix2 was 1 or more then the word was fixated later 
+
+Skip_Raw_fix22$hold<- ifelse(Skip_Raw_fix22$nfix2>"0",1,0 )
+Skip_Raw_fix22$Return2SkipWord= ifelse(Skip_Raw_fix22$skip+Skip_Raw_fix22$hold=="2",1,0)
+Skip_Raw_fix22$hold=NULL
+
+Skips=merge(Skip_Raw_fix22,Skip_Raw_fix)
+
+############################################ Make Model
+summary(GLM1<- glmer(skip~ Age
+                     + (1|item)+ (1|sub), data= Skips, family= binomial))
+ef1=effect("Age", GLM1)
+summary(ef1)
+plot(ef1)
+
+########################### Simulate
+SKIPSIM=powerSim(GLM1,nsim=20)
+SKIPSIM
+
+################################################# Different saccade and Fixation Types ##########################
+
+
+################################################# Line initial fixations 
 # These are fix_dur in RS and Line 1 first fixations
 
 Lineinit= RS
 LI=subset(raw_fix,raw_fix$line==1)
 LI=subset(LI,LI$fix_num==2)
-old<- c(2,5,8,9,11)
-LI$Age=NULL
-LI$remove=NULL
-LI$Age<- ifelse(is.element(LI$sub, old), "Old", "Young")
-LI$launchSite<- LI$prev_max_char_line- LI$prevChar
-LI$landStart<- LI$char_line
-LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
 Lineinit=rbind(Lineinit,LI)
 ##############################
 # Line init following accurate or undersweep return sweep
@@ -277,14 +345,92 @@ Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter
 Intra_line=Inter_line
 
 
-######################################
-# Mark second pass fixations Line initial, Line Final and Inter Line fixations?
-######################################
 
 
-######################################
-# Mark second pass fixations Line initial, Line Final and Inter Line fixations?
-######################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## SPlit off different saccade types 
+########################
+# Line initial fixations 
+# These are fix_dur in RS and Line 1 first fixations
+
+Lineinit= RS
+LI=subset(raw_fix,raw_fix$line==1)
+LI=subset(LI,LI$fix_num==2)
+
+LI$Age<- ifelse(is.element(LI$sub, old), "Old", "Young")
+LI$launchSite<- LI$prev_max_char_line- LI$prevChar
+LI$landStart<- LI$char_line
+LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
+Lineinit=rbind(Lineinit,LI)
+##############################
+# Line init following accurate or undersweep return sweep
+
+Acc_RS_line_init=subset(RS,RS$Rtn_sweep_type=="accurate")
+Und_RS_line_init=subset(RS,RS$Rtn_sweep_type=="undersweep")
+
+#######################
+# Line final 
+
+Line_final=NULL
+Line_final$sub=RS$sub
+Line_final$item=RS$item
+Line_final$seq=RS$seq
+Line_final$fix_num=RS$fix_num-1
+#Line_final$xpos=RS$prevX
+#Line_final$ypos=RS$prevY
+#Line_final$line=RS$line-1
+Line_final=as.data.frame(Line_final)
+Line_final=merge(raw_fix,Line_final)
+# This doesn't give us the amount we should have...
+# We are missing Line final fixations on the last line
+
+
+
+
+# Add columns so that these match later on for duplicate removal
+Line_final$Age=NULL
+Line_final$remove=NULL
+Inter_line$remove=NULL
+Line_final$Age<- ifelse(is.element(Line_final$sub, old), "Old", "Young")
+Line_final$launchSite<- Line_final$prev_max_char_line- Line_final$prevChar
+Line_final$landStart<- Line_final$char_line
+Line_final$undersweep_prob<- ifelse(Line_final$Rtn_sweep_type=="undersweep", 1, 0)
+
+
+
+## Inter-line fixations
+# Make the columns match so they can be bound
+raw_fix2=raw_fix
+raw_fix2$Age=NULL
+raw_fix2$remove=NULL
+raw_fix2$Age<- ifelse(is.element(raw_fix2$sub, old), "Old", "Young")
+raw_fix2$launchSite<- raw_fix2$prev_max_char_line- raw_fix2$prevChar
+raw_fix2$landStart<- raw_fix2$char_line
+raw_fix2$undersweep_prob<- ifelse(raw_fix2$Rtn_sweep_type=="undersweep", 1, 0)
+
+##rbind the columns and then remove all ones that are the same in line Final 
+Inter_line=rbind(raw_fix2,Line_final) 
+Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter_line,fromLast = TRUE),]
+# Bind in line initial and remove the duplicates
+Inter_line=rbind(Inter_line,Lineinit)
+Inter_line=Inter_line[!duplicated(Inter_line,fromLast = FALSE)&!duplicated(Inter_line,fromLast = TRUE),]
+
+#Correct the spelling error
+Intra_line=Inter_line
 
 ########################################
 #Mark Fix Groups
@@ -306,112 +452,6 @@ NRS=subset(All_fix, All_fix$Rtn_sweep==1)
 NRS2=subset(NRS,NRS$Fix_type=="Accurate_init")
 NRS=subset(NRS,NRS$Fix_type=="Undersweep_init")
 NRS=rbind(NRS,NRS2)
-########################################
-#Check for stuff within fixation groups
-
-#Line initial general
-ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
-  
-  #Line initial general
-  ggplot(data = Lineinit, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Line initial undersweep
-ggplot(data = Und_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Line initial accurate
-ggplot(data = Acc_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Line final
-
-ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Intra line
-ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Intra Line saccade lengths 
-ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
-  
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-
-
-#Line initial undersweep
-ggplot(data = Und_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Line initial accurate
-ggplot(data = Acc_RS_line_init, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Line final
-
-ggplot(data = Line_final, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-
-#Intra line
-ggplot(data = Intra_line, aes(x = Age, y = fix_dur, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-#Intra Line saccade lengths 
-ggplot(data = Intra_line, aes(x = Age, y = sacc_len, fill = Age))+
-  geom_bar(stat = "summary", fun.y = "mean", color= "red",position = "dodge")+
-  geom_violin()
-# + geom_jitter()
-
-
-############################################################################################
-## Nothing to see here...only means
-#Intra
-Intra_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
-                 measure=c("fix_dur"), na.rm=TRUE)
-Intra_means<- cast(Intra_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-
-#Line Init Undersweep
-Und_line_init_means=melt(Und_RS_line_init, id=c('sub', 'item', 'Age'), 
-                         measure=c("fix_dur"), na.rm=TRUE)
-Und_line_init_means<- cast(Und_line_init_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-#Line init accurate
-acc_line_init_means=melt(Acc_RS_line_init, id=c('sub', 'item', 'Age'), 
-                         measure=c("fix_dur"), na.rm=TRUE)
-acc_line_init_means<- cast(acc_line_init_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-
-#Line final 
-Line_final_means=melt(Line_final, id=c('sub', 'item', 'Age'), 
-                      measure=c("fix_dur"), na.rm=TRUE)
-Line_final_means<- cast(Line_final_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-
-
-## Intra line Saccade Length means??
-Sacc_len_means=melt(Intra_line, id=c('sub', 'item', 'Age'), 
-                    measure=c("sacc_len"), na.rm=TRUE)
-Sacc_len_means<- cast(Sacc_len_means, Age ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
-
 
 ######################################################################################
 ######################################################################################

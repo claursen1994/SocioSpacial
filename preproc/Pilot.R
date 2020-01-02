@@ -126,13 +126,6 @@ rm(newDatas)
 Lineinit= RS
 LI=subset(raw_fix,raw_fix$line==1)
 LI=subset(LI,LI$fix_num==2)
-old<- c(2,5,8,9,11)
-LI$Age=NULL
-LI$remove=NULL
-LI$Age<- ifelse(is.element(LI$sub, old), "Old", "Young")
-LI$launchSite<- LI$prev_max_char_line- LI$prevChar
-LI$landStart<- LI$char_line
-LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
 Lineinit=rbind(Lineinit,LI)
 ##############################
 # Line init following accurate or undersweep return sweep
