@@ -18,7 +18,7 @@ install_github('martin-vasilev/EMreading')
 Skip_Raw_fix=read.csv("Skip_Raw_fix2.csv")
 
 library("EMreading")
-
+Skip_Raw_fix=raw_fix
 Skip_Raw_fix22=wordMeasures(Skip_Raw_fix)
 Skip_Raw_fix22$skip=NULL
 # If Nfix 1 was 0 then the word was skipped the first time.
