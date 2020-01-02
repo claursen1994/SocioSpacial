@@ -118,11 +118,6 @@ RS<- subset(RS, remove==0)
 RS$remove<- NULL
 rm(newDatas)
 
-#########################
-# Seperate Regressions
-
-Regressions=split(raw_fix,raw_fix$regress)
-Regressions=Regressions$`1`
 
 ########################
 # Line initial fixations 
