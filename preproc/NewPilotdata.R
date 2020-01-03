@@ -286,6 +286,9 @@ SKIPSIM
 
 Lineinit= RS
 LI=subset(raw_fix,raw_fix$line==1)
+LI$launchSite<- LI$prev_max_char_line- LI$prevChar
+LI$landStart<- LI$char_line
+LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
 LI=subset(LI,LI$fix_num==2)
 Lineinit=rbind(Lineinit,LI)
 ##############################
@@ -316,7 +319,6 @@ Line_final=merge(raw_fix,Line_final)
 # Add columns so that these match later on for duplicate removal
 Line_final$Age=NULL
 Line_final$remove=NULL
-Inter_line$remove=NULL
 Line_final$Age<- ifelse(is.element(Line_final$sub, old), "Old", "Young")
 Line_final$launchSite<- Line_final$prev_max_char_line- Line_final$prevChar
 Line_final$landStart<- Line_final$char_line

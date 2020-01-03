@@ -126,7 +126,7 @@ rm(newDatas)
 Lineinit= RS
 LI=subset(raw_fix,raw_fix$line==1)
 LI=subset(LI,LI$fix_num==2)
-Lineinit=rbind(Lineinit,LI)
+Lineinit=rbind(LI,Lineinit)
 ##############################
 # Line init following accurate or undersweep return sweep
 
