@@ -54,9 +54,8 @@ Stim_wb$X=NULL
 #Load in takes a bit of time
 Skip_Raw_fix=read.csv("raw_fix.csv")
 # Remove NA, Return sweeps and also second pass reads
-library("EMreading")
 
-Skip_Raw_fix22=wordMeasures(Skip_Raw_fix)
+
 
 Skip_Raw_fix=subset(Skip_Raw_fix,Skip_Raw_fix$Rtn_sweep!=1)
 
@@ -220,13 +219,3 @@ summary(GLM1<- glmer(Skip~ Age
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
-
-
-
-
-
-
-
-
-
-
