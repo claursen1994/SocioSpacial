@@ -260,10 +260,10 @@ RS<- subset(RS, remove==0)
 RS$remove<- NULL
 rm(newDatas)
 ##################################### Make models
-
-summary(LM1<- lmer(landStart~ Age + (1|item), data= RS))
-summary(LM2<- lmer(launchSite~ Age + (1|item), data= RS))
-summary(GLM0<- glmer(undersweep_prob~ Age + (1|item), data= RS, family= binomial))
+contrasts(RS$Age)<- c(1, -1)
+summary(LM1<- lmer(landStart~ Age + (Age|item), data= RS))
+summary(LM2<- lmer(launchSite~ Age + (launchSite+Age|item), data= RS))
+summary(GLM0<- glmer(undersweep_prob~ Age + (Age|item), data= RS, family= binomial))
 
 #Effect of Age on undersweep Probability
 ef0=effect("Age", GLM0)
@@ -275,20 +275,27 @@ plot(LM1)
 ef2=effect("Age", LM2)
 plot(ef2)
 
+
+
 ############################################## Get power of effects for:
 #UnderSweepProbability
-
-USPSIM=powerSim(GLM0,nsim=20)
+USPEX=extend(GLM0,along= "sub",n=32)
+USPEXS=powerSim(GLM0,nsim=100)
+USPEXS
+USPC=powerCurve(USPEX,along="sub")
+plot(USPC)
+USPSIM=powerSim(GLM0,nsim=32)
 USPSIM
-
-
+print(USPSIM)
 #Landing Position
 
-LANDSIM=powerSim(LM1,nsim=20)
+LANDSIM=powerSim(LM1,nsim=24)
 LANDSIM
+lsim=powerCurve(LM1)
+plot(lsim)
 #Launch Site 
 
-LAUNCHSIM=powerSim(LM2,nsim=20)
+LAUNCHSIM=powerSim(LM2,nsim=16)
 LAUNCHSIM
 
 
