@@ -21,7 +21,7 @@ install.packages("tidyverse")
 install.packages("digest")
 install.packages("EMreading")
 install.packages("simr")
-
+install.packages("jtools")
 #Library#
 
 library("tm")
@@ -43,6 +43,7 @@ library("EMreading")
 library("EMreading")
 library("lme4")
 library("simr")
+library("jtools")
 rm(list= ls())
 data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
 
@@ -289,13 +290,13 @@ USPSIM
 print(USPSIM)
 #Landing Position
 
-LANDSIM=powerSim(LM1,nsim=24)
+LANDSIM=powerSim(LM1,nsim=32)
 LANDSIM
 lsim=powerCurve(LM1)
 plot(lsim)
 #Launch Site 
 
-LAUNCHSIM=powerSim(LM2,nsim=16)
+LAUNCHSIM=powerSim(LM2,nsim=32)
 LAUNCHSIM
 
 
@@ -315,18 +316,71 @@ Skip_Raw_fix22$hold=NULL
 
 Skips=merge(Skip_Raw_fix22,Skip_Raw_fix)
 
+## Add variables for Zipf frequence and Length of word.##
+Skips$wordID=as.character(Skips$wordID)
+Skips$Length=nchar(Skips$wordID)
+#Add in zipf scores for further analysis 
+
+#This can take a while
+lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
+#lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
+Skips$Zipf<- NA
+Skips$freq<-NA
+for(i in 1:nrow(Skips)){
+  a<- which(lex2$Spelling== Skips$wordID[i])
+  if(length(a)>0){
+    Skips$Zipf[i]<- lex2$`LogFreq(Zipf)`[a]
+    Skips$freq[i]<- lex2$FreqCount[a]
+  }
+}
+
+
 ############################################ Make Model
-summary(GLM1<- glmer(skip~ Age
-                     + (1|item)+ (1|sub), data= Skips, family= binomial))
+# center by means 
+Skips$Length=center(Skips$Length)
+Skips$Zipf=center(Skips$Zipf)
+#
+summary(GLM1<- glmer(skip~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, family= binomial))
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
 
 ########################### Simulate
-SKIPSIM=powerSim(GLM1,nsim=20)
+SKIPSIM=powerSim(GLM1,nsim=32, test=fixed("Age*Length"))
 SKIPSIM
 
-################################################# Different saccade and Fixation Types ##########################
+
+##################################### Regressions #######################################
+# Return to skipped words
+summary(GLM2<- glmer(Return2SkipWord~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
+RegEF=effect("Age", GLM2)
+summary(RegEF)
+plot(RegEF)
+
+####################### Simulate 
+Regsim=powerSim(GLM2,nsim=32)
+Regsim
+
+
+##################################### Launch Site #######################################
+
+summary(LaunchLM <- lmer(launchSite~Age+(1|item)+(Age|sub),data=RS))
+LaunchEF=effect("Age",LaunchLM)
+summary(LaunchEF)
+plot(LaunchEF)
+
+#This seems to be a null effect... 
+
+#################################### Landing position ###################################
+summary(LandLM <- lmer(landStart~launchSite+Age+(launchSite+Age|item)+(launchSite+Age|sub),data=RS))
+LandEF=effect("Age",LandLM)
+summary(LandEF)
+plot(LandEF)
+
+#Simulation 
+Landsim=powerSim(LandLM,nsim=32, test=fixed("Age"))
+Landsim
+############################## Different saccade and Fixation Types ##########################
 
 
 ################################################# Line initial fixations 
@@ -364,14 +418,8 @@ Line_final$landStart<- Line_final$char_line
 Line_final$undersweep_prob<- ifelse(Line_final$Rtn_sweep_type=="undersweep", 1, 0)
 
 
-
-# Add columns so that these match later on for duplicate removal
-
-
-
-# Add line final fixations on the last line ?
-
-## Inter-line fixations
+################ Add columns so that these match later on for duplicate removal
+# Intra-line fixations
 # Make the columns match so they can be bound
 raw_fix2=raw_fix
 raw_fix2$remove=NULL
@@ -408,66 +456,30 @@ NRS=rbind(NRS,NRS2)
 rm(NRS2)
 
 
-##################### Check for Age effects within fixation groups
+##################### Check for Age effects within fixation groups ###########################
 #fix type and age
 contrasts(RS$Age)<- c(1, -1)
-summary(allfixtypelm<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
+contrasts(All_fix$Fix_type)=contr.treatment(4)
+summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
 
 ef3=effect("Age:Fix_type", allfixtypelm)
 summary(ef3)
 plot(ef3)
-# just age 
-summary(allfixdurlm<- lmer(fix_dur~ Age + (1|item)+ (1|sub), data= All_fix))
 
-ef4=effect("Age", allfixtypelm)
-summary(ef4)
-plot(ef4)
 ## Simulate 
-FIXTYPESIM=powerSim(allfixdurlm,nsim=20)
+FIXTYPESIM=powerSim(allfixtypelm,nsim=32, test=fixed("Age:Fix_type"))
 FIXTYPESIM
-
-########This doesn't give us all we need... we need individual models for each...
-
-# post return sweep line initial fixation durations 
-summary(RSfixTypelm<- lmer(fix_dur~ Age * Fix_type + (1|item)+ (1|sub), data= NRS))
+####
 
 
-ef5=effect("Age:Fix_type", RSfixTypelm)
-summary(ef5)
-plot(ef5)
-
-RSSIM=powerSim(RSfixTypelm,nsim=20)
-RSSIM
-# Intra_line Fixation durations 
-summary(INTRAfixTypelm<- lmer(fix_dur~ Age+ (1|item)+ (1|sub), data= Intra_line))
 
 
-ef6=effect("Age", INTRAfixTypelm)
-summary(ef6)
-plot(ef6)
-
-ILSIM=powerSim(INTRAfixTypelm,nsim=20)
-ILSIM
-powerCurve(INTRAfixTypelm)
-
-# Line final fixations
-summary(finalfixTypelm<- lmer(fix_dur~ Age+ (1|item)+ (1|sub), data= Line_final))
-
-
-ef7=effect("Age", finalfixTypelm)
-summary(ef7)
-plot(ef7)
-
-LFSIM=powerSim(finalfixTypelm,nsim=20)
-LFSIM
-
-
-# Sacc_len based on fixation durations 
+#  Age effects of Intra line saccade Legnths 
 summary(saclen<-lmer(sacc_len~ Age + (1|item)+ (1|sub) , data= Intra_line))
 ef8=effect("Age",saclen)
 plot(ef8)
 
-SLSIM=powerSim(saclen,nsim=20)
+SLSIM=powerSim(saclen,nsim=32)
 SLSIM
 
 
