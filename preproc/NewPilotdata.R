@@ -278,16 +278,10 @@ plot(ef0)
 
 ################################# Get power of effects for:
 #UnderSweepProbability
-#extend the number of participants 
-ExtGLM0<-extend(GLM0, along= "sub", n=80)
-#Sim
-PSGLM=powerSim(ExtGLM0, nsim=80)
-PSGLM
-#Power Curve
-PSGLM1=powerCurve(ExtGLM0,test=fixed("sub"), nsim=80)
-plot(PSGLM)
-
-
+#General sim
+#make fitted model
+USPSIM=powerSim(GLM0,nsim=32)
+USPSIM
 
 ############################################# SKIP RATE ############################################################
 
@@ -335,7 +329,7 @@ summary(ef1)
 plot(ef1)
 
 ########################### Simulate
-SKIPSIM=powerSim(GLM1,nsim=32, test=fixed("Age*Length"))
+SKIPSIM=powerSim(GLM1,nsim=16, test=fixed("Age*Length"))
 SKIPSIM
 
 
