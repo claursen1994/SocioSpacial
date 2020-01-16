@@ -260,44 +260,33 @@ for( i in 1:length(nsubs)){
 RS<- subset(RS, remove==0)
 RS$remove<- NULL
 rm(newDatas)
+
+################################ UNDERSWEEP PROBABILITY##############################################
+
 ##################################### Make models
 contrasts(RS$Age)<- c(1, -1)
-summary(LM1<- lmer(landStart~ Age + (Age|item), data= RS))
-summary(LM2<- lmer(launchSite~ Age + (launchSite+Age|item), data= RS))
+
 summary(GLM0<- glmer(undersweep_prob~ Age + (Age|item), data= RS, family= binomial))
 
 #Effect of Age on undersweep Probability
 ef0=effect("Age", GLM0)
+summary(ef0)
 plot(ef0)
-# Effecr of Age on Landing Position
-ef1=effect("Age",LM1)
-plot(LM1)
-#Effect of Age on LaunchSite
-ef2=effect("Age", LM2)
-plot(ef2)
 
 
 
-############################################## Get power of effects for:
+
+################################# Get power of effects for:
 #UnderSweepProbability
-USPEX=extend(GLM0,along= "sub",n=32)
-USPEXS=powerSim(GLM0,nsim=100)
-USPEXS
-USPC=powerCurve(USPEX,along="sub")
-plot(USPC)
-USPSIM=powerSim(GLM0,nsim=32)
-USPSIM
-print(USPSIM)
-#Landing Position
+#extend the number of participants 
+ExtGLM0<-extend(GLM0, along= "sub", n=80)
+#Sim
+PSGLM=powerSim(ExtGLM0, nsim=80)
+PSGLM
+#Power Curve
+PSGLM1=powerCurve(ExtGLM0,test=fixed("sub"), nsim=80)
+plot(PSGLM)
 
-LANDSIM=powerSim(LM1,nsim=32)
-LANDSIM
-lsim=powerCurve(LM1)
-plot(lsim)
-#Launch Site 
-
-LAUNCHSIM=powerSim(LM2,nsim=32)
-LAUNCHSIM
 
 
 ############################################# SKIP RATE ############################################################
@@ -378,7 +367,7 @@ summary(LandEF)
 plot(LandEF)
 
 #Simulation 
-Landsim=powerSim(LandLM,nsim=32, test=fixed("Age"))
+Landsim=powerSim(LandLM,nsim=64)#, test=fixed("Age"))
 Landsim
 ############################## Different saccade and Fixation Types ##########################
 
