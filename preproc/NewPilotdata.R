@@ -284,13 +284,16 @@ plot(ef0)
 #UnderSweepProbability
 #General sim
 #make fitted model
-fixef(GLM0)["Age1"]<-0.1
+fixef(GLM0)["Age1"]<-0.15
 powerSim(GLM0)
-model1=extend(GLM0,along="sub", n=32)
-USPSIM=powerSim(model1,nsim=32 )
-PC1=powerCurve(model1)
+
+model1=extend(GLM0,along="sub", n=40)
+
+#USPSIM=powerSim(model1,nsim=32 )
+
+PC1=powerCurve(model1, along = "sub")
 plot(PC1)
-USPSIM
+#USPSIM
 
 ############################################# SKIP RATE ############################################################
 
@@ -336,10 +339,18 @@ summary(GLM1<- glmer(skip~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, fami
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
-summary(GLM1<- glmer(skip~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
+
 ########################### Simulate
-SKIPSIM=powerSim(GLM1,nsim=16, test=fixed("Age"))
-SKIPSIM
+fixef(GLM1)["Agey"]<--0.65
+powerSim(GLM1)
+
+model2=extend(GLM1,along="sub", n=40)
+
+#USPSIM=powerSim(model1,nsim=32 )
+
+PC2=powerCurve(model2, along = "sub")
+plot(PC2)
+#USPSIM
 
 
 ##################################### Regressions #######################################
@@ -350,28 +361,54 @@ summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-Regsim=powerSim(GLM2,nsim=48)
-Regsim
+fixef(GLM2)["Age1"]<--0.65
+powerSim(GLM2)
+
+model3=extend(GLM2,along="sub", n=40)
+
+#USPSIM=powerSim(model1,nsim=32 )
+
+PC3=powerCurve(model3, along = "sub")
+plot(PC3)
+#USPSIM
 
 
 ##################################### Launch Site #######################################
 
-summary(LaunchLM <- lmer(launchSite~Age+(1|item)+(Age|sub),data=RS))
+summary(LaunchLM <- lmer(launchSite~Age+(1|item)+(1|sub),data=RS))
 LaunchEF=effect("Age",LaunchLM)
 summary(LaunchEF)
 plot(LaunchEF)
+#sim
+fixef(LaunchLM)["Age1"]<-0.4
+powerSim(LaunchLM)
 
-#This seems to be a null effect... 
+model4=extend(LaunchLM,along="sub", n=40)
+
+#USPSIM=powerSim(model1,nsim=32 )
+
+PC4=powerCurve(model4, along = "sub")
+plot(PC4)
+#USPSIM
+
 
 #################################### Landing position ###################################
-summary(LandLM <- lmer(landStart~launchSite+Age+(launchSite+Age|item)+(launchSite+Age|sub),data=RS))
+summary(LandLM <- lmer(landStart~launchSite+Age+(1|item)+(1|sub),data=RS))
 LandEF=effect("Age",LandLM)
 summary(LandEF)
 plot(LandEF)
 
 #Simulation 
-Landsim=powerSim(LandLM,nsim=64)#, test=fixed("Age"))
-Landsim
+fixef(LandLM)["Age1"]<-0.85
+powerSim(LandLM)
+
+model5=extend(LandLM,along="sub", n=40)
+
+#USPSIM=powerSim(model1,nsim=32 )
+
+PC5=powerCurve(model5, along = "sub")
+plot(PC5)
+#USPSIM
 ############################## Different saccade and Fixation Types ##########################
 
 
@@ -459,8 +496,15 @@ summary(ef3)
 plot(ef3)
 
 ## Simulate 
-FIXTYPESIM=powerSim(allfixtypelm,nsim=32, test=fixed("Age:Fix_type"))
-FIXTYPESIM
+fixef(LandLM)["Age1"]<-0.85
+powerSim(LandLM)
+
+model5=extend(LandLM,along="sub", n=40)
+
+#USPSIM=powerSim(model1,nsim=32 )
+
+PC5=powerCurve(model5, along = "sub")
+plot(PC5)
 ####
 
 
