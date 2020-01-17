@@ -260,13 +260,17 @@ for( i in 1:length(nsubs)){
 RS<- subset(RS, remove==0)
 RS$remove<- NULL
 rm(newDatas)
-
+#Take out practice trials 
+RS2=RS
+Prac$item=c(25:26)
+RS2 <- RS2[!(RS2$item %in% Prac$item),]
+RS=RS2
 ################################ UNDERSWEEP PROBABILITY##############################################
 
 ##################################### Make models
 contrasts(RS$Age)<- c(1, -1)
 
-summary(GLM0<- glmer(undersweep_prob~ Age + (Age|item), data= RS, family= binomial))
+summary(GLM0<- glmer(undersweep_prob~ Age + (1|item) +(1|sub), data= RS, family= binomial))
 
 #Effect of Age on undersweep Probability
 ef0=effect("Age", GLM0)
@@ -280,7 +284,12 @@ plot(ef0)
 #UnderSweepProbability
 #General sim
 #make fitted model
-USPSIM=powerSim(GLM0,nsim=32)
+fixef(GLM0)["Age1"]<-0.1
+powerSim(GLM0)
+model1=extend(GLM0,along="sub", n=32)
+USPSIM=powerSim(model1,nsim=32 )
+PC1=powerCurve(model1)
+plot(PC1)
 USPSIM
 
 ############################################# SKIP RATE ############################################################
@@ -327,9 +336,9 @@ summary(GLM1<- glmer(skip~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, fami
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
-
+summary(GLM1<- glmer(skip~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
 ########################### Simulate
-SKIPSIM=powerSim(GLM1,nsim=16, test=fixed("Age*Length"))
+SKIPSIM=powerSim(GLM1,nsim=16, test=fixed("Age"))
 SKIPSIM
 
 
@@ -341,7 +350,7 @@ summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-Regsim=powerSim(GLM2,nsim=32)
+Regsim=powerSim(GLM2,nsim=48)
 Regsim
 
 
