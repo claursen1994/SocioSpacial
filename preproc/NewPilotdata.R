@@ -287,11 +287,11 @@ plot(ef0)
 fixef(GLM0)["Age1"]<-0.15
 powerSim(GLM0)
 
-model1=extend(GLM0,along="sub", n=40)
+model1=extend(GLM0,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC1=powerCurve(model1, along = "sub")
+PC1=powerCurve(model1, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
 plot(PC1)
 #USPSIM
 
