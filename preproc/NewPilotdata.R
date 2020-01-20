@@ -261,9 +261,12 @@ RS$remove<- NULL
 rm(newDatas)
 #Take out practice trials 
 RS2=RS
+Prac=NULL
 Prac$item=c(25:26)
 RS2 <- RS2[!(RS2$item %in% Prac$item),]
 RS=RS2
+rm(RS2)
+raw_fix <- raw_fix[!(raw_fix$item %in% Prac$item),]
 ################################ UNDERSWEEP PROBABILITY##############################################
 
 ##################################### Make models
