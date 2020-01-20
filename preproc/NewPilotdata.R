@@ -40,7 +40,6 @@ library("lme4")
 library("effects")
 library("tidyverse")
 library("EMreading")
-library("EMreading")
 library("lme4")
 library("simr")
 library("jtools")
@@ -225,7 +224,7 @@ RS$Age<- as.factor(RS$Age)
 contrasts(RS$Age)<- c(1, -1)
 
 ################################################# Return Sweeps ########################################
-library(lme4)
+
 
 #################################Check and Mark 2nd pass in Return Sweeps. 
 
@@ -284,15 +283,15 @@ plot(ef0)
 #UnderSweepProbability
 #General sim
 #make fitted model
-fixef(GLM0)["Age1"]<-0.15
-powerSim(GLM0)
+#fixef(GLM0)["Age1"]<-0.15
+#powerSim(GLM0)
 
-model1=extend(GLM0,along="sub", n=80)
+#model1=extend(GLM0,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC1=powerCurve(model1, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
-plot(PC1)
+#PC1=powerCurve(model1, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+#plot(PC1)
 #USPSIM
 
 ############################################# SKIP RATE ############################################################
@@ -344,11 +343,11 @@ plot(ef1)
 fixef(GLM1)["Agey"]<--0.65
 powerSim(GLM1)
 
-model2=extend(GLM1,along="sub", n=40)
+model2=extend(GLM1,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC2=powerCurve(model2, along = "sub")
+PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
 plot(PC2)
 #USPSIM
 
@@ -364,11 +363,11 @@ plot(RegEF)
 fixef(GLM2)["Age1"]<--0.65
 powerSim(GLM2)
 
-model3=extend(GLM2,along="sub", n=40)
+model3=extend(GLM2,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC3=powerCurve(model3, along = "sub")
+PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
 plot(PC3)
 #USPSIM
 
@@ -383,11 +382,11 @@ plot(LaunchEF)
 fixef(LaunchLM)["Age1"]<-0.4
 powerSim(LaunchLM)
 
-model4=extend(LaunchLM,along="sub", n=40)
+model4=extend(LaunchLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC4=powerCurve(model4, along = "sub")
+PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
 plot(PC4)
 #USPSIM
 
@@ -402,11 +401,11 @@ plot(LandEF)
 fixef(LandLM)["Age1"]<-0.85
 powerSim(LandLM)
 
-model5=extend(LandLM,along="sub", n=40)
+model5=extend(LandLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC5=powerCurve(model5, along = "sub")
+PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
 plot(PC5)
 #USPSIM
 ############################## Different saccade and Fixation Types ##########################
@@ -488,6 +487,7 @@ rm(NRS2)
 ##################### Check for Age effects within fixation groups ###########################
 #fix type and age
 contrasts(RS$Age)<- c(1, -1)
+All_fix$Fix_type<- factor(All_fix$Fix_type, levels = c("Intra_line","Line_Final","Accurate_init","Undersweep_init"))
 contrasts(All_fix$Fix_type)=contr.treatment(4)
 summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
 
@@ -499,11 +499,11 @@ plot(ef3)
 fixef(LandLM)["Age1"]<-0.85
 powerSim(LandLM)
 
-model5=extend(LandLM,along="sub", n=40)
+model5=extend(LandLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC5=powerCurve(model5, along = "sub")
+PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
 plot(PC5)
 ####
 
