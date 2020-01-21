@@ -350,7 +350,7 @@ model2=extend(GLM1,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age*Length*Zipf"))
 plot(PC2)
 #USPSIM
 
@@ -370,7 +370,7 @@ model3=extend(GLM2,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"))
 plot(PC3)
 #USPSIM
 
@@ -401,7 +401,7 @@ summary(LandEF)
 plot(LandEF)
 
 #Simulation 
-fixef(LandLM)["Age1"]<-0.85
+fixef(LandLM)["Agey"]<-0.85
 powerSim(LandLM)
 
 model5=extend(LandLM,along="sub", n=80)
