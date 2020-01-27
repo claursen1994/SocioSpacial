@@ -1,7 +1,6 @@
 #Pilot Data Analysis
 # Install Packages and Libraries.
 #Packages#
-rm(list= ls())
 
 install.packages("wordcloud")
 install.packages("tm")
@@ -43,6 +42,7 @@ library("EMreading")
 library("lme4")
 library("simr")
 library("jtools")
+
 rm(list= ls())
 data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
 
@@ -71,7 +71,7 @@ raw_fix$nextX<- NA
 raw_fix$prevY<- NA
 raw_fix$prev_max_char_line<- NA
 
-for(i in 1:64){
+for(i in 1: length(unique(raw_fix$sub))){
   n<- subset(raw_fix, sub==i)
   nitems<- unique(n$item)
   cat(i); cat(" ")
@@ -200,6 +200,72 @@ raw_fix<- subset(raw_fix, blink==0 & prev_blink==0 & after_blink==0)
 # remove outliers:
 out<- which(raw_fix$fix_dur<80 | raw_fix$fix_dur>1000)
 raw_fix<- raw_fix[-out,]
+
+
+# remove fixations that were not coded in Eye-doctor:
+raw_fix<- subset(raw_fix, line>0)
+
+
+## Remove lines with only one fixation (since they are both accurate and line-final)
+new_dat<- NULL
+
+nsubs<- unique(raw_fix$sub)
+
+for(i in 1:length(nsubs)){
+  n<- subset(raw_fix, sub== nsubs[i])
+  
+  nitems<- unique(n$item)
+  #cat(i); cat(" ")
+  for(j in 1:length(nitems)){
+    m<- subset(n, item== nitems[j])
+    
+    nlines<- unique(m$line)
+    
+    for(k in 1:length(nlines)){
+      o<- subset(m, line== nlines[k])
+      
+      if(nrow(o)>1){
+        new_dat<- rbind(new_dat, o)
+      }else{
+        cat(sprintf("Subject %i, item %i, line% i has 1 fixation- REMOVED", nsubs[i], nitems[j], nlines[k]))
+        cat("\n")
+      }
+      
+    }
+    
+    
+    
+  }
+  
+}
+
+raw_fix<- new_dat; rm(new_dat)
+
+
+## map fixation types:
+raw_fix$Fix_type<- raw_fix$Rtn_sweep_type
+for(i in 1:nrow(raw_fix)){
+
+  if(i!= nrow(raw_fix)){
+    
+    if(raw_fix$Rtn_sweep[i+1]==1){
+      raw_fix$Fix_type[i]<- 'line-final'
+    }else{
+      if(is.na(raw_fix$Fix_type[i])){
+        raw_fix$Fix_type[i]<- 'intra-line'
+      }
+    }
+    
+  }else{
+    if(is.na(raw_fix$Fix_type[i])){
+      raw_fix$Fix_type[i]<- 'intra-line'
+    }
+  }
+    
+
+}
+
+
 
 
 write.csv(raw_fix,"raw_fix.csv")
@@ -414,85 +480,95 @@ plot(PC5)
 ############################## Different saccade and Fixation Types ##########################
 
 
+
 ################################################# Line initial fixations 
 # These are fix_dur in RS and Line 1 first fixations
 
-Lineinit= RS
-LI=subset(raw_fix,raw_fix$line==1)
-LI$launchSite<- LI$prev_max_char_line- LI$prevChar
-LI$landStart<- LI$char_line
-LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
-LI=subset(LI,LI$fix_num==2)
-Lineinit=rbind(Lineinit,LI)
-rm(LI)
-##############################
-# Line init following accurate or undersweep return sweep
-
-Acc_RS_line_init=subset(RS,RS$Rtn_sweep_type=="accurate")
-Und_RS_line_init=subset(RS,RS$Rtn_sweep_type=="undersweep")
-
-#######################
-# Line final 
-
-Line_final=NULL
-Line_final$sub=RS$sub
-Line_final$item=RS$item
-Line_final$seq=RS$seq
-Line_final$fix_num=RS$fix_num-1
-Line_final=as.data.frame(Line_final)
-Line_final=merge(raw_fix,Line_final)
-# This doesn't give us the amount we should have...
-# We are missing Line final fixations on the last line
-# Add columns so that these match later on for duplicate removal
-Line_final$launchSite<- Line_final$prev_max_char_line- Line_final$prevChar
-Line_final$landStart<- Line_final$char_line
-Line_final$undersweep_prob<- ifelse(Line_final$Rtn_sweep_type=="undersweep", 1, 0)
-
-
-################ Add columns so that these match later on for duplicate removal
-# Intra-line fixations
-# Make the columns match so they can be bound
-raw_fix2=raw_fix
-raw_fix2$remove=NULL
-raw_fix2$launchSite<- raw_fix2$prev_max_char_line- raw_fix2$prevChar
-raw_fix2$landStart<- raw_fix2$char_line
-raw_fix2$undersweep_prob<- ifelse(raw_fix2$Rtn_sweep_type=="undersweep", 1, 0)
-
-##rbind the columns and then remove all ones that are the same in line Final 
-Intra_line=rbind(raw_fix2,Line_final) 
-Intra_line=Intra_line[!duplicated(Intra_line,fromLast = FALSE)&!duplicated(Intra_line,fromLast = TRUE),]
-# Bind in line initial and remove the duplicates
-Intra_line=rbind(Intra_line,Lineinit)
-Intra_line=Intra_line[!duplicated(Intra_line,fromLast = FALSE)&!duplicated(Intra_line,fromLast = TRUE),]
-
-#Mark Fix types
-
-Und_RS_line_init$Fix_type=c("Undersweep_init")
-Acc_RS_line_init$Fix_type=c("Accurate_init")
-Line_final$Fix_type=c("Line_Final")
-Intra_line$Fix_type=c("Intra_line")
-
-#Merge back into full df for some reason 
-
-All_fix=rbind(Und_RS_line_init,Acc_RS_line_init)
-All_fix2=rbind(Line_final,Intra_line)
-All_fix=rbind(All_fix,All_fix2)
-rm(All_fix2)
-All_fix$Fix_type=as.factor(All_fix$Fix_type)
-# Make new RS data frame so differences can be checked there more easily
-NRS=subset(All_fix, All_fix$Rtn_sweep==1)
-NRS2=subset(NRS,NRS$Fix_type=="Accurate_init")
-NRS=subset(NRS,NRS$Fix_type=="Undersweep_init")
-NRS=rbind(NRS,NRS2)
-rm(NRS2)
+# Lineinit= RS
+# LI=subset(raw_fix,raw_fix$line==1)
+# LI$launchSite<- LI$prev_max_char_line- LI$prevChar
+# LI$landStart<- LI$char_line
+# LI$undersweep_prob<- ifelse(LI$Rtn_sweep_type=="undersweep", 1, 0)
+# LI=subset(LI,LI$fix_num==2)
+# Lineinit=rbind(Lineinit,LI)
+# rm(LI)
+# ##############################
+# # Line init following accurate or undersweep return sweep
+# 
+# Acc_RS_line_init=subset(RS,RS$Rtn_sweep_type=="accurate")
+# Und_RS_line_init=subset(RS,RS$Rtn_sweep_type=="undersweep")
+# 
+# #######################
+# # Line final 
+# 
+# Line_final=NULL
+# Line_final$sub=RS$sub
+# Line_final$item=RS$item
+# Line_final$seq=RS$seq
+# Line_final$fix_num=RS$fix_num-1
+# Line_final=as.data.frame(Line_final)
+# Line_final=merge(raw_fix,Line_final)
+# # This doesn't give us the amount we should have...
+# # We are missing Line final fixations on the last line
+# # Add columns so that these match later on for duplicate removal
+# Line_final$launchSite<- Line_final$prev_max_char_line- Line_final$prevChar
+# Line_final$landStart<- Line_final$char_line
+# Line_final$undersweep_prob<- ifelse(Line_final$Rtn_sweep_type=="undersweep", 1, 0)
+# 
+# 
+# ################ Add columns so that these match later on for duplicate removal
+# # Intra-line fixations
+# # Make the columns match so they can be bound
+# raw_fix2=raw_fix
+# raw_fix2$remove=NULL
+# raw_fix2$launchSite<- raw_fix2$prev_max_char_line- raw_fix2$prevChar
+# raw_fix2$landStart<- raw_fix2$char_line
+# raw_fix2$undersweep_prob<- ifelse(raw_fix2$Rtn_sweep_type=="undersweep", 1, 0)
+# 
+# ##rbind the columns and then remove all ones that are the same in line Final 
+# Intra_line=rbind(raw_fix2,Line_final) 
+# Intra_line=Intra_line[!duplicated(Intra_line,fromLast = FALSE)&!duplicated(Intra_line,fromLast = TRUE),]
+# # Bind in line initial and remove the duplicates
+# Intra_line=rbind(Intra_line,Lineinit)
+# Intra_line=Intra_line[!duplicated(Intra_line,fromLast = FALSE)&!duplicated(Intra_line,fromLast = TRUE),]
+# 
+# #Mark Fix types
+# 
+# Und_RS_line_init$Fix_type=c("Undersweep_init")
+# Acc_RS_line_init$Fix_type=c("Accurate_init")
+# Line_final$Fix_type=c("Line_Final")
+# Intra_line$Fix_type=c("Intra_line")
+# 
+# #Merge back into full df for some reason 
+# 
+# All_fix=rbind(Und_RS_line_init,Acc_RS_line_init)
+# All_fix2=rbind(Line_final,Intra_line)
+# All_fix=rbind(All_fix,All_fix2)
+# rm(All_fix2)
+# All_fix$Fix_type=as.factor(All_fix$Fix_type)
+# # Make new RS data frame so differences can be checked there more easily
+# NRS=subset(All_fix, All_fix$Rtn_sweep==1)
+# NRS2=subset(NRS,NRS$Fix_type=="Accurate_init")
+# NRS=subset(NRS,NRS$Fix_type=="Undersweep_init")
+# NRS=rbind(NRS,NRS2)
+# rm(NRS2)
 
 
 ##################### Check for Age effects within fixation groups ###########################
 #fix type and age
 contrasts(RS$Age)<- c(1, -1)
-All_fix$Fix_type<- factor(All_fix$Fix_type, levels = c("Intra_line","Line_Final","Accurate_init","Undersweep_init"))
-contrasts(All_fix$Fix_type)=contr.treatment(4)
-summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
+raw_fix$Fix_type<- as.factor(raw_fix$Fix_type)
+raw_fix$Fix_type<- factor(raw_fix$Fix_type, levels= c('intra-line', 'accurate', 'undersweep', 'line-final'))
+contrasts(raw_fix$Fix_type)
+
+
+# All_fix$Fix_type<- factor(All_fix$Fix_type, levels = c("Intra_line","Line_Final","Accurate_init","Undersweep_init"))
+# contrasts(All_fix$Fix_type)=contr.treatment(4)
+# summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
+
+summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= raw_fix))
+
+
 
 ef3=effect("Age:Fix_type", allfixtypelm)
 summary(ef3)
