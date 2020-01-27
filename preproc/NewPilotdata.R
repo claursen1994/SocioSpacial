@@ -268,7 +268,7 @@ for(i in 1:nrow(raw_fix)){
 
 
 
-write.csv(raw_fix,"raw_fix.csv")
+write.csv(raw_fix,"raw_fix_data.csv")
 RS<- subset(raw_fix, Rtn_sweep==1)
 
 RS$launchSite<- RS$prev_max_char_line- RS$prevChar
