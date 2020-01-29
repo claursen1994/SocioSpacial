@@ -255,10 +255,25 @@ for(i in 1:length(nsubs)){
 raw_fix<- new_dat; rm(new_dat)
 
 
+# Calculate word-level measures here:
+FD<- wordMeasures(raw_fix)
+
+raw_fix<- raw_fix[-which(is.na(raw_fix$SFIX)),]
+
+
 ## map fixation types:
 raw_fix$Fix_type<- raw_fix$Rtn_sweep_type
 for(i in 1:nrow(raw_fix)){
 
+  if(is.na(raw_fix$SFIX[i+1])){
+    raw_fix$Fix_type[i]<- 'intra-line'
+    next
+  }
+  
+  if(is.na(raw_fix$SFIX[i])){
+    next
+  }
+  
   if(i!= nrow(raw_fix)){
     
     if(raw_fix$Rtn_sweep[i+1]==1){
@@ -377,25 +392,27 @@ plot(ef0)
 #USPSIM
 
 ############################################# SKIP RATE ############################################################
+# 
+# Skip_Raw_fix=raw_fix
+# Skip_Raw_fix22=wordMeasures(Skip_Raw_fix)
+# Skip_Raw_fix22$skip=NULL
+# # If Nfix 1 was 0 then the word was skipped the first time.
+# Skip_Raw_fix22$skip<- ifelse(Skip_Raw_fix22$nfix1=="0", 1, 0)
+# 
+# # If Nfix1 was 0 and Nfix2 was 1 or more then the word was fixated later 
+# 
+# Skip_Raw_fix22$hold<- ifelse(Skip_Raw_fix22$nfix2>"0",1,0 )
+# Skip_Raw_fix22$Return2SkipWord= ifelse(Skip_Raw_fix22$skip+Skip_Raw_fix22$hold=="2",1,0)
+# Skip_Raw_fix22$hold=NULL
+# 
+# Skips=merge(Skip_Raw_fix22,Skip_Raw_fix)
+# 
+# ## Add variables for Zipf frequence and Length of word.##
+# Skips$wordID=as.character(Skips$wordID)
+# Skips$Length=nchar(Skips$wordID)
+# #Add in zipf scores for further analysis 
 
-Skip_Raw_fix=raw_fix
-Skip_Raw_fix22=wordMeasures(Skip_Raw_fix)
-Skip_Raw_fix22$skip=NULL
-# If Nfix 1 was 0 then the word was skipped the first time.
-Skip_Raw_fix22$skip<- ifelse(Skip_Raw_fix22$nfix1=="0", 1, 0)
-
-# If Nfix1 was 0 and Nfix2 was 1 or more then the word was fixated later 
-
-Skip_Raw_fix22$hold<- ifelse(Skip_Raw_fix22$nfix2>"0",1,0 )
-Skip_Raw_fix22$Return2SkipWord= ifelse(Skip_Raw_fix22$skip+Skip_Raw_fix22$hold=="2",1,0)
-Skip_Raw_fix22$hold=NULL
-
-Skips=merge(Skip_Raw_fix22,Skip_Raw_fix)
-
-## Add variables for Zipf frequence and Length of word.##
-Skips$wordID=as.character(Skips$wordID)
-Skips$Length=nchar(Skips$wordID)
-#Add in zipf scores for further analysis 
+Skips<- FD; rm(FD)
 
 #This can take a while
 lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
