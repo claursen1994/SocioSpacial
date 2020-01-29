@@ -45,13 +45,14 @@ library("jtools")
 
 rm(list= ls())
 data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
+# data_dir= 'D:/Data/Aging'  # Martin
 
 #Load or read in Data
 
 load("preproc/raw_fix.Rda")
 if(!file.exists("preproc/raw_fix.Rda")){
   # extract raw data & merge it with da1 files:
-  raw_fix<- preprocFromDA1(data_dir = data_dir, maxtrial = 100, padding = 5, tBlink = 100)
+  raw_fix<- preprocFromDA1(data_dir = data_dir, maxtrial = 100, padding = 5, tBlink = 150)
   save(raw_fix, file= "preproc/raw_fix.Rda")
   write.csv2(raw_fix, file= "preproc/raw_fix.csv")
 }
@@ -71,8 +72,12 @@ raw_fix$nextX<- NA
 raw_fix$prevY<- NA
 raw_fix$prev_max_char_line<- NA
 
-for(i in 1: length(unique(raw_fix$sub))){
-  n<- subset(raw_fix, sub==i)
+nsubs<- unique(raw_fix$sub)
+
+# sub 3, item 22
+
+for(i in 1: length(nsubs)){
+  n<- subset(raw_fix, sub== nsubs[i])
   nitems<- unique(n$item)
   cat(i); cat(" ")
   
@@ -93,7 +98,7 @@ for(i in 1: length(unique(raw_fix$sub))){
         m$nextX[k]<- m$xPos[k+1]
         
       }else{
-        if(m$Rtn_sweep[k]==1){
+        if(!is.na(m$Rtn_sweep[k])& m$Rtn_sweep[k]==1){
           m$prev_RS[k-1]<- 1
           
           if(k+1 <= nrow(m)){
@@ -194,7 +199,15 @@ raw_fix<- new; rm(new)
 
 
 # remove blinks:
-raw_fix<- subset(raw_fix, blink==0 & prev_blink==0 & after_blink==0)
+
+blinks<- which(raw_fix$blink== 1 | raw_fix$prev_blink== 1 | raw_fix$after_blink== 1)
+raw_fix<- raw_fix[-blinks,]
+
+raw_fix$blink<- NULL
+raw_fix$prev_blink<- NULL
+raw_fix$after_blink<- NULL
+
+#raw_fix<- subset(raw_fix, blink==0 & prev_blink==0 & after_blink==0)
 
 
 # remove outliers:
