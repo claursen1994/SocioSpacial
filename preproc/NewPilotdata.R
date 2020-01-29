@@ -2,16 +2,13 @@
 # Install Packages and Libraries.
 #Packages#
 
-install.packages("wordcloud")
+
 install.packages("tm")
 install.packages("arm")
 install.packages("MASS")
 install.packages("lattice")
 install.packages("lme4")
 install.packages("effects")
-install.packages("SnowballC")
-install.packages("RColorBrewer")
-install.packages("ngram")
 install.packages("quanteda")
 install.packages("readr")
 install.packages("tidyr")
@@ -21,25 +18,21 @@ install.packages("digest")
 install.packages("EMreading")
 install.packages("simr")
 install.packages("jtools")
+install.packages("ggplot2")
 #Library#
-
 library("tm")
-library("SnowballC")
-library("wordcloud")
-library("RColorBrewer")
-library("ngram")
-library("koRpus")
-library("readxl")
+library("arm")
+library("MASS")
+library("lattice")
+library("lme4")
+library("effects")
 library("quanteda")
 library("readr")
 library("tidyr")
 library("dplyr")
-library("ggplot2")
-library("lme4")
-library("effects")
 library("tidyverse")
+library("digest")
 library("EMreading")
-library("lme4")
 library("simr")
 library("jtools")
 
@@ -255,10 +248,7 @@ for(i in 1:length(nsubs)){
 raw_fix<- new_dat; rm(new_dat)
 
 
-# Calculate word-level measures here:
-FD<- wordMeasures(raw_fix)
 
-raw_fix<- raw_fix[-which(is.na(raw_fix$SFIX)),]
 
 
 ## map fixation types:
@@ -292,7 +282,10 @@ for(i in 1:nrow(raw_fix)){
     
 
 }
+# Calculate word-level measures here:
+FD<- wordMeasures(raw_fix)
 
+raw_fix<- raw_fix[-which(is.na(raw_fix$SFIX)),]
 
 
 
@@ -415,12 +408,15 @@ plot(ef0)
 Skips<- FD; rm(FD)
 
 #This can take a while
+Skips$cleanwordID<- tolower(Skips$wordID)
+Skips$cleanwordID<-removePunctuation(Skips$cleanwordID)
+
 lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
 #lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
 Skips$Zipf<- NA
 Skips$freq<-NA
 for(i in 1:nrow(Skips)){
-  a<- which(lex2$Spelling== Skips$wordID[i])
+  a<- which(lex2$Spelling== Skips$cleanwordID[i])
   if(length(a)>0){
     Skips$Zipf[i]<- lex2$`LogFreq(Zipf)`[a]
     Skips$freq[i]<- lex2$FreqCount[a]
