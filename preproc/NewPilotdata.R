@@ -133,16 +133,22 @@ for(i in 1: length(nsubs)){
       }
       
       ## map previous line length (for launch site calculation):
-      if(!is.na(m$line[k])){
-        if(m$line[k]==2){
-          m$prev_max_char_line[k]<- max_l1
-        }else{
-          m$prev_max_char_line[k]<- NA
-        }
+      # if(!is.na(m$line[k])){
+      #   if(m$line[k]==2){
+      #     m$prev_max_char_line[k]<- max_l1
+      #   }else{
+      #     m$prev_max_char_line[k]<- NA
+      #   }
+      # }else{
+      #   if(m$Rtn_sweep[k]==1){
+      #     m$prev_max_char_line[k]<- max_l1
+      #   }
+      # }
+      
+      if(k>1){
+        m$prev_max_char_line[k]<- m$max_char_line[k-1] 
       }else{
-        if(m$Rtn_sweep[k]==1){
-          m$prev_max_char_line[k]<- max_l1
-        }
+        m$prev_max_char_line[k]<- NA
       }
       
     } # end of m
