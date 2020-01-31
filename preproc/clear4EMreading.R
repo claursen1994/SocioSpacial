@@ -1,3 +1,15 @@
+#This is a bash it until it works fix and may be cause more hassle but once bashed about for a bit it will allow you to
+#Use EM reading properly as well as other packages
+#You may need to install EM reading twice after this 
+#You may need to install all other packages individually 
+#You may then need to install EMreading again 
+#You may lose your will to live 
+#You should then be good to go. 
+
+
+
+
+
 # create a list of all installed packages
 ip <- as.data.frame(installed.packages())
 head(ip)

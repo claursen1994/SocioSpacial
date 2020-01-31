@@ -306,13 +306,51 @@ for(i in 1:nrow(raw_fix)){
 
 
 write.csv(raw_fix,"raw_fix_data.csv")
+
+
+################################################# Return Sweeps ########################################
+
+#raw_fix=read.csv("raw_fix_data.csv")
+
+# Let's check that we didn't lose over 1/3 of return sweeps in a trial. If so let's delete them. 
+
+noRS_sub<- NULL # no return sweeps this trial
+noRS_item<- NULL # no return sweeps this trial
+for(i in 1:16){
+  n<- subset(raw_fix, sub==i)
+  nitems<- unique(n$item)
+  
+  for(j in 1:length(nitems)){
+    m<- subset(n, item== nitems[j])
+    
+    if(sum(m$Rtn_sweep)>14){ # >14 minimum number of return sweeps in all trials..
+      cat(sprintf("Subject %g, item %g, %g return sweeps\n", i, nitems[j], sum(m$Rtn_sweep)))
+    }
+    
+    if(sum(m$Rtn_sweep)<7){ #over  1/3 of the return sweeps are missing using min return sweeps in all trials as baseline
+      cat(sprintf("Subject %g, item %g, %g return sweeps\n", i, nitems[j], sum(m$Rtn_sweep)))
+      noRS_sub<- c(noRS_sub, i)
+      noRS_item<- c(noRS_item, nitems[j])
+      
+    }
+  }
+}
+for(i in 1:length(noRS_sub)){
+  out<- which(raw_fix$sub== noRS_sub[i]& raw_fix$item== noRS_item[i])
+  raw_fix<- raw_fix[-out,]
+  
+}
+nNoRS<- length(noRS_sub)
+RS=NULL
 RS<- subset(raw_fix, Rtn_sweep==1)
+
+## Nice
 
 RS$launchSite<- RS$prev_max_char_line- RS$prevChar
 RS$landStart<- RS$char_line
 RS$undersweep_prob<- ifelse(RS$Rtn_sweep_type=="undersweep", 1, 0)
 
-
+# Take a look at some means
 
 library(reshape)
 Des<- melt(RS, id=c('sub', 'item', 'Age'), 
@@ -325,9 +363,6 @@ m
 #Set up contrast for LMMS etc
 RS$Age<- as.factor(RS$Age)
 contrasts(RS$Age)<- c(1, -1)
-
-################################################# Return Sweeps ########################################
-
 
 #################################Check and Mark 2nd pass in Return Sweeps. 
 
@@ -373,11 +408,13 @@ raw_fix <- raw_fix[!(raw_fix$item %in% Prac$item),]
 ################################ UNDERSWEEP PROBABILITY##############################################
 
 ##################################### Make models
+library("lme4")
 contrasts(RS$Age)<- c(1, -1)
 
 summary(GLM0<- glmer(undersweep_prob~ Age + (1|item) +(1|sub), data= RS, family= binomial))
 
 #Effect of Age on undersweep Probability
+library("effects")
 ef0=effect("Age", GLM0)
 summary(ef0)
 plot(ef0)
@@ -425,6 +462,8 @@ Skips<- FD; rm(FD)
 
 #This can take a while
 Skips$cleanwordID<- tolower(Skips$wordID)
+#install.packages("tm")
+#library("tm")
 Skips$cleanwordID<-removePunctuation(Skips$cleanwordID)
 
 lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
@@ -448,6 +487,7 @@ Skips$Zipf=center(Skips$Zipf)
 #
 #merge in Ages
 Skips=merge(Skips,PilotAges)
+#Run Model
 summary(GLM1<- glmer(skip_1st~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, family= binomial))
 ef1=effect("Age", GLM1)
 summary(ef1)
@@ -455,13 +495,13 @@ plot(ef1)
 
 ########################### Simulate
 fixef(GLM1)["Agey"]<--0.65
-powerSim(GLM1)
+#powerSim(GLM1)
 
 model2=extend(GLM1,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age*Length*Zipf"))
+PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age*Length*Zipf"),nsim = 1)
 plot(PC2)
 #USPSIM
 
@@ -472,20 +512,20 @@ plot(PC2)
 Skips$skip_1st<-as.factor(Skips$skip_1st)
 contrasts(Skips$skip_1st)=contr.treatment(2)
 
-summary(GLM2<- glmer(regress~ skip_1st*Age +(skip_1st*Age|item)+ (skip_1st*Age|sub), data= Skips, family= binomial))
-RegEF=effect("skip_1st*Age", GLM2)
+summary(GLM2<- glmer(regress~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
+RegEF=effect("Age", GLM2)
 summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-fixef(GLM2)["Age1"]<--0.5
-powerSim(GLM2)
+fixef(GLM2)["Age1"]<--0.9
+#powerSim(GLM2)
 
 model3=extend(GLM2,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"))
+PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=1)
 plot(PC3)
 #USPSIM
 
@@ -497,15 +537,18 @@ LaunchEF=effect("Age",LaunchLM)
 summary(LaunchEF)
 plot(LaunchEF)
 #sim
-fixef(LaunchLM)["Age1"]<-0.5
-powerSim(LaunchLM)
+fixef(LaunchLM)["Age1"]<-0.8
+#powerSim(LaunchLM)
 
 model4=extend(LaunchLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=2)
 plot(PC4)
+chk<-lastResult()
+chk$errors
+
 #USPSIM
 
 
@@ -516,15 +559,19 @@ summary(LandEF)
 plot(LandEF)
 
 #Simulation 
-fixef(LandLM)["Age1"]<-0.83
-powerSim(LandLM)
+fixef(LandLM)["Age1"]<-1.5
+powerSim(LandLM,nsim=10)
 
 model5=extend(LandLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age1","z"),nsim=2)
 plot(PC5)
+chk<-lastResult()
+chk$errors
+doTest(LandLM, fixed("Age"))
+powerSim(LandLM, fixed("Age"),nsim=10)
 #USPSIM
 ############################## Different saccade and Fixation Types ##########################
 
@@ -631,20 +678,15 @@ model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age* Fix_type"), nsim=2)
 plot(PC7)
 ####
 
 
 
 
-#  Age effects of Intra line saccade Legnths 
-summary(saclen<-lmer(sacc_len~ Age + (1|item)+ (1|sub) , data= Intra_line))
-ef8=effect("Age",saclen)
-plot(ef8)
+#  Age effects of saccade Legnths 
 
-SLSIM=powerSim(saclen,nsim=32)
-SLSIM
 
 
 
