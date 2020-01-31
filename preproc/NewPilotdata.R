@@ -2,7 +2,15 @@
 # Install Packages and Libraries.
 #Packages#
 
+if('devtools' %in% rownames(installed.packages())==FALSE){
+  install.packages('devtools')
+  library(devtools)
+}else{
+  library(devtools)
+}
+install_github('martin-vasilev/EMreading')
 
+install.packages("reshape")
 install.packages("tm")
 install.packages("arm")
 install.packages("MASS")
@@ -19,6 +27,7 @@ install.packages("EMreading")
 install.packages("simr")
 install.packages("jtools")
 install.packages("ggplot2")
+install.packages("readxl")
 #Library#
 library("tm")
 library("arm")
@@ -37,7 +46,8 @@ library("simr")
 library("jtools")
 
 rm(list= ls())
-data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
+#data_dir= ("H:/Profile/Desktop/worb 2/SocioSpacial/SoSpaPilotASC")
+data_dir=("E:/CalvinsDumb_work_Stuff/Proc/List Files") # From External Drive
 # data_dir= 'D:/Data/Aging'  # Martin
 
 #Load or read in Data
@@ -247,7 +257,10 @@ for(i in 1:length(nsubs)){
 
 raw_fix<- new_dat; rm(new_dat)
 
+# Calculate word-level measures here:
+FD<- wordMeasures(raw_fix)
 
+raw_fix<- raw_fix[-which(is.na(raw_fix$SFIX)),]
 
 
 
@@ -282,10 +295,7 @@ for(i in 1:nrow(raw_fix)){
     
 
 }
-# Calculate word-level measures here:
-FD<- wordMeasures(raw_fix)
 
-raw_fix<- raw_fix[-which(is.na(raw_fix$SFIX)),]
 
 
 
@@ -302,7 +312,7 @@ library(reshape)
 Des<- melt(RS, id=c('sub', 'item', 'Age'), 
            measure=c("landStart", "undersweep_prob", "launchSite", "sacc_dur") , na.rm=TRUE)
 
-m<- cast(Des, Age ~ variable
+m<- cast(Des, Age+sub ~ variable
          , function(x) c(M=signif(mean(x),3)
                          , SD= sd(x) ))
 m
@@ -422,14 +432,17 @@ for(i in 1:nrow(Skips)){
     Skips$freq[i]<- lex2$FreqCount[a]
   }
 }
-
+Skips$Length=nchar(Skips$cleanwordID)
 
 ############################################ Make Model
 # center by means 
+
 Skips$Length=center(Skips$Length)
 Skips$Zipf=center(Skips$Zipf)
 #
-summary(GLM1<- glmer(skip~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, family= binomial))
+#merge in Ages
+Skips=merge(Skips,PilotAges)
+summary(GLM1<- glmer(skip_1st~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, family= binomial))
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
@@ -449,13 +462,17 @@ plot(PC2)
 
 ##################################### Regressions #######################################
 # Return to skipped words
-summary(GLM2<- glmer(Return2SkipWord~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
-RegEF=effect("Age", GLM2)
+#contrast treat first pass skips 
+Skips$skip_1st<-as.factor(Skips$skip_1st)
+contrasts(Skips$skip_1st)=contr.treatment(2)
+
+summary(GLM2<- glmer(regress~ skip_1st*Age +(skip_1st*Age|item)+ (skip_1st*Age|sub), data= Skips, family= binomial))
+RegEF=effect("skip_1st*Age", GLM2)
 summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-fixef(GLM2)["Age1"]<--0.65
+fixef(GLM2)["Age1"]<--0.5
 powerSim(GLM2)
 
 model3=extend(GLM2,along="sub", n=80)
@@ -474,7 +491,7 @@ LaunchEF=effect("Age",LaunchLM)
 summary(LaunchEF)
 plot(LaunchEF)
 #sim
-fixef(LaunchLM)["Age1"]<-0.4
+fixef(LaunchLM)["Age1"]<-0.5
 powerSim(LaunchLM)
 
 model4=extend(LaunchLM,along="sub", n=80)
@@ -493,7 +510,7 @@ summary(LandEF)
 plot(LandEF)
 
 #Simulation 
-fixef(LandLM)["Agey"]<-0.85
+fixef(LandLM)["Age1"]<-0.83
 powerSim(LandLM)
 
 model5=extend(LandLM,along="sub", n=80)
@@ -588,28 +605,28 @@ raw_fix$Fix_type<- factor(raw_fix$Fix_type, levels= c('intra-line', 'accurate', 
 contrasts(raw_fix$Fix_type)
 
 
-# All_fix$Fix_type<- factor(All_fix$Fix_type, levels = c("Intra_line","Line_Final","Accurate_init","Undersweep_init"))
-# contrasts(All_fix$Fix_type)=contr.treatment(4)
-# summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= All_fix))
 
+
+
+################################# Fixation Duration 
 summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= raw_fix))
 
 
 
-ef3=effect("Age:Fix_type", allfixtypelm)
-summary(ef3)
-plot(ef3)
+ef7=effect("Age:Fix_type", allfixtypelm)
+summary(ef7)
+plot(ef7)
 
 ## Simulate 
-fixef(LandLM)["Age1"]<-0.85
-powerSim(LandLM)
+fixef(allfixtypelm)["Agey"]<--0.706
+powerSim(allfixtypelm)
 
-model5=extend(LandLM,along="sub", n=80)
+model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
-plot(PC5)
+PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80))
+plot(PC7)
 ####
 
 
