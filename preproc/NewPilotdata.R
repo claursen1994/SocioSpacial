@@ -495,15 +495,15 @@ plot(ef1)
 
 ########################### Simulate
 fixef(GLM1)["Agey"]<--0.51
-
+fixef(GLM1)["Agy:Lngth:Z"]<--0.041
 #powerSim(GLM1)
 
 model2=extend(GLM1,along="sub", n=80)
-
+powerSim(GLM1, test=fixed("Age"),nsim=10)
 #USPSIM=powerSim(model1,nsim=32 )
 
 PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age"),nsim = 3,
-               sim = model3, seed=10)
+               sim = model2, seed=10)
 plot(PC2)
 #USPSIM
 
@@ -520,20 +520,21 @@ summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-fixef(GLM2)["Agey"]<--0.09
+fixef(GLM2)["Agey"]<--0.67
 doTest(GLM2,test=fixed("Age"))
 powerSim(GLM2, test= fixed("Age"),nsim=10)
 
 model3=extend(GLM2,along="sub", n=80)
-
+rm(model3)
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age","z"),nsim=3,
+PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=3,
                sim = model3, seed=10)
 plot(PC3)
 #USPSIM
 chk<-lastResult()
 chk$errors
+#Yes
 
 ##################################### Launch Site #######################################
 
@@ -561,7 +562,7 @@ rm(model4)
 #################################### Landing position ###################################
 #install.packages("lmerTest")
 #library("lmerTest")
-summary(LandLM <- lmer(landStart~Age+(1|item)+(1|sub),data=RS))
+summary(LandLM <- lmer(landStart~Age+launchSite+(1|item)+(1|sub),data=RS))
 LandEF=effect("Age",LandLM)
 summary(LandEF)
 plot(LandEF)
@@ -676,7 +677,7 @@ contrasts(raw_fix$Fix_type)
 ################################# Fixation Duration 
 summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= raw_fix))
 
-
+allfixtypelm
 
 ef7=effect("Age:Fix_type", allfixtypelm)
 summary(ef7)
@@ -684,13 +685,15 @@ plot(ef7)
 
 ## Simulate 
 fixef(allfixtypelm)["Agey"]<--0.706
-#powerSim(allfixtypelm)
-
+fixef(allfixtypelm)["Agey:Fix_typeundersweep "]<--0.101
+powerSim(allfixtypelm)
+powerSim(allfixtypelm, test=fixed("Agey"),nsim=10)
+doTest(allfixtypelm,test= fcompare (~Age+Fix_type), nsim=10)
 model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age:Fix_type"), nsim=10,
+PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"), nsim=3,
                sim = model7, seed=10)
 plot(PC7)
 chk<-lastResult()
