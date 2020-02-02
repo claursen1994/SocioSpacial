@@ -543,7 +543,7 @@ summary(LaunchEF)
 plot(LaunchEF)
 #sim
 fixef(LaunchLM)["Age1"]<-0.8
-powerSim(model4,test = fixed("Age"),nsim=10)
+#powerSim(model4,test = fixed("Age"),nsim=10)
 
 model4=extend(LaunchLM,along="sub", n=80)
 
@@ -554,13 +554,13 @@ PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),tes
 plot(PC4)
 chk<-lastResult()
 chk$errors
-
+rm(model4)
 #USPSIM
 #Yes
 
 #################################### Landing position ###################################
-install.packages("lmerTest")
-library("lmerTest")
+#install.packages("lmerTest")
+#library("lmerTest")
 summary(LandLM <- lmer(landStart~Age+(1|item)+(1|sub),data=RS))
 LandEF=effect("Age",LandLM)
 summary(LandEF)
@@ -570,15 +570,15 @@ plot(LandEF)
 fixef(LandLM)["Age1"]<-1.5
 fixef(LandLM)["launchSite:Age1"]<-0.03
 fixef(LandLM)["launchSite"]<-0.08
-doTest(LandLM, test=fixed("launchSite:Age"))
-powerSim(LandLM,nsim=20, test=fixed ("Age"))
+#doTest(LandLM, test=fixed("launchSite:Age"))
+#powerSim(LandLM,nsim=20, test=fixed ("Age"))
 
 model5=extend(LandLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
 PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=1000,
-               sim = model4, seed=10)
+               sim = model5, seed=10)
 
 plot(PC5)
 chk<-lastResult()
