@@ -684,8 +684,14 @@ summary(ef7)
 plot(ef7)
 
 ## Simulate 
-fixef(allfixtypelm)["Agey"]<--0.706
-fixef(allfixtypelm)["Agey:Fix_typeundersweep "]<--0.101
+fixef(allfixtypelm)["Agey"]<--0.01
+fixef(allfixtypelm)["Fix_typeintra-line "]<--0.177
+fixef(allfixtypelm)["Fix_typeline-final "]<--0.236
+fixef(allfixtypelm)["Fix_typeundersweep "]<--0.464
+fixef(allfixtypelm)["Agey:Fix_typeintra-line "]<--0.048
+fixef(allfixtypelm)["Agey:Fix_typeline-final "]<--0.116
+fixef(allfixtypelm)["Agey:Fix_typeundersweep "]<--0.105
+
 powerSim(allfixtypelm)
 powerSim(allfixtypelm, test=fixed("Agey"),nsim=10)
 doTest(allfixtypelm,test= fcompare (~Age+Fix_type), nsim=10)
@@ -693,7 +699,7 @@ model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"), nsim=3,
+PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age:Fix_type","lr"), nsim=3,
                sim = model7, seed=10)
 plot(PC7)
 chk<-lastResult()
