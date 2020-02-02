@@ -547,14 +547,14 @@ model4=extend(LaunchLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=10,
+PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=100,
                sim = model4, seed=10)
 plot(PC4)
 chk<-lastResult()
 chk$errors
 
 #USPSIM
-
+#Yes
 
 #################################### Landing position ###################################
 install.packages("lmerTest")
@@ -575,13 +575,16 @@ model5=extend(LandLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=2)
+PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=100,
+               sim = model4, seed=10)
+
 plot(PC5)
 chk<-lastResult()
 chk$errors
 doTest(LandLM, fixed("Age"))
 powerSim(LandLM, fixed("Age"),nsim=10)
 #USPSIM
+#Yes
 ############################## Different saccade and Fixation Types ##########################
 
 
@@ -687,8 +690,12 @@ model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age* Fix_type"), nsim=2)
+PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age:Fix_type"), nsim=10,
+               sim = model7, seed=10)
 plot(PC7)
+chk<-lastResult()
+chk$errors
+
 ####
 
 
