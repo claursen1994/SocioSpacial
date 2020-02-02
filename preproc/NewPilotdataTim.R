@@ -463,9 +463,9 @@ Skips<- FD; rm(FD)
 #This can take a while
 Skips$cleanwordID<- tolower(Skips$wordID)
 #install.packages("tm")
-#library("tm")
+library("tm")
 Skips$cleanwordID<-removePunctuation(Skips$cleanwordID)
-
+library(readr)
 lex2=read_table2("SUBTLEX-UK/SUBTLEX-UK.txt")
 #lex = read_xlsx("//bournemouth.ac.uk/data/staff/home/claursen/Profile/Desktop/SpatSoc Stimuli/SUBTLEX-UK.xlsx")
 Skips$Zipf<- NA
@@ -473,7 +473,7 @@ Skips$freq<-NA
 for(i in 1:nrow(Skips)){
   a<- which(lex2$Spelling== Skips$cleanwordID[i])
   if(length(a)>0){
-    Skips$Zipf[i]<- lex2$`LogFreq(Zipf)`[a]
+    Skips$Zipf[i]<- lex2$'LogFreq(Zipf)'[a]
     Skips$freq[i]<- lex2$FreqCount[a]
   }
 }
@@ -482,27 +482,31 @@ Skips$Length=nchar(Skips$cleanwordID)
 ############################################ Make Model
 # center by means 
 
-Skips$Length=center(Skips$Length)
-Skips$Zipf=center(Skips$Zipf)
+Skips$Length=(Skips$Length-mean(Skips$Length))
+Skips$Zipf=(Skips$Zipf-mean(Skips$Zipf, na.rm=TRUE))
 #
 #merge in Ages
 Skips=merge(Skips,PilotAges)
 #Run Model
-summary(GLM1<- glmer(skip_1st~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, family= binomial))
+Skips$sub<-as.factor(Skips$sub)
+Skips$item<-as.factor(Skips$item)
+library(lme4)
+summary(GLM1<- glmer(skip_1st~ Age*Length*Zipf +  (1|item) + (1|sub), data= Skips, family= "binomial"))
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
-
+plot(effect("Age:Length",GLM1))
+plot(effect("Length:Zipf",GLM1))
 ########################### Simulate
 fixef(GLM1)["Agey"]<--0.51
-fixef(GLM1)["Agy:Lngth:Z"]<--0.041
+
 #powerSim(GLM1)
 
 model2=extend(GLM1,along="sub", n=80)
-powerSim(GLM1, test=fixed("Age"),nsim=10)
+
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age"),nsim = 3,
+PC2=powerCurve(model2, along = "sub", breaks = c(40,48,56), test = fixed("Age"),nsim = 3,
                sim = model2, seed=10)
 plot(PC2)
 #USPSIM
@@ -520,21 +524,20 @@ summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-fixef(GLM2)["Agey"]<--0.67
+fixef(GLM2)["Agey"]<--0.09
 doTest(GLM2,test=fixed("Age"))
 powerSim(GLM2, test= fixed("Age"),nsim=10)
 
 model3=extend(GLM2,along="sub", n=80)
-rm(model3)
+
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=3,
+PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age","z"),nsim=3,
                sim = model3, seed=10)
 plot(PC3)
 #USPSIM
 chk<-lastResult()
 chk$errors
-#Yes
 
 ##################################### Launch Site #######################################
 
@@ -550,7 +553,7 @@ model4=extend(LaunchLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=1000,
+PC4=powerCurve(model4, along = "sub", breaks = c(40,56,72),test = fixed("Age"),nsim=1000,
                sim = model4, seed=10)
 plot(PC4)
 chk<-lastResult()
@@ -562,13 +565,14 @@ rm(model4)
 #################################### Landing position ###################################
 #install.packages("lmerTest")
 #library("lmerTest")
-summary(LandLM <- lmer(landStart~Age+launchSite+(1|item)+(1|sub),data=RS))
+summary(LandLM <- lmer(landStart~Age+(1|item)+(1|sub),data=RS))
 LandEF=effect("Age",LandLM)
 summary(LandEF)
 plot(LandEF)
 
 #Simulation 
 fixef(LandLM)["Age1"]<-1.5
+fixef(LandLM)["launchSite:Age1"]<-0.03
 fixef(LandLM)["launchSite"]<-0.08
 #doTest(LandLM, test=fixed("launchSite:Age"))
 #powerSim(LandLM,nsim=20, test=fixed ("Age"))
@@ -583,7 +587,8 @@ PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),tes
 plot(PC5)
 chk<-lastResult()
 chk$errors
-rm(ef7)
+doTest(LandLM, fixed("Age"))
+powerSim(LandLM, fixed("Age"),nsim=10)
 #USPSIM
 #Yes
 ############################## Different saccade and Fixation Types ##########################
@@ -677,29 +682,21 @@ contrasts(raw_fix$Fix_type)
 ################################# Fixation Duration 
 summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= raw_fix))
 
-allfixtypelm
+
 
 ef7=effect("Age:Fix_type", allfixtypelm)
 summary(ef7)
 plot(ef7)
 
 ## Simulate 
-fixef(allfixtypelm)["Agey"]<--0.01
-fixef(allfixtypelm)["Fix_typeintra-line "]<--0.177
-fixef(allfixtypelm)["Fix_typeline-final "]<--0.236
-fixef(allfixtypelm)["Fix_typeundersweep "]<--0.464
-fixef(allfixtypelm)["Agey:Fix_typeintra-line "]<--0.048
-fixef(allfixtypelm)["Agey:Fix_typeline-final "]<--0.116
-fixef(allfixtypelm)["Agey:Fix_typeundersweep "]<--0.105
-
+fixef(allfixtypelm)["Agey"]<--0.706
 powerSim(allfixtypelm)
-powerSim(allfixtypelm, test=fixed("Agey"),nsim=10)
-doTest(allfixtypelm,test= fcompare (~Age+Fix_type), nsim=10)
+
 model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age:Fix_type","lr"), nsim=3,
+PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age:Fix_type"), nsim=10,
                sim = model7, seed=10)
 plot(PC7)
 chk<-lastResult()
