@@ -549,7 +549,7 @@ model4=extend(LaunchLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=100,
+PC4=powerCurve(model4, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=1000,
                sim = model4, seed=10)
 plot(PC4)
 chk<-lastResult()
@@ -577,7 +577,7 @@ model5=extend(LandLM,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=100,
+PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=1000,
                sim = model4, seed=10)
 
 plot(PC5)
