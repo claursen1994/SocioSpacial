@@ -568,7 +568,6 @@ plot(LandEF)
 
 #Simulation 
 fixef(LandLM)["Age1"]<-1.5
-fixef(LandLM)["launchSite:Age1"]<-0.03
 fixef(LandLM)["launchSite"]<-0.08
 #doTest(LandLM, test=fixed("launchSite:Age"))
 #powerSim(LandLM,nsim=20, test=fixed ("Age"))
@@ -583,8 +582,7 @@ PC5=powerCurve(model5, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),tes
 plot(PC5)
 chk<-lastResult()
 chk$errors
-doTest(LandLM, fixed("Age"))
-powerSim(LandLM, fixed("Age"),nsim=10)
+rm(ef7)
 #USPSIM
 #Yes
 ############################## Different saccade and Fixation Types ##########################
@@ -686,7 +684,7 @@ plot(ef7)
 
 ## Simulate 
 fixef(allfixtypelm)["Agey"]<--0.706
-powerSim(allfixtypelm)
+#powerSim(allfixtypelm)
 
 model7=extend(allfixtypelm,along="sub", n=80)
 
