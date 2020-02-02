@@ -494,14 +494,16 @@ summary(ef1)
 plot(ef1)
 
 ########################### Simulate
-fixef(GLM1)["Agey"]<--0.65
+fixef(GLM1)["Agey"]<--0.51
+
 #powerSim(GLM1)
 
 model2=extend(GLM1,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age*Length*Zipf"),nsim = 1)
+PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age"),nsim = 3,
+               sim = model3, seed=10)
 plot(PC2)
 #USPSIM
 
