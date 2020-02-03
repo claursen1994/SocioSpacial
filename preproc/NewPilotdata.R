@@ -489,22 +489,23 @@ Skips$Zipf=center(Skips$Zipf)
 #
 #merge in Ages
 Skips=merge(Skips,PilotAges)
+
+
 #Run Model
-summary(GLM1<- glmer(skip_1st~ Age*Length*Zipf +(1|item)+ (1|sub), data= Skips, family= binomial))
+summary(GLM1<- glmer(skip_1st~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
 
 ########################### Simulate
-fixef(GLM1)["Agey"]<--0.51
-fixef(GLM1)["Agy:Lngth:Z"]<--0.041
+
 #powerSim(GLM1)
 
 model2=extend(GLM1,along="sub", n=80)
 powerSim(GLM1, test=fixed("Age"),nsim=10)
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC2=powerCurve(model2, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80), test = fixed("Age"),nsim = 3,
+PC2=powerCurve(model2, along = "sub", breaks = c(48,56,72,80), test = fixed("Age"),nsim = 20,
                sim = model2, seed=10)
 plot(PC2)
 #USPSIM
@@ -512,25 +513,28 @@ plot(PC2)
 
 ##################################### Regressions #######################################
 # Return to skipped words
+#Delete previous model to free up space
+rm(model2)
 #contrast treat first pass skips 
+
+
 Skips$skip_1st<-as.factor(Skips$skip_1st)
 contrasts(Skips$skip_1st)=contr.treatment(2)
 
-summary(GLM2<- glmer(regress~ Age +(1|item)+ (1|sub), data= Skips, family= binomial))
+summary(GLM2<- glmer(regress~ Age +(1|item)+ (1|sub), data= raw_fix, family= binomial))
 RegEF=effect("Age", GLM2)
 summary(RegEF)
 plot(RegEF)
 
 ####################### Simulate 
-fixef(GLM2)["Agey"]<--0.67
-doTest(GLM2,test=fixed("Age"))
+
 powerSim(GLM2, test= fixed("Age"),nsim=10)
 
 model3=extend(GLM2,along="sub", n=80)
-rm(model3)
+
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC3=powerCurve(model3, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age"),nsim=3,
+PC3=powerCurve(model3, along = "sub", breaks = c(48,56,80),test = fixed("Age"),nsim=20,
                sim = model3, seed=10)
 plot(PC3)
 #USPSIM
@@ -677,6 +681,7 @@ contrasts(raw_fix$Fix_type)
 
 
 ################################# Fixation Duration 
+#Dont run this model
 summary(allfixtypelm<- lmer(log(fix_dur)~  Age * Fix_type+ (1|item)+ (1|sub), data= raw_fix))
 
 allfixtypelm
@@ -729,7 +734,7 @@ summary(UnderFixlm<- lmer(log(fix_dur)~  Age  + (1|item)+ (1|sub), data= UnderFi
 
 model7=extend(UnderFixlm,along="sub", n=80)
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,72),test = fixed("Age"),nsim=50,
+PC7=powerCurve(model7, along = "sub", breaks = c(16,72),test = fixed("Age"),nsim=500,
                sim = model7, seed=10)
 
 plot(PC7)
@@ -742,7 +747,7 @@ summary(IntraFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= IntraFix
 
 model8=extend(IntraFixlm,along="sub", n=80)
 
-PC8=powerCurve(model8, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=15,
+PC8=powerCurve(model8, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=500,
                sim = model8, seed=10)
 
 plot(PC8)
@@ -755,7 +760,7 @@ summary(LineFinlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= LineFinFi
 
 model9=extend(LineFinlm,along="sub", n=80)
 
-PC9=powerCurve(model9, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=50,
+PC9=powerCurve(model9, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=500,
                sim = model9, seed=10)
 
 plot(PC9)
@@ -768,7 +773,7 @@ summary(AccurateFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= Accur
 
 model10=extend(AccurateFixlm,along="sub", n=80)
 
-PC10=powerCurve(model10, along = "sub", breaks = c(56,72, 80),test = fixed("Age"),nsim=40,
+PC10=powerCurve(model10, along = "sub", breaks = c(56,72, 80),test = fixed("Age"),nsim=500,
                sim = model10, seed=10)
 
 plot(PC10)
