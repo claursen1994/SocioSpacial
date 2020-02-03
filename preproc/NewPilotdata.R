@@ -699,11 +699,7 @@ model7=extend(allfixtypelm,along="sub", n=80)
 
 #USPSIM=powerSim(model1,nsim=32 )
 
-PC7=powerCurve(model7, along = "sub", breaks = c(16,24,32,40,48,56,64,72,80),test = fixed("Age:Fix_type","lr"), nsim=3,
-               sim = model7, seed=10)
-plot(PC7)
-chk<-lastResult()
-chk$errors
+ 
 
 ####
 
