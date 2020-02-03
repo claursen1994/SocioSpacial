@@ -686,36 +686,36 @@ summary(ef7)
 plot(ef7)
 
 ## Simulate
-
+#####################################################################################################################
 # Remember Simr can't yet look at interactions  in the same run yet, so we need to look at them seperately
+#####################################################################################################################
 
-
-Sim0=powerSim(allfixtypelm,test=fcompare(log(fix_dur)~  Age * Fix_type), nsim=20)
-
-
-
-powerSim(allfixtypelm, test=fixed("Agey"),nsim=10)
-doTest(allfixtypelm,test= fcompare (~Age+Fix_type), nsim=10)
-powerSim(allfixtypelm,test= fcompare (log(fix_dur)~  Age * Fix_type), nsim=10 )
+#Sim0=powerSim(allfixtypelm,test=fcompare(log(fix_dur)~  Age * Fix_type), nsim=20)
 
 
 
-model6=extend(allfixtypelm,along="sub", n=80)
+#powerSim(allfixtypelm, test=fixed("Agey"),nsim=10)
+#doTest(allfixtypelm,test= fcompare (~Age+Fix_type), nsim=10)
+#powerSim(allfixtypelm,test= fcompare (log(fix_dur)~  Age * Fix_type), nsim=10 )
 
-PC6=powerCurve(model6, along = "sub", breaks = c(56,72),test = fixed("Age","z"),nsim=10,
-               sim = model6, seed=10)
 
-plot(PC6)
-chk<-lastResult()
-chk$errors
-chk$warnings
 
-##### Split up data frame by fix types. 
+#model6=extend(allfixtypelm,along="sub", n=80)
 
+#PC6=powerCurve(model6, along = "sub", breaks = c(56,72),test = fixed("Age","z"),nsim=10,
+               #sim = model6, seed=10)
+
+#plot(PC6)
+#chk<-lastResult()
+#chk$errors
+#chk$warnings
+
+ 
+# General Model
 summary(allfixtypelm<- lmer(log(fix_dur)~  Age * Fix_type+ (1|item)+ (1|sub), data= raw_fix))
 
 allfixtypelm
-
+# Split by fix_type
 
 UnderFix<-split(raw_fix, raw_fix$Fix_type)
 IntraFix<-UnderFix$`intra-line`
@@ -723,7 +723,7 @@ AccurateFix<-UnderFix$accurate
 LineFinFix<-UnderFix$`line-final`
 UnderFix<-UnderFix$undersweep
 
-#try out a model
+
 #Undersweep fix dur model 
 summary(UnderFixlm<- lmer(log(fix_dur)~  Age  + (1|item)+ (1|sub), data= UnderFix))
 
