@@ -306,12 +306,14 @@ for(i in 1:nrow(raw_fix)){
 
 
 write.csv(raw_fix,"raw_fix_data.csv")
-
+write.csv(FD,"FD.csv")
 
 ################################################# Return Sweeps ########################################
-
-#raw_fix=read.csv("raw_fix_data.csv")
-
+FD=read.csv("FD.csv")
+FD$X=NULL
+raw_fix=read.csv("raw_fix_data.csv")
+raw_fix$X=NULL
+PilotAges <- read_excel("preproc/PilotAges.xlsx")
 # Let's check that we didn't lose over 1/3 of return sweeps in a trial. If so let's delete them. 
 
 noRS_sub<- NULL # no return sweeps this trial
@@ -675,7 +677,7 @@ contrasts(raw_fix$Fix_type)
 
 
 ################################# Fixation Duration 
-summary(allfixtypelm<- lmer(log(fix_dur)~ Age * Fix_type + (1|item)+ (1|sub), data= raw_fix))
+summary(allfixtypelm<- lmer(log(fix_dur)~  Age * Fix_type+ (1|item)+ (1|sub), data= raw_fix))
 
 allfixtypelm
 
@@ -683,36 +685,96 @@ ef7=effect("Age:Fix_type", allfixtypelm)
 summary(ef7)
 plot(ef7)
 
-## Simulate 
-fixef(allfixtypelm)["Agey"]<--0.01
-fixef(allfixtypelm)["Fix_typeintra-line "]<--0.177
-fixef(allfixtypelm)["Fix_typeline-final "]<--0.236
-fixef(allfixtypelm)["Fix_typeundersweep "]<--0.464
-fixef(allfixtypelm)["Agey:Fix_typeintra-line "]<--0.048
-fixef(allfixtypelm)["Agey:Fix_typeline-final "]<--0.116
-fixef(allfixtypelm)["Agey:Fix_typeundersweep "]<--0.105
+## Simulate
 
-powerSim(allfixtypelm)
+# Remember Simr can't yet look at interactions  in the same run yet, so we need to look at them seperately
+
+
+Sim0=powerSim(allfixtypelm,test=fcompare(log(fix_dur)~  Age * Fix_type), nsim=20)
+
+
+
 powerSim(allfixtypelm, test=fixed("Agey"),nsim=10)
 doTest(allfixtypelm,test= fcompare (~Age+Fix_type), nsim=10)
-model7=extend(allfixtypelm,along="sub", n=80)
-
-#USPSIM=powerSim(model1,nsim=32 )
-
- 
-
-####
+powerSim(allfixtypelm,test= fcompare (log(fix_dur)~  Age * Fix_type), nsim=10 )
 
 
 
+model6=extend(allfixtypelm,along="sub", n=80)
 
-#  Age effects of saccade Legnths 
+PC6=powerCurve(model6, along = "sub", breaks = c(56,72),test = fixed("Age","z"),nsim=10,
+               sim = model6, seed=10)
+
+plot(PC6)
+chk<-lastResult()
+chk$errors
+chk$warnings
+
+##### Split up data frame by fix types. 
+
+summary(allfixtypelm<- lmer(log(fix_dur)~  Age * Fix_type+ (1|item)+ (1|sub), data= raw_fix))
+
+allfixtypelm
 
 
+UnderFix<-split(raw_fix, raw_fix$Fix_type)
+IntraFix<-UnderFix$`intra-line`
+AccurateFix<-UnderFix$accurate
+LineFinFix<-UnderFix$`line-final`
+UnderFix<-UnderFix$undersweep
 
+#try out a model
+#Undersweep fix dur model 
+summary(UnderFixlm<- lmer(log(fix_dur)~  Age  + (1|item)+ (1|sub), data= UnderFix))
 
+model7=extend(UnderFixlm,along="sub", n=80)
 
+PC7=powerCurve(model7, along = "sub", breaks = c(16,72),test = fixed("Age"),nsim=50,
+               sim = model7, seed=10)
 
+plot(PC7)
+chk<-lastResult()
+chk$errors
+chk$warnings
+
+#intra line model
+summary(IntraFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= IntraFix))
+
+model8=extend(IntraFixlm,along="sub", n=80)
+
+PC8=powerCurve(model8, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=15,
+               sim = model8, seed=10)
+
+plot(PC8)
+chk<-lastResult()
+chk$errors
+chk$warnings
+
+# Line final fixation model
+summary(LineFinlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= LineFinFix))
+
+model9=extend(LineFinlm,along="sub", n=80)
+
+PC9=powerCurve(model9, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=50,
+               sim = model9, seed=10)
+
+plot(PC9)
+chk<-lastResult()
+chk$errors
+chk$warnings
+
+#Accurate model
+summary(AccurateFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= AccurateFix))
+
+model10=extend(AccurateFixlm,along="sub", n=80)
+
+PC10=powerCurve(model10, along = "sub", breaks = c(56,72, 80),test = fixed("Age"),nsim=40,
+               sim = model10, seed=10)
+
+plot(PC10)
+chk<-lastResult()
+chk$errors
+chk$warnings
 
 
 
