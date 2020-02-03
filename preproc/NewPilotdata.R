@@ -57,7 +57,7 @@ if(!file.exists("preproc/raw_fix.Rda")){
   # extract raw data & merge it with da1 files:
   raw_fix<- preprocFromDA1(data_dir = data_dir, maxtrial = 100, padding = 5, tBlink = 150)
   save(raw_fix, file= "preproc/raw_fix.Rda")
-  write.csv2(raw_fix, file= "preproc/raw_fix.csv")
+  #write.csv2(raw_fix, file= "preproc/raw_fix.csv")
 }
 
 
