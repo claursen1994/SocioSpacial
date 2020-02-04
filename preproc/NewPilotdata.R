@@ -747,7 +747,7 @@ summary(IntraFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= IntraFix
 
 model8=extend(IntraFixlm,along="sub", n=80)
 
-PC8=powerCurve(model8, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=100,
+PC8=powerCurve(model8, along = "sub", breaks = c(24,32,40,48,72),test = fixed("Age"),nsim=100,
                sim = model8, seed=10)
 
 plot(PC8)
@@ -773,7 +773,7 @@ summary(AccurateFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= Accur
 
 model10=extend(AccurateFixlm,along="sub", n=80)
 
-PC10=powerCurve(model10, along = "sub", breaks = c(56,72, 80),test = fixed("Age"),nsim=500,
+PC10=powerCurve(model10, along = "sub", breaks = c(24,32,40,48,72),test = fixed("Age"),nsim=500,
                sim = model10, seed=10)
 
 plot(PC10)
