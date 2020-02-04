@@ -432,7 +432,7 @@ Skips=merge(Skips,PilotAges)
 
 
 # Finally save the stuff we need 
-write.csv(raw_fix,"raw_fix_data.csv")
+write.csv(raw_fix,"raw_fix.csv")
 write.csv(Skips,"Skips.csv")
 write.csv(RS,"RS.csv")
 
