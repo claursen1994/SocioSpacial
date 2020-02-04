@@ -1,2 +1,0 @@
-- 95.64 percent of trials manually discarded due to tracking loss, etc.
-- 1.66 percent of trials discarded due to the lack of a return sweep in the trial
