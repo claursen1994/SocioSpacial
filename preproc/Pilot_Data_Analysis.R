@@ -223,7 +223,7 @@ summary(IntraFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= IntraFix
 
 model8=extend(IntraFixlm,along="sub", n=80)
 
-PC8=powerCurve(model8, along = "sub", breaks = c(56,72),test = fixed("Age"),nsim=500,
+PC8=powerCurve(model8, along = "sub", breaks = c(56,64,72),test = fixed("Age"),nsim=500,
                sim = model8, seed=10)
 
 plot(PC8)
