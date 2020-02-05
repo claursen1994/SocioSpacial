@@ -298,6 +298,39 @@ for(i in 1:nrow(raw_fix)){
   
   
 }
+
+# Get words per minute
+########################################
+# Word count for Words per minute read 
+
+
+MDMK= read_excel("Stimuli/MDMK.xlsx")
+
+WordNums=NULL
+WordNums$item=MDMK$item
+WordNums$cond=MDMK$cond
+WordNums$WordCount<- sapply(MDMK$Stimulus, function(x) length(unlist(strsplit(as.character(x), "\\W+"))))
+WordNums=as.data.frame(WordNums)
+write.csv(WordNums,"WordNums.csv")
+########################################################
+
+
+library("data.table")
+raw_fix$total_reading_time=NULL
+raw_fix=as.data.table(raw_fix)
+raw_fix2=raw_fix[,.(total_reading_time=max(time_since_start)), by=.(sub,item)]
+
+#raw_fix=read.csv("raw_fix.csv")
+raw_fix=merge(raw_fix,raw_fix2)
+raw_fix$total_reading_time=raw_fix$total_reading_time/60000
+raw_fix=as.data.frame(raw_fix)
+
+WordNums=read.csv("WordNums.csv")
+WordNums$X=NULL
+raw_fix=merge(raw_fix,WordNums)
+
+raw_fix$words_per_min=raw_fix$WordCount/raw_fix$total_reading_time
+
 ################################################# Return Sweeps ########################################
 
 
@@ -421,7 +454,7 @@ for(i in 1:nrow(Skips)){
 }
 Skips$Length=nchar(Skips$cleanwordID)
 
-############################################ Make Model
+############################################ 
 # center by means 
 
 Skips$Length=center(Skips$Length)
@@ -429,6 +462,8 @@ Skips$Zipf=center(Skips$Zipf)
 #
 #merge in Ages
 Skips=merge(Skips,PilotAges)
+
+
 
 
 # Finally save the stuff we need 
