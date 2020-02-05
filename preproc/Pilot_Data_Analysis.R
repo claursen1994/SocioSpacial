@@ -49,6 +49,7 @@ library("jtools")
 
 
 # Load in Data for Skips, raw_fix, and RS
+library(readxl)
 Skips=read.csv("Skips.csv")
 Skips$X=NULL
 raw_fix=read.csv("raw_fix_data.csv")
@@ -246,9 +247,9 @@ chk$warnings
 #Accurate model
 summary(AccurateFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= AccurateFix))
 
-model10=extend(AccurateFixlm,along="sub", n=80)
+model10=extend(AccurateFixlm,along="sub", n=800)
 
-PC10=powerCurve(model10, along = "sub", breaks = c(56,72, 80),test = fixed("Age"),nsim=500,
+PC10=powerCurve(model10, along = "sub", breaks = c(80,200,400,600,800),test = fixed("Age"),nsim=100,
                 sim = model10, seed=10)
 
 plot(PC10)
