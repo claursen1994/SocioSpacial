@@ -207,7 +207,9 @@ UnderFix<-UnderFix$undersweep
 
 #Undersweep fix dur model 
 summary(UnderFixlm<- lmer(log(fix_dur)~  Age  + (1|item)+ (1|sub), data= UnderFix))
-
+RF=effect("Age",UnderFixlm)
+summary(RF)
+plot(RF)
 model7=extend(UnderFixlm,along="sub", n=80)
 
 PC7=powerCurve(model7, along = "sub", breaks = c(16,72),test = fixed("Age"),nsim=500,
@@ -245,7 +247,11 @@ chk$errors
 chk$warnings
 
 #Accurate model
+
 summary(AccurateFixlm<- lmer(log(fix_dur)~  Age + (1|item)+ (1|sub), data= AccurateFix))
+RF=effect("Age",AccurateFixlm)
+summary(RF)
+plot(RF)
 
 model10=extend(AccurateFixlm,along="sub", n=800)
 
@@ -256,3 +262,21 @@ plot(PC10)
 chk<-lastResult()
 chk$errors
 chk$warnings
+
+
+###########################
+# Words Per min
+
+summary(WPM<- lmer(words_per_min~  Age + (1|item)+ (1|sub), data= raw_fix))
+
+WPMEF=effect("Age",WPM)
+summary(WPMEF)
+plot(WPMEF)
+
+
+model11=extend(WPM,along="sub", n=80)
+
+PC11=powerCurve(model11, along = "sub", breaks = c(16,24,40,48,56,64,80),test = fixed("Age"),nsim=100,
+                sim = model11, seed=10)
+
+
