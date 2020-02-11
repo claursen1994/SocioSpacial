@@ -279,4 +279,4 @@ model11=extend(WPM,along="sub", n=80)
 PC11=powerCurve(model11, along = "sub", breaks = c(16,24,40,48,56,64,80),test = fixed("Age"),nsim=100,
                 sim = model11, seed=10)
 
-
+plot(PC11)
