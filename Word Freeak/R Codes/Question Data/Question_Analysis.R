@@ -155,8 +155,8 @@ contrasts(GAVN$State)=contr.treatment(4)
 contrasts(GAVN$Age)=contr.treatment(2)
 # Investigative LMMs
 # General non comp questions.
-summary( GLM1<- glmer(accuracy~ Age+State + (1|item)+(1|sub), data= GAVN, family=binomial))
-ef1=effect("Age:State", GLM1)
+summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age*State", GLM1)
 summary(ef1)
 plot(ef1)
 
@@ -227,12 +227,52 @@ IncGAVN=subset(GAVN,GAVN$accuracy==0)
 IncGAVN$chose3=NULL
 IncGAVN$chose3<- ifelse(IncGAVN$subresp=="3", 1, 0)
 GAVN$chose3<- ifelse(GAVN$subresp=="3",1,0 )
-summary( GLM1<- glmer(chose3~ Age*seq + (1|item)+(1|sub), data= GAVN, family= binomial))
+
+IncGAVN=subset(GAVN,GAVN$accuracy==0)
+summary( GLM1<- glmer(chose3~ Age*seq + (1|item)+(1|sub), data= IncGAVN, family= binomial))
 ef1=effect("Age:seq", GLM1)
 summary(ef1)
 plot(ef1)
 
+CorrGAVN=subset(GAVN,GAVN$accuracy==1)
+summary( GLM1<- glmer(chose3~ Age*seq + (1|item)+(1|sub), data= CorrGAVN, family= binomial))
+ef1=effect("Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
+summary( GLM1<- glmer(chose3~ Age + (1|item)+(1|sub), data= GAVN, family= binomial))
+ef1=effect("Age", GLM1)
+summary(ef1)
+plot(ef1)
+
+
+
+# SPlit by dependnum to see the differences  
+GAVN$dependnum=as.factor(GAVN$dependnum)
+summary( GLM1<- glmer(accuracy~ Age*seq*dependnum + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:seq+dependnum", GLM1)
+summary(ef1)
+plot(ef1)
+
+Dep1=split(GAVN,GAVN$dependnum)
+Dep2=Dep1$`2`
+Dep1=Dep1$`1`
+
+
+summary( GLM1<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep1, family=binomial))
+ef1=effect("Age:State:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+summary( GLM2<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep2, family=binomial))
+ef2=effect("Age:State:seq", GLM2)
+summary(ef2)
+plot(ef2)
+
+summary( GLM3<- lmer(duration_ms~ Age*State*seq + (1|item)+(1|sub), data= GAVN))
+ef3=effect("Age:State:seq", GLM3)
+summary(ef3)
+plot(ef3)
 
 
 
