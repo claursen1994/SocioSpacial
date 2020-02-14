@@ -258,25 +258,153 @@ Dep1=split(GAVN,GAVN$dependnum)
 Dep2=Dep1$`2`
 Dep1=Dep1$`1`
 
-
+#Accuracy of Q1 over trial
 summary( GLM1<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep1, family=binomial))
 ef1=effect("Age:State:seq", GLM1)
 summary(ef1)
 plot(ef1)
 
+# Accuracy of Q2 over trial 
 summary( GLM2<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep2, family=binomial))
 ef2=effect("Age:State:seq", GLM2)
 summary(ef2)
 plot(ef2)
 
+#Time taken to answer over trial
 summary( GLM3<- lmer(duration_ms~ Age*State*seq + (1|item)+(1|sub), data= GAVN))
 ef3=effect("Age:State:seq", GLM3)
 summary(ef3)
 plot(ef3)
 
 
+# Create a list with no option 3
 
-summary(GLM0<- glmer(undersweep_prob~ Age + (1|item) +(1|sub), data= RS, family= binomial))
+NO3GAVN=subset(GAVN,GAVN$chose3==0)
+
+
+FF<- melt(NO3GAVN, id=c('sub', 'item', 'Age','State'), 
+            measure=c("subresp"), na.rm=TRUE)
+FF<- cast(FF, item ~ variable
+            ,function(x) c(M=signif(mean(x),3)
+                           , SD= sd(x) ))
+
+FF
+NO3GAVN$subresp=as.factor(NO3GAVN$subresp)
+NO3GAVN$resp<- ifelse(NO3GAVN$subresp=="2", 1, 0)
+G9=ggplot(NO3GAVN, aes(item, resp, colour = Age, fill = State)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(G9)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Let's have a look at what answer was prefered for all items.
+AMBIGON=subset(GAVN,GAVN$State=="AmbiSoc")
+AMBIGON1=subset(GAVN,GAVN$State=="AmbiSpa")
+AMBIGON=rbind(AMBIGON,AMBIGON1)
+rm(AMBIGON1)
+NO3GAVN=subset(AMBIGON,AMBIGON$chose3==0)
+OldNO3GAVN=subset(NO3GAVN,NO3GAVN$Age=="o")
+YoungNO3GAVN=subset(NO3GAVN,NO3GAVN$Age=="y")
+
+OLDG<- melt(OldNO3GAVN, id=c('sub', 'item', 'Age','State'), 
+                measure=c("subresp"), na.rm=TRUE)
+OLDG<- cast(OLDG, item ~ variable
+                   ,function(x) c(M=signif(mean(x),3)
+                                  , SD= sd(x) ))
+OLDG$Age<-c("o")
+
+YUNG<- melt(YoungNO3GAVN, id=c('sub', 'item', 'Age','State'), 
+            measure=c("subresp"), na.rm=TRUE)
+YUNG<- cast(YUNG, item ~ variable
+            ,function(x) c(M=signif(mean(x),3)
+                           , SD= sd(x) ))
+YUNG$Age<-c("y")
+
+summary(Check<-lmer(subresp~ Age*item + (1|sub), data=NO3GAVN))
+ef7=effect("Age:item", Check)
+summary(ef7)
+plot(ef7)
+
+PlotA=rbind(OLDG,YUNG)
+PlotB=OLDG
+PlotB$respo=abs(PlotB$subresp_M-YUNG$subresp_M)
+YUNG$Age = factor(YUNG$Age)
+
+G=ggplot(PlotB, aes(item, respo))+
+geom_point(method = "lm")
+print(G)
+
+#### The same again for Non Ambiguous but incorrect only
+
+
+
+NAMBIGON=subset(GAVN,GAVN$State=="NambiSoc")
+NAMBIGON1=subset(GAVN,GAVN$State=="NambiSpa")
+NAMBIGON=rbind(NAMBIGON,NAMBIGON1)
+rm(NAMBIGON1)
+NNO3GAVN=subset(NAMBIGON,NAMBIGON$chose3==0)
+NNO3GAVN=subset(NNO3GAV,NNO3GAV$accuracy==0)
+NOldNO3GAVN=subset(NNO3GAVN,NNO3GAVN$Age=="o")
+NYoungNO3GAVN=subset(NNO3GAVN,NNO3GAVN$Age=="y")
+
+NOLDG<- melt(NOldNO3GAVN, id=c('sub', 'item', 'Age'), 
+            measure=c("subresp"), na.rm=TRUE)
+NOLDG<- cast(NOLDG, item ~ variable
+            ,function(x) c(M=signif(mean(x),3)
+                           , SD= sd(x) ))
+NOLDG$Age<-c("o")
+
+NYUNG<- melt(NYoungNO3GAVN, id=c('sub', 'item', 'Age'), 
+            measure=c("subresp"), na.rm=TRUE)
+NYUNG<- cast(NYUNG, item ~ variable
+            ,function(x) c(M=signif(mean(x),3)
+                           , SD= sd(x) ))
+NYUNG$Age<-c("y")
+
+summary(Check<-lmer(subresp~ Age*item + (1|sub), data=NNO3GAVN))
+#ef7=effect("Age:item", Check)
+#summary(ef7)
+#plot(ef7)
+
+NPlotA=rbind(NOLDG,NYUNG)
+NPlotB=NOLDG
+NPlotB$respo=abs(NPlotB$subresp_M-NYUNG$subresp_M)
+
+
+NG=ggplot(NPlotB, aes(item, respo))+
+  geom_point(method = "lm")
+print(NG)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #############################
 # General Q1 vs Q2 by cond ##
 #############################
