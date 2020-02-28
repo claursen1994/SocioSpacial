@@ -63,6 +63,18 @@ Prac=NULL
 Prac$item=c(25:26)
 QuestDa <- QuestDa[!(QuestDa$item %in% Prac$item),]
 
+library(readxl)
+SocialWordO <- read_excel("SocialWordO.xlsx")
+
+SpatialWordO <- read_excel("SpatialWordO.xlsx")
+SocialWordO$State=NULL
+SocialWordO$State=c("NambiSoc")
+SocialWordO$WO=SocialWordO$Difference
+SpatialWordO$State=NULL
+SpatialWordO$State=c("NambiSpa")
+SpatialWordO$WO=SpatialWordO$...4
+WordORDS=cbind(SpatialWordO,SocialWordO)
+
 ############
 #Average 
 QuestDa=as.data.frame(QuestDa)
