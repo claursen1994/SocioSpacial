@@ -67,13 +67,6 @@ library(readxl)
 SocialWordO <- read_excel("SocialWordO.xlsx")
 
 SpatialWordO <- read_excel("SpatialWordO.xlsx")
-SocialWordO$State=NULL
-SocialWordO$State=c("NambiSoc")
-SocialWordO$WO=SocialWordO$Difference
-SpatialWordO$State=NULL
-SpatialWordO$State=c("NambiSpa")
-SpatialWordO$WO=SpatialWordO$...4
-WordORDS=cbind(SpatialWordO,SocialWordO)
 
 ############
 #Average 
@@ -112,6 +105,7 @@ NoCompQ=melt(NoCompQ, id=c('sub', 'item', 'cond'),
 NoCompQ<- cast(NoCompQ, item ~ variable,function(x) c(M=signif(mean(x),3), SD= sd(x) ))
 plot(NoCompQ$item,NoCompQ$accuracy_M)
 
+library(readxl)
 
 # Split and play zone #
 #######################
@@ -132,10 +126,13 @@ NambiSpaQ2=rbind(Q2s$`2`,Q2s$`3`)
 
 AmbiSoc0=rbind(AmbiSocQ1,AmbiSocQ2)
 AmbiSoc0$State=c("AmbiSoc")
+
 AmbiSpa0=rbind(AmbiSpaQ1,AmbiSpaQ2)
 AmbiSpa0$State=c("AmbiSpa")
+
 NambiSoc0=rbind(NamibiSocQ1,NamibiSocQ2)
 NambiSoc0$State=c("NambiSoc")
+
 NambiSpa0=rbind(NambiSpaQ1,NambiSpaQ2)
 NambiSpa0$State=c("NambiSpa")
 
@@ -161,11 +158,20 @@ GAVNSOC= rbind(GAVN0$NambiSoc,GAVN0$AmbiSoc)
 GAVNSPA=rbind(GAVN0$NambiSpa,GAVN0$AmbiSpa)
 GAVNAMBI=rbind(GAVN0$AmbiSoc,GAVN0$AmbiSpa)
 GAVNNAMBI=rbind(GAVN0$NambiSoc,GAVN0$NambiSpa)
+#Add word order models
+WordOrds <- read_excel("WordOrds.xlsx")
+GAVN=merge(GAVN,WordOrds)
+GAVN$WOSel= ifelse(GAVN$subresp==GAVN$`Which Ans is WO`,1,0)
 #
+#Add constructs
+Const <- read_excel("H:/Profile/Desktop/Const.xlsx")
+GAVN=merge(GAVN,Const)
+
 GAVN$State=as.factor(GAVN$State)
 contrasts(GAVN$State)=contr.treatment(4)
 contrasts(GAVN$Age)=contr.treatment(2)
 # Investigative LMMs
+
 # General non comp questions.
 summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVN, family=binomial))
 ef1=effect("Age*State", GLM1)
@@ -198,6 +204,55 @@ summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVNNAMBI, f
 ef1=effect("Age:State", GLM1)
 summary(ef1)
 plot(ef1)
+
+GAVN$dif=GAVN$`Is Dif?`
+GAVN$`Is Dif?`=NULL
+# Is the likelihood to select word order dependent on age?
+
+summary( WO<- glmer(WOSel~ Age + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age", WO)
+summary(ef1)
+plot(ef1)
+
+#Makes sense for there to be no difference as the word order is often the right answer, But what
+#About the Ambiguous situations
+
+GAVN$WOSel=as.factor(GAVN$WOSel)
+IncGAVN=subset(GAVN,GAVN$accuracy==0)
+AmbiGAVN=subset(GAVN,GAVN$correctresp==3)
+NambiGAVN=subset(GAVN,GAVN$correctresp!= 3)
+
+#Word order selection likelihood
+#Items
+summary( WO<- glmer(WOSel~ Age*item + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:item", WO)
+summary(ef1)
+plot(ef1)
+
+
+#Seqences
+summary( WO<- glmer(WOSel~ Age*State*seq + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:State:seq", WO)
+summary(ef1)
+plot(ef1)
+# Compare to Accuracy
+summary( WO<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:State:seq", WO)
+summary(ef1)
+plot(ef1)
+
+
+## Check with constructions Involved
+#Split of social as this has no construct
+GAVNSPA=subset(GAVN,GAVN$State!="AmbiSoc")
+GAVNSPA=subset(GAVNSPA,GAVNSPA$State!="NambiSoc")
+
+summary( WOC<- glmer(accuracy~ Age*construct*seq + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
+ef1=effect("Age:construct:seq", WOC)
+summary(ef1)
+plot(ef1)
+
+
 
 ###############################################################################################
 # Not much revealed by general accuracy but what about by trial order....
@@ -326,83 +381,6 @@ print(G9)
 
 
 
-# Let's have a look at what answer was prefered for all items.
-AMBIGON=subset(GAVN,GAVN$State=="AmbiSoc")
-AMBIGON1=subset(GAVN,GAVN$State=="AmbiSpa")
-AMBIGON=rbind(AMBIGON,AMBIGON1)
-rm(AMBIGON1)
-NO3GAVN=subset(AMBIGON,AMBIGON$chose3==0)
-OldNO3GAVN=subset(NO3GAVN,NO3GAVN$Age=="o")
-YoungNO3GAVN=subset(NO3GAVN,NO3GAVN$Age=="y")
-
-OLDG<- melt(OldNO3GAVN, id=c('sub', 'item', 'Age','State'), 
-                measure=c("subresp"), na.rm=TRUE)
-OLDG<- cast(OLDG, item ~ variable
-                   ,function(x) c(M=signif(mean(x),3)
-                                  , SD= sd(x) ))
-OLDG$Age<-c("o")
-
-YUNG<- melt(YoungNO3GAVN, id=c('sub', 'item', 'Age','State'), 
-            measure=c("subresp"), na.rm=TRUE)
-YUNG<- cast(YUNG, item ~ variable
-            ,function(x) c(M=signif(mean(x),3)
-                           , SD= sd(x) ))
-YUNG$Age<-c("y")
-
-summary(Check<-lmer(subresp~ Age*item + (1|sub), data=NO3GAVN))
-ef7=effect("Age:item", Check)
-summary(ef7)
-plot(ef7)
-
-PlotA=rbind(OLDG,YUNG)
-PlotB=OLDG
-PlotB$respo=abs(PlotB$subresp_M-YUNG$subresp_M)
-YUNG$Age = factor(YUNG$Age)
-
-G=ggplot(PlotB, aes(item, respo))+
-geom_point(method = "lm")
-print(G)
-
-#### The same again for Non Ambiguous but incorrect only
-
-
-
-NAMBIGON=subset(GAVN,GAVN$State=="NambiSoc")
-NAMBIGON1=subset(GAVN,GAVN$State=="NambiSpa")
-NAMBIGON=rbind(NAMBIGON,NAMBIGON1)
-rm(NAMBIGON1)
-NNO3GAVN=subset(NAMBIGON,NAMBIGON$chose3==0)
-NNO3GAVN=subset(NNO3GAV,NNO3GAV$accuracy==0)
-NOldNO3GAVN=subset(NNO3GAVN,NNO3GAVN$Age=="o")
-NYoungNO3GAVN=subset(NNO3GAVN,NNO3GAVN$Age=="y")
-
-NOLDG<- melt(NOldNO3GAVN, id=c('sub', 'item', 'Age'), 
-            measure=c("subresp"), na.rm=TRUE)
-NOLDG<- cast(NOLDG, item ~ variable
-            ,function(x) c(M=signif(mean(x),3)
-                           , SD= sd(x) ))
-NOLDG$Age<-c("o")
-
-NYUNG<- melt(NYoungNO3GAVN, id=c('sub', 'item', 'Age'), 
-            measure=c("subresp"), na.rm=TRUE)
-NYUNG<- cast(NYUNG, item ~ variable
-            ,function(x) c(M=signif(mean(x),3)
-                           , SD= sd(x) ))
-NYUNG$Age<-c("y")
-
-summary(Check<-lmer(subresp~ Age*item + (1|sub), data=NNO3GAVN))
-#ef7=effect("Age:item", Check)
-#summary(ef7)
-#plot(ef7)
-
-NPlotA=rbind(NOLDG,NYUNG)
-NPlotB=NOLDG
-NPlotB$respo=abs(NPlotB$subresp_M-NYUNG$subresp_M)
-
-
-NG=ggplot(NPlotB, aes(item, respo))+
-  geom_point(method = "lm")
-print(NG)
 
 
 
