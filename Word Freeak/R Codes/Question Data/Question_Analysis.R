@@ -403,7 +403,12 @@ ef2=effect("Age:State:seq", GLM2)
 summary(ef2)
 plot(ef2)
 
-
+U0=ggplot(GAVN, aes(seq, accuracy, colour = State, fill = State, shape=Age)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
 
 
 
