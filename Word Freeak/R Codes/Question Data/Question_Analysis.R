@@ -162,57 +162,38 @@ GAVNNAMBI=rbind(GAVN0$NambiSoc,GAVN0$NambiSpa)
 WordOrds <- read_excel("WordOrds.xlsx")
 GAVN=merge(GAVN,WordOrds)
 GAVN$WOSel= ifelse(GAVN$subresp==GAVN$`Which Ans is WO`,1,0)
+GAVN$chose3<- ifelse(GAVN$subresp=="3",1,0 )
+GAVN$dif=GAVN$`Is Dif?`
+GAVN$`Is Dif?`=NULL
 #
 #Add constructs
 Const <- read_excel("H:/Profile/Desktop/Const.xlsx")
 GAVN=merge(GAVN,Const)
-
 GAVN$State=as.factor(GAVN$State)
 contrasts(GAVN$State)=contr.treatment(4)
 contrasts(GAVN$Age)=contr.treatment(2)
-# Investigative LMMs
 
-# General non comp questions.
+#Delete the fragments and leftovers
+
+rm(list=ls()[! ls() %in% c("GAVN","Aegis","Const","CompQ")])
+
+##############################################################################################
+######################################## Investigative LMMs###################################
+
+# Accuracy of General non comp questions.
 summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVN, family=binomial))
 ef1=effect("Age*State", GLM1)
 summary(ef1)
 plot(ef1)
 
-# Social Ambi v Nambi
-
-summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVNSOC, family=binomial))
-ef1=effect("Age:State", GLM1)
-summary(ef1)
-plot(ef1)
-
-# Spatial Ambi v Nambi
-summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
-ef1=effect("Age:State", GLM1)
-summary(ef1)
-plot(ef1)
-
-# Ambi Soc vs Ambi Spa
-
-summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVNAMBI, family=binomial))
-ef1=effect("Age:State", GLM1)
-summary(ef1)
-plot(ef1)
-
-# Nambi Soc Vs Nambi Spa 
-
-summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVNNAMBI, family=binomial))
-ef1=effect("Age:State", GLM1)
-summary(ef1)
-plot(ef1)
-
-GAVN$dif=GAVN$`Is Dif?`
-GAVN$`Is Dif?`=NULL
 # Is the likelihood to select word order dependent on age?
 
 summary( WO<- glmer(WOSel~ Age + (1|item)+(1|sub), data= GAVN, family=binomial))
 ef1=effect("Age", WO)
 summary(ef1)
 plot(ef1)
+
+
 
 #Makes sense for there to be no difference as the word order is often the right answer, But what
 #About the Ambiguous situations
@@ -229,8 +210,59 @@ ef1=effect("Age:item", WO)
 summary(ef1)
 plot(ef1)
 
+############################################################################################
+#What about Ambiguous only?
+AGAVN=subset(GAVN,GAVN$State!="NambiSoc")
+AGAVN=subset(AGAVN,AGAVN$State!="NambiSpa")
+#Accuracy 
+summary( WO<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= AGAVN, family=binomial))
+ef1=effect("Age:State", WO)
+summary(ef1)
+plot(ef1)
+#Selecting the word order
+summary( WO<- glmer(WOSel~ Age*State + (1|item)+(1|sub), data= AGAVN, family=binomial))
+ef1=effect("Age:State", WO)
+summary(ef1)
+plot(ef1)
+#selecting opt 3
+summary( WO<- glmer(chose3~ Age*State + (1|item)+(1|sub), data= AGAVN, family=binomial))
+ef1=effect("Age:State", WO)
+summary(ef1)
+plot(ef1)
+############################################################################################
+# What about non ambiguous only?
+NGAVN=subset(GAVN,GAVN$State!="AmbiSoc")
+NGAVN=subset(NGAVN,NGAVN$State!="AmbiSpa")
+#Accuracy 
+summary( WO<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= NGAVN, family=binomial))
+ef1=effect("Age:State", WO)
+summary(ef1)
+plot(ef1)
+#Selecting the word order
+summary( WO<- glmer(WOSel~ Age*State + (1|item)+(1|sub), data= NGAVN, family=binomial))
+ef1=effect("Age:State", WO)
+summary(ef1)
+plot(ef1)
+#selecting opt 3
+summary( WO<- glmer(chose3~ Age*State + (1|item)+(1|sub), data= NGAVN, family=binomial))
+ef1=effect("Age:State", WO)
+summary(ef1)
+plot(ef1)
 
-#Seqences
+#If word order is the answer how is accuracy changed?
+GAVN$ISANSWO=as.factor(GAVN$`Is Ans WO?`)
+contrasts(GAVN$ISANSWO)=contr.treatment(2)
+summary( WO<- glmer(accuracy~ ISANSWO + (1|item)+(1|sub), data= NGAVN, family=binomial))
+ef1=effect("ISANSWO", WO)
+summary(ef1)
+plot(ef1)
+
+
+
+
+#More General
+
+#Seqence accuracy
 summary( WO<- glmer(WOSel~ Age*State*seq + (1|item)+(1|sub), data= GAVN, family=binomial))
 ef1=effect("Age:State:seq", WO)
 summary(ef1)
@@ -240,15 +272,62 @@ summary( WO<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= GAVN, fami
 ef1=effect("Age:State:seq", WO)
 summary(ef1)
 plot(ef1)
+# compare with selecting 3
+summary( WO<- glmer(chose3~ Age*State*seq + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:State:seq", WO)
+summary(ef1)
+plot(ef1)
 
+# Look at Ambiguous only
 
-## Check with constructions Involved
+################################# Check with constructions Involved
 #Split of social as this has no construct
 GAVNSPA=subset(GAVN,GAVN$State!="AmbiSoc")
 GAVNSPA=subset(GAVNSPA,GAVNSPA$State!="NambiSoc")
 
-summary( WOC<- glmer(accuracy~ Age*construct*seq + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
-ef1=effect("Age:construct:seq", WOC)
+# Accuracy based on contructions 
+summary( WOC<- glmer(accuracy~ Age*construct*State + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
+ef1=effect("Age:construct:State", WOC)
+summary(ef1)
+plot(ef1)
+
+#Word order selection
+summary( WOC<- glmer(WOSel~ Age*construct*State + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
+ef1=effect("Age:construct:State", WOC)
+summary(ef1)
+plot(ef1)
+# Choosing there is not enough info 
+
+summary( WOC<- glmer(chose3~ Age*construct*State + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
+ef1=effect("Age:construct:State", WOC)
+summary(ef1)
+plot(ef1)
+
+
+#Remove instances where the answer was not the word order model.
+NWOGAVN=subset(GAVN,GAVN$`Is Ans WO?`==0)
+WOGAVN=subset(GAVN,GAVN$`Is Ans WO?`==1)
+#Where the answer was not word order
+summary( WOC<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= NWOGAVN, family=binomial))
+ef1=effect("Age:State:seq", WOC)
+summary(ef1)
+plot(ef1)
+#Where the answer was word order
+summary( WOC<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= WOGAVN, family=binomial))
+ef1=effect("Age:State:seq", WOC)
+summary(ef1)
+plot(ef1)
+
+#remove the ones that do not have word order as an answer 
+WOGAVN2=subset(GAVN,GAVN$`Which Ans is WO`!=0)
+#Seqences
+summary( WO<- glmer(WOSel~ Age*State*seq + (1|item)+(1|sub), data= WOGAVN2, family=binomial))
+ef1=effect("Age:State:seq", WO)
+summary(ef1)
+plot(ef1)
+# Compare to Accuracy
+summary( WO<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= WOGAVN2, family=binomial))
+ef1=effect("Age:State:seq", WO)
 summary(ef1)
 plot(ef1)
 
@@ -262,64 +341,51 @@ ef1=effect("Age+seq+State", GLM1)
 summary(ef1)
 plot(ef1)
 
-## Social Ambi v Nambi
-summary( GLM1<- glmer(accuracy~ Age*seq*State + (1|item)+(1|sub), data= GAVNSOC, family=binomial))
-ef1=effect("Age:seq:State", GLM1)
+
+
+
+
+# Split by dependnum to see the differences  
+#accuracy
+GAVN$dependnum=as.factor(GAVN$dependnum)
+summary( GLM1<- glmer(accuracy~ Age*dependnum*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:dependnum:State", GLM1)
 summary(ef1)
 plot(ef1)
-
-# Spatial Ambi v Nambi
-summary( GLM1<- glmer(accuracy~ Age*seq*State + (1|item)+(1|sub), data= GAVNSPA, family=binomial))
-ef1=effect("Age:seq:State", GLM1)
+#Chose 3
+summary( GLM1<- glmer(chose3~ Age*dependnum*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:dependnum:State", GLM1)
 summary(ef1)
 plot(ef1)
-
-# Ambi Soc vs Ambi Spa
-
-summary( GLM1<- glmer(accuracy~ Age*seq*State + (1|item)+(1|sub), data= GAVNAMBI, family=binomial))
-ef1=effect("Age:seq:State", GLM1)
-summary(ef1)
-plot(ef1)
-
-# Nambi Soc Vs Nambi Spa 
-
-summary( GLM1<- glmer(accuracy~ Age*seq*State + (1|item)+(1|sub), data= GAVNNAMBI, family=binomial))
-ef1=effect("Age:seq:State", GLM1)
+#selection of word order
+summary( GLM1<- glmer(WOSel~ Age*dependnum*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:dependnum:State", GLM1)
 summary(ef1)
 plot(ef1)
 
 
-# SubResp Over Seq
-IncGAVN=subset(GAVN,GAVN$accuracy==0)
-IncGAVN$chose3=NULL
-IncGAVN$chose3<- ifelse(IncGAVN$subresp=="3", 1, 0)
-GAVN$chose3<- ifelse(GAVN$subresp=="3",1,0 )
-
-IncGAVN=subset(GAVN,GAVN$accuracy==0)
-summary( GLM1<- glmer(chose3~ Age*seq + (1|item)+(1|sub), data= IncGAVN, family= binomial))
-ef1=effect("Age:seq", GLM1)
+#########################Time taken to answer
+# Selecting word order
+summary( GLM1<- glmer(WOSel~ Age*duration_ms*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:duration_ms:State", GLM1)
 summary(ef1)
 plot(ef1)
-
-CorrGAVN=subset(GAVN,GAVN$accuracy==1)
-summary( GLM1<- glmer(chose3~ Age*seq + (1|item)+(1|sub), data= CorrGAVN, family= binomial))
-ef1=effect("Age:seq", GLM1)
+# answering accuracy
+summary( GLM1<- glmer(accuracy~ Age*duration_ms*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:duration_ms:State", GLM1)
 summary(ef1)
 plot(ef1)
-
-summary( GLM1<- glmer(chose3~ Age + (1|item)+(1|sub), data= GAVN, family= binomial))
+# choosing 3
+summary( GLM1<- glmer(chose3~ Age*duration_ms*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:duration_ms:State", GLM1)
+summary(ef1)
+plot(ef1)
+#which question took the longest?
+summary( GLM1<- lmer(duration_ms~ Age + (1|item)+(1|sub), data= GAVN))
 ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
 
-
-
-# SPlit by dependnum to see the differences  
-GAVN$dependnum=as.factor(GAVN$dependnum)
-summary( GLM1<- glmer(accuracy~ Age*seq*dependnum + (1|item)+(1|sub), data= GAVN, family=binomial))
-ef1=effect("Age:seq+dependnum", GLM1)
-summary(ef1)
-plot(ef1)
 
 Dep1=split(GAVN,GAVN$dependnum)
 Dep2=Dep1$`2`
@@ -336,35 +402,6 @@ summary( GLM2<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep2, fa
 ef2=effect("Age:State:seq", GLM2)
 summary(ef2)
 plot(ef2)
-
-#Time taken to answer over trial
-summary( GLM3<- lmer(duration_ms~ Age*State*seq + (1|item)+(1|sub), data= GAVN))
-ef3=effect("Age:State:seq", GLM3)
-summary(ef3)
-plot(ef3)
-
-
-# Create a list with no option 3
-
-NO3GAVN=subset(GAVN,GAVN$chose3==0)
-
-
-FF<- melt(NO3GAVN, id=c('sub', 'item', 'Age','State'), 
-            measure=c("subresp"), na.rm=TRUE)
-FF<- cast(FF, item ~ variable
-            ,function(x) c(M=signif(mean(x),3)
-                           , SD= sd(x) ))
-
-FF
-NO3GAVN$subresp=as.factor(NO3GAVN$subresp)
-NO3GAVN$resp<- ifelse(NO3GAVN$subresp=="2", 1, 0)
-G9=ggplot(NO3GAVN, aes(item, resp, colour = Age, fill = State)) +
-  geom_point() +
-  geom_smooth(method = "glm", 
-              method.args = list(family = "binomial"), 
-              se = FALSE) 
-print(G9)
-
 
 
 
