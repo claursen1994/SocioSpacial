@@ -172,6 +172,28 @@ GAVN=merge(GAVN,Const)
 GAVN$State=as.factor(GAVN$State)
 contrasts(GAVN$State)=contr.treatment(4)
 contrasts(GAVN$Age)=contr.treatment(2)
+#add in clearer paragraph orders
+GAVN$Porder= ifelse(GAVN$cond==1,"Asoc-Aspa",
+                    ifelse(GAVN$cond==2,"Nsoc-Nspa",
+                           ifelse(GAVN$cond==3,"Asoc-Nspa",
+                                  ifelse(GAVN$cond==4,"Nsoc-Aspa",
+                                         ifelse(GAVN$cond==5,"Aspa-Asoc",
+                                                ifelse(GAVN$cond==6,"Nspa-Nsoc",
+                                                       ifelse(GAVN$cond==7,"Aspa-Nsoc",
+                                                              ifelse(GAVN$cond==8,"Nspa-Asoc",0))))))))
+
+
+# What came 1st?
+
+GAVN$stPQ=as.factor( ifelse(GAVN$cond==1,"Asoc",
+                  ifelse(GAVN$cond==2,"Nsoc",
+                         ifelse(GAVN$cond==3,"Asoc",
+                                ifelse(GAVN$cond==4,"Nsoc",
+                                       ifelse(GAVN$cond==5,"Aspa",
+                                              ifelse(GAVN$cond==6,"Nspa",
+                                                     ifelse(GAVN$cond==7,"Aspa",
+                                                            ifelse(GAVN$cond==8,"Nspa",0)))))))))
+
 
 #Delete the fragments and leftovers
 
@@ -386,24 +408,69 @@ ef1=effect("Age", GLM1)
 summary(ef1)
 plot(ef1)
 
+############ Conditions ###############################
+#accuracy
 
-Dep1=split(GAVN,GAVN$dependnum)
-Dep2=Dep1$`2`
-Dep1=Dep1$`1`
-
-#Accuracy of Q1 over trial
-summary( GLM1<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep1, family=binomial))
-ef1=effect("Age:State:seq", GLM1)
+summary( GLM1<- glmer(accuracy~ Porder*Age*dependnum + (1|item)+(1|sub), data= GAVN, family= binomial))
+ef1=effect("Porder:Age:dependnum", GLM1)
 summary(ef1)
 plot(ef1)
 
-# Accuracy of Q2 over trial 
-summary( GLM2<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= Dep2, family=binomial))
-ef2=effect("Age:State:seq", GLM2)
-summary(ef2)
-plot(ef2)
+# chose3 
+summary( GLM1<- glmer(chose3~ Porder*Age*dependnum + (1|item)+(1|sub), data= GAVN, family= binomial))
+ef1=effect("Porder:Age:dependnum", GLM1)
+summary(ef1)
+plot(ef1)
 
-U0=ggplot(GAVN, aes(seq, accuracy, colour = State, fill = State, shape=Age)) +
+# Word worder selection
+summary( GLM1<- glmer(WOSel~ Porder*Age*dependnum + (1|item)+(1|sub), data= GAVN, family= binomial))
+ef1=effect("Porder:Age:dependnum", GLM1)
+summary(ef1)
+plot(ef1)
+
+# TO understand fully whats going on we need to understand the different tates individually.
+
+AmbiSoc=subset(GAVN,GAVN$State=="AmbiSoc")
+NambiSoc=subset(GAVN,GAVN$State=="NambiSoc")
+AmbiSpa=subset(GAVN,GAVN$State=="AmbiSpa")
+NambiSpa=subset(GAVN,GAVN$State=="NambiSpa")
+
+# This is the interesting one
+#AmbiSoc
+# does question behaviour change?
+summary( GLM1<- glmer(accuracy ~ seq*Age*dependnum + (1|item)+(1|sub), data= AmbiSoc, family= binomial))
+ef1=effect("seq:Age:dependnum", GLM1)
+summary(ef1)
+plot(ef1)
+
+
+#chose 3
+summary( GLM1<- glmer(chose3 ~ seq*Age*dependnum + (1|item)+(1|sub), data= AmbiSoc, family= binomial))
+ef1=effect("seq:Age:dependnum", GLM1)
+summary(ef1)
+plot(ef1)
+
+# WOSel
+
+summary( GLM1<- glmer(WOSel ~ seq*Age*dependnum + (1|item)+(1|sub), data= AmbiSoc, family= binomial))
+ef1=effect("seq:Age:dependnum", GLM1)
+summary(ef1)
+plot(ef1)
+
+
+# We need to Split by Age
+
+oGAVN=subset(GAVN,GAVN$Age=="o")
+yGAVN=subset(GAVN,GAVN$Age=="y")
+
+U0=ggplot(oGAVN, aes(seq, accuracy, colour = Porder, linetype = dependnum)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+
+U0=ggplot(yGAVN, aes(seq, accuracy, colour = Porder, linetype = dependnum)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
@@ -411,26 +478,93 @@ U0=ggplot(GAVN, aes(seq, accuracy, colour = State, fill = State, shape=Age)) +
 print(U0)
 
 
+# Does Spatial or social inhibit accuracy? if put 1st?
+
+GAVN2=subset(GAVN,GAVN$dependnum==2)
+GAVN0=split(GAVN2,GAVN2$State)
+ASOC=GAVN0$AmbiSoc
+NSOC=GAVN0$NambiSoc
+ASPA=GAVN0$AmbiSpa
+NSPA=GAVN0$NambiSpa
+
+#ASOC
+#accuracy
+summary( GLM1<- glmer(accuracy ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASOC, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+# WOSel
+summary( GLM1<- glmer(WOSel ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASOC, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+# chose3
+summary( GLM1<- glmer(chose3 ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASOC, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
 
+#ASPA
+#accuracy
+summary( GLM1<- glmer(accuracy ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASPA, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+# WOSel
+summary( GLM1<- glmer(WOSel ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASPA, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+# chose3
+summary( GLM1<- glmer(chose3 ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASPA, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
 
+#NSOC
+#accuracy
+summary( GLM1<- glmer(accuracy ~ stPQ*Age*seq + (1|item)+(1|sub), data= NSOC, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+# WOSel
+summary( GLM1<- glmer(WOSel ~ stPQ*Age*seq + (1|item)+(1|sub), data= NSOC, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+# chose3
+summary( GLM1<- glmer(chose3 ~ stPQ*Age*seq + (1|item)+(1|sub), data= NSOC, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
 
+#NSPA
+#accuracy
+summary( GLM1<- glmer(accuracy ~ stPQ*Age*seq + (1|item)+(1|sub), data= NSPA, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
+# WOSel
+summary( GLM1<- glmer(WOSel ~ stPQ*Age*seq + (1|item)+(1|sub), data= NSPA, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
-
-
-
-
-
-
-
-
-
-
-
-
+# chose3
+summary( GLM1<- glmer(chose3 ~ stPQ*Age*seq + (1|item)+(1|sub), data= NSPA, family= binomial))
+ef1=effect("stPQ:Age:seq", GLM1)
+summary(ef1)
+plot(ef1)
 
 
 
