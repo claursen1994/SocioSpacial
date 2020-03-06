@@ -194,7 +194,11 @@ GAVN$stPQ=as.factor( ifelse(GAVN$cond==1,"Asoc",
                                                      ifelse(GAVN$cond==7,"Aspa",
                                                             ifelse(GAVN$cond==8,"Nspa",0)))))))))
 
-
+# Ambiguous selection of Non ambiguous correct order
+#ONLy for use with Ambiguous situations
+GAVN$corr4Nambi=ifelse(GAVN$subresp==GAVN$ANS,1,0)
+GAVN$ISANSWO=as.factor(GAVN$`Is Ans WO?`)
+contrasts(GAVN$ISANSWO)=contr.treatment(2)
 #Delete the fragments and leftovers
 
 rm(list=ls()[! ls() %in% c("GAVN","Aegis","Const","CompQ")])
@@ -203,15 +207,15 @@ rm(list=ls()[! ls() %in% c("GAVN","Aegis","Const","CompQ")])
 ######################################## Investigative LMMs###################################
 
 # Accuracy of General non comp questions.
-summary( GLM1<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= GAVN, family=binomial))
-ef1=effect("Age*State", GLM1)
+summary( GLM1<- glmer(accuracy~ Age*State+ (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:State", GLM1)
 summary(ef1)
 plot(ef1)
 
 # Is the likelihood to select word order dependent on age?
 
-summary( WO<- glmer(WOSel~ Age + (1|item)+(1|sub), data= GAVN, family=binomial))
-ef1=effect("Age", WO)
+summary( WO<- glmer(WOSel~ Age*State + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:State", WO)
 summary(ef1)
 plot(ef1)
 
@@ -237,8 +241,8 @@ plot(ef1)
 AGAVN=subset(GAVN,GAVN$State!="NambiSoc")
 AGAVN=subset(AGAVN,AGAVN$State!="NambiSpa")
 #Accuracy 
-summary( WO<- glmer(accuracy~ Age*State + (1|item)+(1|sub), data= AGAVN, family=binomial))
-ef1=effect("Age:State", WO)
+summary( WO<- glmer(accuracy~ Age*State*seq + (1|item)+(1|sub), data= AGAVN, family=binomial))
+ef1=effect("Age:State:seq", WO)
 summary(ef1)
 plot(ef1)
 #Selecting the word order
@@ -272,10 +276,9 @@ summary(ef1)
 plot(ef1)
 
 #If word order is the answer how is accuracy changed?
-GAVN$ISANSWO=as.factor(GAVN$`Is Ans WO?`)
-contrasts(GAVN$ISANSWO)=contr.treatment(2)
-summary( WO<- glmer(accuracy~ ISANSWO + (1|item)+(1|sub), data= NGAVN, family=binomial))
-ef1=effect("ISANSWO", WO)
+
+summary( WO<- glmer(accuracy~ ISANSWO*Age*State + (1|item)+(1|sub), data= NGAVN, family=binomial))
+ef1=effect("ISANSWO:Age:State", WO)
 summary(ef1)
 plot(ef1)
 
@@ -362,7 +365,12 @@ summary( GLM1<- glmer(accuracy~ Age+seq+State + (1|item)+(1|sub), data= GAVN, fa
 ef1=effect("Age+seq+State", GLM1)
 summary(ef1)
 plot(ef1)
-
+######
+# Accuracy in depend num 1 vs 2 in age 
+summary( GLM1<- glmer(accuracy~ Age*dependnum + (1|item)+(1|sub), data= GAVN, family=binomial))
+ef1=effect("Age:dependnum", GLM1)
+summary(ef1)
+plot(ef1)
 
 
 
@@ -487,6 +495,21 @@ NSOC=GAVN0$NambiSoc
 ASPA=GAVN0$AmbiSpa
 NSPA=GAVN0$NambiSpa
 
+
+GAVN1=subset(GAVN,GAVN$dependnum==1)
+GAVN1$stPQ=c("x1st")
+GAVN9=split(GAVN1,GAVN1$State)
+ASOC1=GAVN9$AmbiSoc
+NSOC1=GAVN9$NambiSoc
+ASPA1=GAVN9$AmbiSpa
+NSPA1=GAVN9$NambiSpa
+
+GAVN=rbind(GAVN1,GAVN2)
+GAVN8=split(GAVN,GAVN$State)
+ASOC5=GAVN8$AmbiSoc
+NSOC5=GAVN8$NambiSoc
+ASPA5=GAVN8$AmbiSpa
+NSPA5=GAVN8$NambiSpa
 #ASOC
 #accuracy
 summary( GLM1<- glmer(accuracy ~ stPQ*Age*seq + (1|item)+(1|sub), data= ASOC, family= binomial))
@@ -566,50 +589,106 @@ ef1=effect("stPQ:Age:seq", GLM1)
 summary(ef1)
 plot(ef1)
 
+#Average 
 
 
 
 
 
-#############################
-# General Q1 vs Q2 by cond ##
-#############################
-
-Q1$cond = factor(Q1$cond)
-U0=ggplot(Q1, aes(seq, accuracy, colour = cond, fill = cond)) +
+#ASOC1 Graph
+U0=ggplot(ASOC1, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
               se = FALSE) 
 print(U0)
 
-Q2$cond = factor(Q2$cond)
-U1=ggplot(Q2, aes(seq, accuracy, colour = cond, fill = cond)) +
+#ASOC 2 
+U0=ggplot(ASOC, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
+geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+
+
+
+# ASPA 1 Graph
+U0=ggplot(ASPA1, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
               se = FALSE) 
-print(U1)
-
-Qi=rbind(Q1,Q2)
-
-U2=ggplot(Qi, aes(seq, accuracy, colour = cond, fill = cond)) +
+print(U0)
+# ASPA 2 Graph
+U0=ggplot(ASPA, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
               se = FALSE) 
-print(U2)
+print(U0)
 
 
-
-
-GASAS=rbind(AmbiSoc0,AmbiSpa0)
-
-GASAS$State = factor(GASAS$State)
-G1=ggplot(GASAS, aes(seq, accuracy, colour = State, fill = State)) +
+# NSPA 1 Graph
+U0=ggplot(NSPA1, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
   geom_point() +
   geom_smooth(method = "glm", 
               method.args = list(family = "binomial"), 
               se = FALSE) 
-print(G1)
+print(U0)
+# NSPA 2 Graph
+U0=ggplot(NSPA, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+
+# NSOC 1 Graph
+U0=ggplot(NSOC1, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+# NSOC 2 Graph
+U0=ggplot(NSOC, aes(seq, accuracy, colour = Age, linetype = stPQ)) +
+  geom_point() +
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE) 
+print(U0)
+
+#ASOC again THIS ONE!!!
+summary( GLM1<- glmer(accuracy ~ stPQ*Age + (1|item)+(1|sub), data= ASOC5, family= binomial))
+ef1=effect("stPQ:Age", GLM1)
+summary(ef1)
+plot(ef1)
+
+#NSOC
+summary( GLM1<- glmer(accuracy ~ stPQ*Age + (1|item)+(1|sub), data= NSOC5, family= binomial))
+ef1=effect("stPQ:Age", GLM1)
+summary(ef1)
+plot(ef1)
+
+#ASPA
+summary( GLM1<- glmer(accuracy ~ stPQ*Age + (1|item)+(1|sub), data= ASPA5, family= binomial))
+ef1=effect("stPQ:Age", GLM1)
+summary(ef1)
+plot(ef1)
+
+
+
+#NSPA
+summary( GLM1<- glmer(accuracy ~ stPQ*Age + (1|item)+(1|sub)+(1|dif), data= NSPA5, family= binomial))
+ef1=effect("stPQ:Age", GLM1)
+summary(ef1)
+plot(ef1)
+GAVN$dependnum=as.factor(GAVN$dependnum)
+summary( GLM1<- glmer(WOSel ~ Age*dependnum + (1|item)+(1|sub), data= GAVN, family= binomial))
+ef1=effect("Age*dependnum", GLM1)
+summary(ef1)
+plot(ef1)
+
+
 
