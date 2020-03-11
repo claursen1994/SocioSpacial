@@ -685,10 +685,211 @@ ef1=effect("stPQ:Age", GLM1)
 summary(ef1)
 plot(ef1)
 GAVN$dependnum=as.factor(GAVN$dependnum)
-summary( GLM1<- glmer(WOSel ~ Age*dependnum + (1|item)+(1|sub), data= GAVN, family= binomial))
-ef1=effect("Age*dependnum", GLM1)
+summary( GLM1<- glmer(chose3 ~ Age*seq*State + (1|item)+(1|sub), data= GAVN, family= binomial))
+ef1=effect("Age*seq*State", GLM1)
 summary(ef1)
 plot(ef1)
+
+# Q2 Accuracy
+summary( GLM1<- glmer(WOSel ~ Age*State*seq + (1|item)+(1|sub)+(1|dif), data= GAVN1, family= binomial))
+ef1=effect("Age*State:seq", GLM1)
+summary(ef1)
+plot(ef1)
+
+
+
+
+
+
+
+
+#### Proportional differences in model preferences.In Ambig SOCIAL
+install.packages("dplyr")
+library("dplyr")
+
+GASOC=subset(rbind(ASOC,ASOC1),accuracy==0)
+GASPA=subset(rbind(ASPA,ASPA1),accuracy==0)
+
+GASOC$item=as.factor(GASOC$item)
+GASPA$item=as.factor(GASPA$item)
+
+#Social
+chrisPlotDat = GASOC %>%
+  group_by(item, Age, subresp) %>%
+  summarise(count = n())
+
+prop = c()
+
+for(i in 1:nrow(chrisPlotDat)){
+  
+  tmpDat = chrisPlotDat[i,]
+  partID = tmpDat$item
+  
+  allSweeps = sum(chrisPlotDat$count[chrisPlotDat$item == partID])
+  
+  propTMP = tmpDat$count/allSweeps
+  
+  prop = rbind(prop, propTMP)
+  
+  
+}
+
+chrisPlotDat$prop = prop
+
+ggplot(data = chrisPlotDat, aes(x = item, y = prop, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "median", position = "dodge")+
+  geom_violin()
+
+
+
+
+chrisModel = lmer(prop ~ Age*item  + (1|item), data = chrisPlotDat)
+summary(chrisModel)
+
+ef1=effect("Age:item", chrisModel)
+summary(ef1)
+plot(ef1)
+
+
+#Spatial
+
+#
+chrisPlotDat = GASPA %>%
+  group_by(item, Age, subresp) %>%
+  summarise(count = n())
+
+prop = c()
+
+for(i in 1:nrow(chrisPlotDat)){
+  
+  tmpDat = chrisPlotDat[i,]
+  partID = tmpDat$item
+  
+  allSweeps = sum(chrisPlotDat$count[chrisPlotDat$item == partID])
+  
+  propTMP = tmpDat$count/allSweeps
+  
+  prop = rbind(prop, propTMP)
+  
+  
+}
+
+chrisPlotDat$prop = prop
+
+ggplot(data = chrisPlotDat, aes(x = item, y = prop, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "median", position = "dodge")+
+  geom_violin()
+
+
+
+
+chrisModel = lmer(prop ~ Age*item  + (1|item), data = chrisPlotDat)
+summary(chrisModel)
+
+ef1=effect("Age:item", chrisModel)
+summary(ef1)
+plot(ef1)
+
+###########################################################################################
+#             Word order model preferences
+
+
+
+#Social
+chrisPlotDat = GASOC %>%
+  group_by(item, Age, WOSel) %>%
+  summarise(count = n())
+
+prop = c()
+
+for(i in 1:nrow(chrisPlotDat)){
+  
+  tmpDat = chrisPlotDat[i,]
+  partID = tmpDat$item
+  
+  allSweeps = sum(chrisPlotDat$count[chrisPlotDat$item == partID])
+  
+  propTMP = tmpDat$count/allSweeps
+  
+  prop = rbind(prop, propTMP)
+  
+  
+}
+
+chrisPlotDat$prop = prop
+
+ggplot(data = chrisPlotDat, aes(x = item, y = prop, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "median", position = "dodge")+
+  geom_violin()
+
+
+
+
+chrisModel = lmer(prop ~ Age  + (1|item), data = chrisPlotDat)
+summary(chrisModel)
+
+ef1=effect("Age", chrisModel)
+summary(ef1)
+plot(ef1)
+
+
+#Spatial
+
+#Social
+chrisPlotDat = GASPA %>%
+  group_by(item, Age, WOSel) %>%
+  summarise(count = n())
+
+prop = c()
+
+for(i in 1:nrow(chrisPlotDat)){
+  
+  tmpDat = chrisPlotDat[i,]
+  partID = tmpDat$item
+  
+  allSweeps = sum(chrisPlotDat$count[chrisPlotDat$item == partID])
+  
+  propTMP = tmpDat$count/allSweeps
+  
+  prop = rbind(prop, propTMP)
+  
+  
+}
+
+chrisPlotDat$prop = prop
+
+ggplot(data = chrisPlotDat, aes(x = item, y = prop, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "median", position = "dodge")+
+  geom_violin()
+
+
+
+
+chrisModel = lmer(prop ~ Age  + (1|item), data = chrisPlotDat)
+summary(chrisModel)
+
+ef1=effect("Age", chrisModel)
+summary(ef1)
+plot(ef1)
+
+
+
+
+
+
+
+#Proportionality has too much variations. 
+
+GASOC$subrespTTT=ifelse(GASOC$subresp==1,0,1)
+
+ggplot(data = GASOC, aes(x = item, y = subrespTTT, fill = Age))+
+  geom_bar(stat = "summary", fun.y = "median", position = "dodge")
+
+U0=ggplot(GASOC, aes(item, subrespTTT, colour = Age)) +
+  geom_bar()
+
+print(U0)
+
 
 
 
